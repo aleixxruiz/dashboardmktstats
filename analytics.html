@@ -7,34 +7,43 @@
 <link rel="icon" type="image/png" href="assets/logo-ingesco.png">
 <style>
   :root{--navy:#13294b;--azul:#1f5f9b;--cielo:#34a0d9;--fondo:#f4f6f9;
-    --tarjeta:#fff;--texto:#13294b;--suave:#6b7688;--borde:#e3e8ef;--ambar:#d99a2b}
+    --tarjeta:#fff;--texto:#13294b;--suave:#6b7688;--borde:#e3e8ef;
+    --verde:#16a34a;--rojo:#dc2626;--naranja:#e08a2b}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);
-    color:var(--texto);padding:32px 24px 64px}
-  .contenedor{max-width:1100px;margin:0 auto}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:32px 24px 64px}
+  .contenedor{max-width:1120px;margin:0 auto}
   a{text-decoration:none}
-  header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
-    margin-bottom:28px;border-bottom:3px solid var(--navy);padding-bottom:18px}
+  header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:26px;border-bottom:3px solid var(--navy);padding-bottom:18px}
   .titulo{display:flex;align-items:center;gap:18px}
   .titulo .logo{height:50px;width:auto}
   .titulo .sep{width:1px;height:44px;background:var(--borde)}
   .titulo h1{font-size:22px;font-weight:800;color:var(--navy)}
   .titulo p{color:var(--suave);font-size:13px;margin-top:3px}
-  .btn-inicio{background:var(--navy);color:#fff;padding:9px 15px;border-radius:10px;
-    font-weight:700;font-size:13px}
+  .meta{text-align:right;font-size:12px;color:var(--suave)}
+  .btn-inicio{background:var(--navy);color:#fff;padding:9px 15px;border-radius:10px;font-weight:700;font-size:13px;display:inline-block;margin-bottom:8px}
   .btn-inicio:hover{filter:brightness(1.15)}
-  .construccion{background:var(--tarjeta);border:1px solid var(--borde);border-radius:16px;
-    padding:48px 32px;text-align:center;margin-top:30px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-  .construccion .emo{font-size:54px}
-  .construccion h2{font-size:22px;margin-top:14px;color:var(--navy)}
-  .construccion .badge{display:inline-block;background:rgba(217,154,43,.14);color:var(--ambar);
-    border:1px solid rgba(217,154,43,.4);font-size:12px;font-weight:700;padding:5px 14px;
-    border-radius:999px;margin-top:14px}
-  .construccion p{color:var(--suave);font-size:14.5px;line-height:1.7;max-width:620px;margin:18px auto 0}
-  .lista{max-width:560px;margin:24px auto 0;text-align:left;background:#f8fafc;border:1px solid var(--borde);
-    border-radius:12px;padding:20px 24px}
-  .lista h3{font-size:14px;color:var(--navy);margin-bottom:10px}
-  .lista ul{margin-left:18px;color:var(--suave);font-size:13.5px;line-height:1.9}
+  h2.seccion{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--suave);margin:32px 0 14px;font-weight:700}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+  .kpi{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .kpi .etq{font-size:13px;color:var(--suave);font-weight:600}
+  .kpi .valor{font-size:30px;font-weight:800;margin-top:8px;color:var(--navy)}
+  .kpi .delta{font-size:12px;font-weight:700;margin-top:6px}
+  .kpi .delta.up{color:var(--verde)} .kpi .delta.down{color:var(--rojo)} .kpi .delta.flat{color:var(--suave)}
+  .rejilla{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:860px){.rejilla{grid-template-columns:1fr}}
+  .panel{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .panel h3{font-size:16px;margin-bottom:16px}
+  .barra{margin:11px 0}
+  .barra .top{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px}
+  .barra .top b{font-weight:700}
+  .pista{background:#eef2f7;border-radius:7px;height:11px;overflow:hidden}
+  .relleno{height:100%;border-radius:7px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--borde)}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--suave)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  td.clave{font-weight:600;color:var(--navy);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vacio{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:24px;border-radius:14px}
   footer{margin-top:40px;text-align:center;color:var(--suave);font-size:12px}
 </style>
 </head>
@@ -46,34 +55,95 @@
       <div class="sep"></div>
       <div>
         <h1>📊 Visibilidad en Web</h1>
-        <p>Google Analytics · tráfico y comportamiento de la web</p>
+        <p>Google Analytics · tráfico de la web</p>
       </div>
     </div>
-    <a class="btn-inicio" href="index.html">← Inicio</a>
+    <div class="meta">
+      <a class="btn-inicio" href="index.html">← Inicio</a><br>
+      <span id="periodo">—</span><br><span id="actualizado">—</span>
+    </div>
   </header>
 
-  <div class="construccion">
-    <div class="emo">🚧</div>
-    <h2>Sección en construcción</h2>
-    <div class="badge">● Pendiente de conectar la API de Google Analytics</div>
-    <p>Aquí se mostrará la visibilidad de la web según <b>Google Analytics</b>:
-    visitas, usuarios, fuentes de tráfico y su evolución en el tiempo.</p>
+  <div id="contenido"></div>
 
-    <div class="lista">
-      <h3>Lo que mostrará esta página (previsto)</h3>
-      <ul>
-        <li>Usuarios y sesiones (con evolución por días/semanas)</li>
-        <li>Canales de adquisición (orgánico, directo, social, referido…)</li>
-        <li>Páginas más vistas</li>
-        <li>Países y dispositivos</li>
-        <li>Conversiones / eventos clave</li>
-      </ul>
-    </div>
-    <p style="font-size:13px;margin-top:22px">Para activarla necesito acceso a la API
-    (cuenta de servicio de Google + ID de la propiedad GA4). En cuanto lo tengamos, se rellena con datos reales.</p>
-  </div>
-
-  <footer><b>INGESCO®</b> · Joining sky and ground. Protecting you since 1973</footer>
+  <footer><b>INGESCO®</b> · Joining sky and ground. Protecting you since 1973 · Fuente: Google Analytics (GA4)</footer>
 </div>
+
+<script src="datos/ga.js"></script>
+<script>
+(function(){
+  const cont = document.getElementById('contenido');
+  if(typeof window.GA === 'undefined'){
+    cont.innerHTML = '<div class="vacio">⚠️ <b>Aún no hay datos.</b> Ejecuta «Actualizar datos» y recarga.</div>';
+    return;
+  }
+  const G = window.GA;
+  const num = n => Number(n||0).toLocaleString('es-ES');
+  const colores = ['#1f5f9b','#34a0d9','#13294b','#e08a2b','#16a34a','#8a93a3','#6b7688','#9ed3f4'];
+  document.getElementById('periodo').textContent = 'Periodo: ' + G.periodo.ini + ' – ' + G.periodo.fin;
+  document.getElementById('actualizado').textContent = 'Actualizado: ' + G.fechaActualizacion;
+
+  const t = G.totales;
+  function delta(cur,prev){
+    if(!prev) return '<div class="delta flat">—</div>';
+    const d=(cur-prev)/prev*100, cls=d>=0?'up':'down', fl=d>=0?'▲':'▼';
+    return '<div class="delta '+cls+'">'+fl+' '+Math.abs(d).toFixed(1).replace('.',',')+'% vs. periodo anterior</div>';
+  }
+  const fmtDur = s => { s=Math.round(s); const m=Math.floor(s/60), x=s%60; return m>0?(m+'m '+x+'s'):(x+'s'); };
+
+  let html='<div class="kpis">';
+  html+='<div class="kpi"><div class="etq">🧑‍💼 Usuarios</div><div class="valor">'+num(t.usuarios)+'</div>'+delta(t.usuarios,t.usuariosPrev)+'</div>';
+  html+='<div class="kpi"><div class="etq">🔁 Sesiones</div><div class="valor">'+num(t.sesiones)+'</div>'+delta(t.sesiones,t.sesionesPrev)+'</div>';
+  html+='<div class="kpi"><div class="etq">📄 Páginas vistas</div><div class="valor">'+num(t.vistas)+'</div><div class="delta flat">en el periodo</div></div>';
+  html+='<div class="kpi"><div class="etq">⏱️ Duración media</div><div class="valor">'+fmtDur(t.duracion)+'</div><div class="delta flat">por sesión</div></div>';
+  html+='</div>';
+
+  html+='<h2 class="seccion">Evolución diaria</h2><div class="panel">'+grafico(G.porDia)+'</div>';
+
+  html+='<h2 class="seccion">De dónde viene el tráfico</h2><div class="rejilla">';
+  html+=barras('Canales de adquisición', G.canales, 'sesiones');
+  html+=barras('Dispositivos', G.dispositivos, 'sesiones');
+  html+='</div>';
+
+  html+='<h2 class="seccion">Contenido y audiencia</h2><div class="rejilla">';
+  html+=tablaPaginas('Páginas más vistas', G.paginas);
+  html+=barras('Países', G.paises, 'usuarios');
+  html+='</div>';
+
+  cont.innerHTML = html;
+
+  function barras(titulo, filas, unidad){
+    const max = Math.max(...(filas||[]).map(f=>f.valor),1);
+    let h='<div class="panel"><h3>'+titulo+'</h3>';
+    (filas||[]).forEach((f,i)=>{
+      const w=Math.round(f.valor/max*100);
+      h+='<div class="barra"><div class="top"><span>'+f.nombre+'</span><b>'+num(f.valor)+'</b></div>'+
+         '<div class="pista"><div class="relleno" style="width:'+Math.max(w,2)+'%;background:'+colores[i%colores.length]+'"></div></div></div>';
+    });
+    return h+'</div>';
+  }
+  function tablaPaginas(titulo, filas){
+    let h='<div class="panel"><h3>'+titulo+'</h3><table><tr><th>Página</th><th class="num">Vistas</th></tr>';
+    (filas||[]).forEach(f=>{ h+='<tr><td class="clave" title="'+f.nombre+'">'+f.nombre+'</td><td class="num">'+num(f.valor)+'</td></tr>'; });
+    return h+'</table></div>';
+  }
+  function grafico(dias){
+    if(!dias||dias.length<2) return '<p style="color:var(--suave)">Sin datos suficientes.</p>';
+    const W=1060,H=240,pad=44;
+    const xs=dias.map((d,i)=>pad+i*(W-2*pad)/(dias.length-1));
+    const maxV=Math.max(...dias.map(d=>d.sesiones))*1.15||1;
+    const ys=dias.map(d=>H-pad-(d.sesiones/maxV)*(H-2*pad));
+    const pts=xs.map((x,i)=>x+','+ys[i]).join(' ');
+    const area=pts+' '+xs[xs.length-1]+','+(H-pad)+' '+xs[0]+','+(H-pad);
+    const idxs=[0,Math.floor(dias.length/2),dias.length-1];
+    const labels=idxs.map(i=>'<text x="'+xs[i]+'" y="'+(H-pad+20)+'" text-anchor="middle" font-size="11" fill="#6b7688">'+dias[i].fecha.slice(5)+'</text>').join('');
+    return '<svg width="100%" viewBox="0 0 '+W+' '+H+'">'+
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1f5f9b" stop-opacity="0.30"/><stop offset="100%" stop-color="#1f5f9b" stop-opacity="0"/></linearGradient></defs>'+
+      '<polygon points="'+area+'" fill="url(#g)"></polygon>'+
+      '<polyline points="'+pts+'" fill="none" stroke="#1f5f9b" stroke-width="2.5"></polyline>'+labels+
+      '<text x="'+pad+'" y="24" font-size="12" fill="#13294b" font-weight="700">Sesiones por día</text></svg>';
+  }
+})();
+</script>
 </body>
 </html>
