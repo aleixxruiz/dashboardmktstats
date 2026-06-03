@@ -2,13 +2,95 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>INGESCO · Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuadro de Mando de Visibilidad · INGESCO</title>
 <link rel="icon" type="image/png" href="assets/logo-ingesco.png">
-<meta http-equiv="refresh" content="0; url=dashboard.html">
-<style>body{font-family:'Segoe UI',sans-serif;background:#0a1830;color:#eaf1fb;
-  display:flex;height:100vh;align-items:center;justify-content:center;margin:0}</style>
+<style>
+  :root{
+    --navy:#13294b; --azul:#1f5f9b; --cielo:#34a0d9;
+    --texto:#eaf1fb; --suave:#9fb3d1;
+    --verde:#34c98a; --ambar:#e0b341;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--texto);
+    background:radial-gradient(1100px 560px at 50% -10%,#1d3e6b,transparent),
+               linear-gradient(160deg,#0a1830,#13294b 60%,#0a1830);
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;padding:48px 24px}
+  .marca{text-align:center;margin-bottom:14px}
+  .marca .logo{height:66px;width:auto;background:#fff;padding:12px 18px;border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  h1{font-size:30px;font-weight:800;letter-spacing:-.5px;margin-top:26px;text-align:center;
+    background:linear-gradient(90deg,#fff,#9ed3f4);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--suave);font-size:15px;text-align:center;margin-top:8px}
+
+  .tarjetas{display:grid;grid-template-columns:repeat(3,minmax(240px,1fr));gap:22px;
+    margin-top:46px;max-width:1000px;width:100%}
+  @media(max-width:820px){.tarjetas{grid-template-columns:1fr}}
+
+  .card{position:relative;display:block;text-decoration:none;color:inherit;
+    background:linear-gradient(165deg,#16315a,#0f2342);border:1px solid #28477a;
+    border-radius:20px;padding:30px 26px;transition:.18s;overflow:hidden}
+  .card:hover{transform:translateY(-4px);border-color:var(--cielo);
+    box-shadow:0 16px 40px rgba(0,0,0,.4)}
+  .card.proximamente{opacity:.82}
+  .card .icono{font-size:42px;line-height:1}
+  .card h2{font-size:20px;font-weight:800;margin-top:18px}
+  .card .fuente{color:var(--cielo);font-size:13px;font-weight:700;margin-top:4px;letter-spacing:.3px}
+  .card p{color:var(--suave);font-size:13.5px;line-height:1.5;margin-top:14px;min-height:56px}
+  .card .ir{display:inline-flex;align-items:center;gap:6px;margin-top:18px;
+    font-weight:700;font-size:14px;color:#fff}
+  .estado{position:absolute;top:18px;right:18px;font-size:11px;font-weight:700;
+    padding:4px 10px;border-radius:999px;letter-spacing:.3px}
+  .estado.activo{background:rgba(52,201,138,.16);color:var(--verde);border:1px solid rgba(52,201,138,.4)}
+  .estado.pronto{background:rgba(224,179,65,.14);color:var(--ambar);border:1px solid rgba(224,179,65,.4)}
+
+  footer{margin-top:50px;color:var(--suave);font-size:12.5px;text-align:center}
+  footer b{color:#cfe0f5}
+</style>
 </head>
 <body>
-  <p>Abriendo el dashboard… si no avanza, <a href="dashboard.html" style="color:#5ec2f0">haz clic aquí</a>.</p>
+
+  <div class="marca">
+    <img class="logo" src="assets/logo-ingesco.png" alt="INGESCO">
+  </div>
+  <h1>Cuadro de Mando de Visibilidad</h1>
+  <p class="sub">INGESCO · Marketing — visibilidad de la web en todos los canales</p>
+
+  <div class="tarjetas">
+
+    <a class="card" href="dashboard.html">
+      <span class="estado activo">● Activo</span>
+      <div class="icono">🤖</div>
+      <h2>Visibilidad con IA</h2>
+      <div class="fuente">Microsoft Clarity</div>
+      <p>Comportamiento de los visitantes y tráfico que llega desde asistentes de IA (ChatGPT, Perplexity, Copilot…).</p>
+      <span class="ir">Entrar →</span>
+    </a>
+
+    <a class="card proximamente" href="analytics.html">
+      <span class="estado pronto">● Próximamente</span>
+      <div class="icono">📊</div>
+      <h2>Visibilidad en Web</h2>
+      <div class="fuente">Google Analytics</div>
+      <p>Sesiones, usuarios, fuentes de tráfico y conversiones de la web a lo largo del tiempo.</p>
+      <span class="ir">Entrar →</span>
+    </a>
+
+    <a class="card proximamente" href="google-search.html">
+      <span class="estado pronto">● Próximamente</span>
+      <div class="icono">🔍</div>
+      <h2>Visibilidad en Google</h2>
+      <div class="fuente">Search Console</div>
+      <p>Posiciones, impresiones, clics y términos por los que apareces en el buscador de Google.</p>
+      <span class="ir">Entrar →</span>
+    </a>
+
+  </div>
+
+  <footer>
+    <b>INGESCO®</b> · Joining sky and ground. Protecting you since 1973
+  </footer>
+
 </body>
 </html>
