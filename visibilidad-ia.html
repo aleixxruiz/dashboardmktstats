@@ -75,6 +75,19 @@
 
   .hist-nota{font-size:13px;color:var(--suave);line-height:1.6}
   footer{margin-top:42px;text-align:center;color:var(--suave);font-size:12px}
+
+  .citas-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:860px){.citas-grid{grid-template-columns:1fr}}
+  .tabla-citas{width:100%;border-collapse:collapse;font-size:13px}
+  .tabla-citas th{text-align:left;color:var(--suave);font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:8px 6px;border-bottom:1px solid var(--borde)}
+  .tabla-citas td{padding:8px 6px;border-bottom:1px solid var(--borde);vertical-align:top}
+  .tabla-citas td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:#fff;white-space:nowrap}
+  .tabla-citas td.q{color:#eaf1fb;line-height:1.35}
+  .tabla-citas a{color:#7cc6f2;text-decoration:none}
+  .tabla-citas a:hover{text-decoration:underline}
+  .tabla-citas tr:hover td{background:rgba(255,255,255,.03)}
+  .soa-banner{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+  .soa-num{font-size:40px;font-weight:800;color:var(--acento2);line-height:1}
 </style>
 </head>
 <body>
@@ -99,25 +112,8 @@
 
   <div id="contenido"></div>
 
-  <h2 class="seccion">Términos y páginas citadas</h2>
-  <div class="citas-panel">
-    <div class="txt">
-      <span class="badge">Solo en Copilot / Bing</span>
-      <h3>📑 ¿Qué busca la gente y qué páginas tuyas cita la IA?</h3>
-      <p>Microsoft Clarity registra los <b>grounding queries</b> (los términos que la IA usa para
-      encontrar tu contenido) y las <b>páginas de ingesco.com citadas</b> en respuestas de IA.
-      Estos datos <b>no se pueden exportar por API</b>, así que se consultan directamente en Clarity:</p>
-      <ul>
-        <li><b>Grounding queries</b> — términos que disparan tu visibilidad.</li>
-        <li><b>Mis páginas citadas</b> — qué URLs tuyas referencia la IA y cuántas veces.</li>
-        <li><b>Cuota de autoridad</b> — tu peso frente a la competencia en esas respuestas.</li>
-      </ul>
-      <p style="margin-top:12px;font-size:12px">Nota: estos datos provienen de las IA de Microsoft
-      (Copilot y Bing). ChatGPT, Gemini y Perplexity no comparten esta información.</p>
-    </div>
-    <a class="cta" href="https://clarity.microsoft.com/projects/view/ucpc895xla/aivisibility?URL=2%3B6%3B%5Ehttps%3A%2F%2Fwww%5C.ingesco%5C.com%2Fes%28%5C%3F.*%29%3F%24&amp;date=Last+3+days&amp;heatmapDeviceType=2&amp;heatmapType=0" target="_blank" rel="noopener">Abrir en Clarity ↗<br>
-      <span style="font-weight:500;font-size:11px;opacity:.85">AI Visibility → Citation</span></a>
-  </div>
+  <h2 class="seccion">Visibilidad en respuestas de IA · Copilot / Bing</h2>
+  <div id="citas"></div>
 
   <footer>
     <b>INGESCO®</b> · Joining sky and ground. Protecting you since 1973 ·
@@ -247,6 +243,49 @@
       '<polygon points="'+area+'" fill="url(#g)"></polygon>'+
       '<polyline points="'+pts+'" fill="none" stroke="#5ec2f0" stroke-width="2.5"></polyline>'+dots+'</svg></div>';
   }
+})();
+</script>
+
+<!-- Citas en IA (grounding queries + cited pages), desde el CSV de Clarity -->
+<script src="datos/citas-ia.js"></script>
+<script>
+(function(){
+  const c = document.getElementById('citas');
+  if(!c) return;
+  const claUrl = "https://clarity.microsoft.com/projects/view/ucpc895xla/aivisibility?date=Last+3+days";
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const acorta = u => u.replace(/^https?:\/\/[^/]+/,'') || '/';
+
+  if(typeof window.CITAS === 'undefined'){
+    c.innerHTML = '<div class="panel" style="color:var(--suave);font-size:14px;line-height:1.6">📑 Aquí aparecerán los <b>grounding queries</b> y tus <b>páginas citadas</b> por la IA. '+
+      'Descarga el CSV en Clarity (AI Visibility → Citation), guárdalo en la carpeta del proyecto y ejecuta «Actualizar datos». '+
+      '<a href="'+claUrl+'" target="_blank" rel="noopener" style="color:#7cc6f2">Abrir Clarity ↗</a></div>';
+    return;
+  }
+  const C = window.CITAS;
+  const Q = (C.queries||[]).slice(0,20);
+  const P = (C.paginas||[]).slice(0,20);
+
+  let h = '<div class="panel"><div class="soa-banner">'+
+    '<div><div style="font-size:12px;color:var(--suave);font-weight:600">CUOTA DE AUTORIDAD (Share of Authority)</div>'+
+    '<div class="soa-num">'+String(C.soa).replace('.',',')+'%</div></div>'+
+    '<div style="flex:1;min-width:220px;font-size:13px;color:var(--suave)">Tu peso frente a la competencia en las respuestas de IA · Periodo <b style="color:#eaf1fb">'+esc(C.periodo)+'</b> · Solo Copilot/Bing</div>'+
+    '<a class="btn-cita" href="'+claUrl+'" target="_blank" rel="noopener">Ver en Clarity ↗</a>'+
+    '</div></div>';
+
+  h += '<div class="citas-grid">';
+  h += '<div class="panel"><h3 style="margin-bottom:12px">🔎 Grounding queries <span style="color:var(--suave);font-weight:600;font-size:12px">(términos que usa la IA)</span></h3>'+
+       '<table class="tabla-citas"><tr><th>Término</th><th class="num">SoA</th><th class="num">Citas</th></tr>';
+  Q.forEach(q=>{ h+='<tr><td class="q">'+esc(q.query)+'</td><td class="num" style="color:var(--suave);font-weight:600">'+esc(q.soa)+'</td><td class="num">'+q.citations+'</td></tr>'; });
+  h += '</table></div>';
+
+  h += '<div class="panel"><h3 style="margin-bottom:12px">📄 Mis páginas citadas</h3>'+
+       '<table class="tabla-citas"><tr><th>Página</th><th class="num">Citas</th></tr>';
+  P.forEach(p=>{ h+='<tr><td><a href="'+esc(p.url)+'" target="_blank" rel="noopener" title="'+esc(p.url)+'">'+esc(acorta(p.url))+'</a></td><td class="num">'+p.citations+'</td></tr>'; });
+  h += '</table></div>';
+  h += '</div>';
+
+  c.innerHTML = h;
 })();
 </script>
 </body>
