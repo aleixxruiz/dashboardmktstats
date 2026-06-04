@@ -1,0 +1,23 @@
+name: Actualizar datos del dashboard
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Crear config.json desde el secreto
+        env:
+          CONFIG_JSON: ${{ secrets.CONFIG_JSON }}
+        shell: bash
+        run: printf '%s' "$CONFIG_JSON" > config.json
+
+      - name: Actualizar y publicar
+        shell: pwsh
+        run: ./scripts/actualizar.ps1 -Silencioso
