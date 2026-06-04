@@ -43,6 +43,8 @@ $todos = @(
     @{ local = "analytics.html";             remoto = "analytics.html" },
     @{ local = "google-search.html";         remoto = "google-search.html" },
     @{ local = "leads.html";                 remoto = "leads.html" },
+    @{ local = "faq.html";                   remoto = "faq.html" },
+    @{ local = "peticiones.html";            remoto = "peticiones.html" },
     @{ local = "assets\logo-ingesco.png";    remoto = "assets/logo-ingesco.png" },
     @{ local = "assets\favicon.ico.png";     remoto = "assets/favicon.ico.png" },
     @{ local = "assets\widget.js";           remoto = "assets/widget.js" },
