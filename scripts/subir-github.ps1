@@ -39,7 +39,6 @@ $headers = @{
 # Lista de archivos: (ruta local relativa  ->  ruta en el repositorio)
 $todos = @(
     @{ local = "index.html";                 remoto = "index.html" },
-    @{ local = "dashboard.html";             remoto = "dashboard.html" },
     @{ local = "visibilidad-ia.html";        remoto = "visibilidad-ia.html" },
     @{ local = "analytics.html";             remoto = "analytics.html" },
     @{ local = "google-search.html";         remoto = "google-search.html" },
