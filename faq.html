@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preguntas frecuentes · INGESCO</title>
+<link rel="icon" type="image/png" href="assets/favicon.ico.png">
+<style>
+  :root{
+    --navy:#13294b; --azul:#1f5f9b; --cielo:#34a0d9;
+    --fondo:#f4f6f9; --tarjeta:#ffffff; --texto:#13294b; --suave:#6b7688; --borde:#e3e8ef;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--texto);
+    background:var(--fondo);min-height:100vh;padding:40px 24px 64px}
+  .contenedor{max-width:900px;margin:0 auto}
+
+  header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+    margin-bottom:30px;border-bottom:3px solid var(--azul);padding-bottom:18px}
+  .titulo{display:flex;align-items:center;gap:16px}
+  .titulo .logo{height:48px;width:auto}
+  .titulo h1{font-size:23px;font-weight:800;letter-spacing:-.5px;color:var(--navy)}
+  .titulo p{color:var(--suave);font-size:13px;margin-top:3px}
+  .btn-inicio{background:var(--navy);color:#fff;
+    padding:9px 16px;border-radius:11px;font-weight:800;font-size:13px;text-decoration:none}
+  .btn-inicio:hover{filter:brightness(1.15)}
+
+  .faq-item{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;
+    margin:14px 0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .faq-q{display:flex;justify-content:space-between;align-items:center;gap:12px;
+    padding:18px 22px;cursor:pointer;user-select:none;font-size:16px;font-weight:700;color:var(--azul)}
+  .faq-q:hover{background:#f8fafc}
+  .faq-q .flecha{color:var(--cielo);font-size:14px;transition:.2s}
+  .faq-a{display:none;padding:0 22px 20px;color:var(--suave);font-size:14.5px;line-height:1.6}
+  .faq-item.abierto .faq-a{display:block}
+  .faq-item.abierto .flecha{transform:rotate(90deg)}
+
+  .intro{color:var(--suave);font-size:15px;line-height:1.6;margin-bottom:24px}
+  .faq-seccion{font-size:21px;letter-spacing:-.3px;color:var(--navy);
+    margin:42px 0 14px;font-weight:800;display:flex;align-items:center;gap:10px;
+    border-bottom:2px solid var(--azul);padding-bottom:10px}
+  footer{margin-top:46px;text-align:center;color:var(--suave);font-size:12.5px}
+  footer b{color:var(--navy)}
+</style>
+</head>
+<body>
+<div class="contenedor">
+
+  <header>
+    <div class="titulo">
+      <img class="logo" src="assets/logo-ingesco.png" alt="INGESCO">
+      <div>
+        <h1>❓ Preguntas frecuentes</h1>
+        <p>Dudas habituales sobre el Cuadro de Mando de Marketing</p>
+      </div>
+    </div>
+    <a class="btn-inicio" href="index.html">← Inicio</a>
+  </header>
+
+  <p class="intro">Aquí encontrarás respuestas a las preguntas más habituales sobre el panel y sus datos.</p>
+
+  <div id="faq">
+
+    <h2 class="faq-seccion">🏠 Generales · sobre el panel</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es este Cuadro de Mando?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Reúne en un solo sitio los datos de marketing de INGESCO de varias plataformas (comportamiento web, visibilidad en Google y en IA, y captación de leads), presentados de forma visual y resumida.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Cada cuánto se actualizan los datos?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Automáticamente una vez al día, cada mañana. No hay que hacer nada manual.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Los datos son de hoy mismo?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Normalmente llegan hasta el día anterior. Arriba de cada panel verás la fecha de «Actualizado».</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Desde dónde puedo consultarlo?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Es una página web: se abre desde cualquier ordenador o móvil con el enlace, sin instalar nada.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Contiene datos personales de clientes?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">No. De los contactos solo se muestran cifras agregadas (totales, orígenes, etc.), nunca nombres ni correos.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Por qué cada sección tiene un color distinto?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Para reconocer de un vistazo cada herramienta.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿He visto un error o quiero pedir algo nuevo?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Usa la página de «Peticiones» desde la pantalla de inicio.</div>
+    </div>
+
+    <h2 class="faq-seccion">🤖 Comportamiento en IA · Microsoft Clarity</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué mide esta sección?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Cómo se comportan de verdad los visitantes en la web: dispositivos, cuánto bajan en la página, tiempo activo y señales de problemas (clics fallidos, frustración, errores).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es el «tráfico desde IA»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Visitas de personas que llegan a ingesco.com después de preguntar a un asistente de IA (ChatGPT, Perplexity, Copilot, Gemini, Claude).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué son las «citas» y la Cuota de Autoridad?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Cuántas veces la IA te menciona como fuente al responder. Hoy solo se puede medir en Copilot/Bing.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Por qué la gráfica de evolución se va llenando poco a poco?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Clarity solo entrega los últimos días, así que el histórico se va acumulando día a día desde que arrancó el panel.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué son los «clics muertos» y los «clics de frustración»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Clics en algo que parece un botón pero no responde (muertos), o clics repetidos y rápidos por nerviosismo cuando algo no funciona (frustración).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es «Sesiones reales»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Visitas de personas de verdad; se descartan los robots automáticos para que la cifra no engañe.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es «Páginas por sesión»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Cuántas páginas ve de media cada visita.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es «Tiempo activo medio»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">El tiempo en que el visitante realmente interactúa (no cuenta cuando deja la pestaña abierta sin tocar).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es «Scroll medio»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Hasta qué punto de la página bajan de media (en %).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué muestra «Sesiones por dispositivo»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">El reparto de visitas entre ordenador, móvil y tablet.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué son «Plataformas detectadas»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Cuántos asistentes de IA distintos te han traído visitas.</div>
+    </div>
+
+    <h2 class="faq-seccion">📊 Visibilidad en Web · Google Analytics</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿En qué se diferencia de Clarity?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Analytics dice cuántos nos visitan y de dónde vienen; Clarity dice cómo se comportan una vez dentro.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué diferencia hay entre usuario y sesión?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Un usuario es una persona; una sesión es cada visita. Una misma persona puede tener varias sesiones.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué muestra el mapa?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Desde qué países nos visitan; cuanto más oscuro, más visitas.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué significa «▲/▼ vs. periodo anterior»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Compara el periodo actual con el anterior de la misma duración, para ver si subimos o bajamos.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es «Páginas vistas»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">El total de páginas cargadas en el periodo.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es «Duración media»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Cuánto dura de media una visita.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué son los «Canales de adquisición»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Por qué vía llegan los visitantes (orgánico, directo, redes, etc.).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es «Páginas más visitadas»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Las páginas con más visitas (puedes clicar para abrirlas).</div>
+    </div>
+
+    <h2 class="faq-seccion">🔍 Búsquedas en Google · Search Console</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué mide esta sección?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Cómo apareces en el buscador de Google: clics, impresiones, CTR y posición media.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es impresión, clic, CTR y posición?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Impresión = apareces en los resultados; clic = entran; CTR = porcentaje de los que entran; posición = en qué lugar sales (cuanto más baja, mejor).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es la «indexación»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Las páginas que Google tiene (o no) guardadas en su buscador. Se revisa una vez por semana.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿En qué se diferencia de Analytics?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Search Console es antes del clic (lo que pasa en Google); Analytics es después (lo que pasa ya en la web).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es el dato «Totales (desde…)»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Junto al dato del último mes, el acumulado histórico desde que se mide.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué son las «Consultas»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Las palabras que la gente escribe en Google y con las que apareces.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es «Páginas con mejor rendimiento»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Las páginas que más clics reciben desde Google.</div>
+    </div>
+
+    <h2 class="faq-seccion">🧲 Captación de Leads · HubSpot</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué cuenta como lead?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Cada contacto registrado en el CRM de HubSpot.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Cómo se sabe de dónde vino cada contacto?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">HubSpot guarda su origen (tráfico directo, búsqueda orgánica, formularios de la web, etc.).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es «captación por formulario»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Clasifica los contactos según el primer formulario que rellenaron (Calculus, Prefooter, Webinar…).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es la «etapa del ciclo de vida»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">En qué punto está cada contacto (suscriptor, lead, cliente…) según HubSpot.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es «Nuevos (30 días)»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Contactos captados en el último mes, con comparativa frente al mes anterior.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es «Origen principal»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">La vía que más contactos aporta y su porcentaje.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué es «Captados este mes»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Los leads conseguidos en el mes en curso.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><span>¿Qué muestra la «Evolución mensual»?</span><span class="flecha">▸</span></div>
+      <div class="faq-a">Los leads nuevos mes a mes (últimos 12 meses).</div>
+    </div>
+
+  </div>
+
+  <footer><b>INGESCO®</b> · Joining sky and ground. Protecting you since 1973</footer>
+</div>
+
+<script>
+  function toggleFaq(el){ el.parentElement.classList.toggle('abierto'); }
+</script>
+<script src="assets/widget.js?v=5"></script>
+</body>
+</html>
