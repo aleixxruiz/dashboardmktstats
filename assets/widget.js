@@ -8,7 +8,7 @@
 (function(){
   var CONFIG = {
     teamsEmail: "aleix.ruiz@ingesco.com",  // correo de Teams del responsable
-    aiUrl: "",                              // URL de la función de IA (se rellena al montarla)
+    aiUrl: "https://asistente-ingesco.aleixcr9.workers.dev/",   // función de IA (Cloudflare Worker)
     titulo: "¿Tienes una duda?"
   };
 
