@@ -61,7 +61,7 @@ foreach ($row in @(Reporte @{ dateRanges=@(@{startDate="28daysAgo"; endDate="yes
     $porDia += [pscustomobject]@{ fecha=$fecha; sesiones=[int](V $row 0); usuarios=[int](V $row 1) }
 }
 
-# --- Helper para listas dimension+metrica ---
+# --- Helper para listas de 1 dimension ---
 function Lista($dim, $metrica, $limite) {
     $out = @()
     foreach ($row in @(Reporte @{ dateRanges=@(@{startDate="28daysAgo"; endDate="yesterday"}); dimensions=@(@{name=$dim}); metrics=@(@{name=$metrica}); orderBys=@(@{metric=@{metricName=$metrica}; desc=$true}); limit=$limite })) {
@@ -69,11 +69,30 @@ function Lista($dim, $metrica, $limite) {
     }
     return $out
 }
+# --- Helper para listas de 2 dimensiones ---
+function Lista2($dim1, $dim2, $metrica, $limite) {
+    $out = @()
+    foreach ($row in @(Reporte @{ dateRanges=@(@{startDate="28daysAgo"; endDate="yesterday"}); dimensions=@(@{name=$dim1},@{name=$dim2}); metrics=@(@{name=$metrica}); orderBys=@(@{metric=@{metricName=$metrica}; desc=$true}); limit=$limite })) {
+        $out += [pscustomobject]@{ d1=$row.dimensionValues[0].value; d2=$row.dimensionValues[1].value; valor=[int](V $row 0) }
+    }
+    return $out
+}
 
 $canales      = Lista "sessionDefaultChannelGroup" "sessions" 8
-$paginas      = Lista "pageTitle" "screenPageViews" 10
-$paises       = Lista "country" "activeUsers" 8
 $dispositivos = Lista "deviceCategory" "sessions" 5
+
+# Paginas con su ruta (para enlaces) + titulo
+$paginas = @()
+foreach ($r in (Lista2 "pagePath" "pageTitle" "screenPageViews" 12)) {
+    $paginas += [pscustomobject]@{ path=$r.d1; titulo=$r.d2; valor=$r.valor }
+}
+# Paises con codigo ISO (para el mapa) + nombre
+$paises = @()
+foreach ($r in (Lista2 "countryId" "country" "activeUsers" 250)) {
+    if (-not [string]::IsNullOrWhiteSpace($r.d1)) {
+        $paises += [pscustomobject]@{ code=$r.d1; nombre=$r.d2; valor=$r.valor }
+    }
+}
 
 $obj = @{
     fechaActualizacion = (Get-Date).ToString("dd/MM/yyyy HH:mm")
