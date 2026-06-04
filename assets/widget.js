@@ -18,7 +18,7 @@
    + 'background:#DEDC00;color:#1e2b50;border:none;cursor:pointer;font-size:32px;font-weight:800;font-family:Segoe UI,sans-serif;'
    + 'box-shadow:0 8px 24px rgba(30,43,80,.30);display:flex;align-items:center;justify-content:center;transition:.15s}'
    + '.asis-btn:hover{transform:scale(1.07)}'
-   + '.asis-panel{position:fixed;right:22px;bottom:90px;z-index:99999;width:340px;max-width:calc(100vw - 32px);'
+   + '.asis-panel{position:fixed;right:22px;bottom:90px;z-index:99999;width:392px;max-width:calc(100vw - 32px);'
    + 'background:#f3f5cf;color:#1e2b50;border:1px solid #cdd06a;border-radius:16px;box-shadow:0 16px 50px rgba(30,43,80,.30);'
    + 'font-family:Segoe UI,system-ui,sans-serif;overflow:hidden;display:none}'
    + '.asis-panel.abierto{display:block}'
@@ -52,7 +52,7 @@
   panel.innerHTML =
      '<div class="asis-head"><span>🤖 XIELA IA</span><span class="x" id="asisX">✕</span></div>'
    + '<div class="asis-body" id="asisMenu">'
-   +   '<p style="font-size:13.5px;color:#9fb6d6;margin-bottom:14px">'+CONFIG.titulo+'</p>'
+   +   '<p style="font-size:14.5px;color:#1e2b50;font-weight:700;margin-bottom:14px">'+CONFIG.titulo+'</p>'
    +   '<button class="asis-op" id="asisIA"><span class="ic">🤖</span><span><b>Preguntar a XIELA IA</b><span>Resuelve dudas sobre los datos del panel</span></span></button>'
    +   '<button class="asis-op" id="asisTeams"><span class="ic">💬</span><span><b>Escribir a Aleix por Teams</b><span>Manda un mensaje directo por Teams</span></span></button>'
    + '</div>'
