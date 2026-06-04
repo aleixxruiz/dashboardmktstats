@@ -113,13 +113,11 @@
 
   html+='<h2 class="seccion">Evolución mensual de captación</h2><div class="panel">'+grafico(L.porMes)+'</div>';
 
-  html+='<h2 class="seccion">Captación por formulario</h2>';
-  html+=barrasForm('Sobre '+num(L.conFormulario)+' leads que llegaron por un formulario (los grupos se despliegan al hacer clic)', (L.porFormulario||[]), L.conFormulario);
+  html+='<h2 class="seccion">Cómo llegaron los contactos</h2>';
+  html+=barrasForm('Todos los contactos ('+num(L.total)+') según cómo entraron — clic en un grupo para desplegar el detalle', (L.porFormulario||[]), L.total);
 
-  html+='<h2 class="seccion">Segmentación</h2><div class="rejilla">';
-  html+=barras('Por origen', (L.porFuente||[]).map(f=>({nombre:nf(f.nombre),valor:f.valor})), L.total);
+  html+='<h2 class="seccion">Segmentación</h2>';
   html+=barras('Por etapa del ciclo', L.porEtapa||[], L.total);
-  html+='</div>';
 
   cont.innerHTML = html;
 
