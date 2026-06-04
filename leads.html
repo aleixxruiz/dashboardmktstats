@@ -84,7 +84,7 @@
 
   // Traducción de orígenes de HubSpot
   const FUENTES = {
-    DIRECT_TRAFFIC:'Tráfico directo', ORGANIC_SEARCH:'Búsqueda orgánica', OFFLINE:'Offline / manual',
+    DIRECT_TRAFFIC:'Tráfico directo', ORGANIC_SEARCH:'Búsqueda orgánica', OFFLINE:'Offline (import/chat/manual)',
     SOCIAL_MEDIA:'Redes sociales', PAID_SOCIAL:'Redes sociales (pago)', REFERRALS:'Referencias',
     PAID_SEARCH:'Búsqueda de pago', OTHER_CAMPAIGNS:'Otras campañas', AI_REFERRALS:'Referencias de IA',
     EMAIL_MARKETING:'Email marketing', DESCONOCIDO:'Desconocido'
@@ -153,7 +153,7 @@
         h+='<div class="detalle" id="'+id+'" style="display:none">';
         f.detalle.forEach(d=>{
           const wd=Math.round(d.valor/maxd*100), pcd=total?Math.round(d.valor/total*100):0;
-          h+='<div class="barra"><div class="top"><span>'+d.nombre+'</span><b>'+num(d.valor)+' · '+pcd+'%</b></div>'+
+          h+='<div class="barra"><div class="top"><span>'+nf(d.nombre)+'</span><b>'+num(d.valor)+' · '+pcd+'%</b></div>'+
              '<div class="pista"><div class="relleno" style="width:'+Math.max(wd,2)+'%;background:#9aa3b2"></div></div></div>';
         });
         h+='</div>';
