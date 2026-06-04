@@ -7,12 +7,13 @@
 <link rel="icon" type="image/png" href="assets/favicon.ico.png">
 <style>
   :root{
-    --fondo:#0a1830; --tarjeta:#102544; --borde:#1e3a5f;
-    --texto:#eaf1fb; --suave:#93a7c4; --acento:#34a0d9; --acento2:#5ec2f0;
+    /* Paleta turquesa suave (color de marca de Microsoft Clarity) */
+    --fondo:#08222a; --tarjeta:#0d2f37; --borde:#1c4b54;
+    --texto:#e9f6f7; --suave:#8fbac1; --acento:#44c2c9; --acento2:#7ad8d8;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
-    background:radial-gradient(1200px 600px at 20% -10%,#173a63,transparent),var(--fondo);
+    background:radial-gradient(1200px 600px at 20% -10%,#0e4a54,transparent),var(--fondo);
     color:var(--texto);padding:32px 24px 64px;min-height:100vh}
   .contenedor{max-width:1100px;margin:0 auto}
   a{color:inherit;text-decoration:none}
@@ -22,7 +23,7 @@
   .titulo{display:flex;align-items:center;gap:18px}
   .titulo .logo{height:50px;width:auto;background:#fff;padding:7px 11px;border-radius:10px}
   .titulo h1{font-size:24px;font-weight:800;letter-spacing:-.5px;
-    background:linear-gradient(90deg,#fff,#7cc6f2);-webkit-background-clip:text;background-clip:text;color:transparent}
+    background:linear-gradient(90deg,#fff,#9ce6e6);-webkit-background-clip:text;background-clip:text;color:transparent}
   .titulo p{color:var(--suave);font-size:13.5px;margin-top:6px}
   .nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
   .btn{border:1px solid var(--borde);background:var(--tarjeta);padding:8px 14px;border-radius:10px;
@@ -38,7 +39,7 @@
   .hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:16px}
   .card{background:var(--tarjeta);border:1px solid var(--borde);border-radius:16px;padding:22px;
     position:relative;overflow:hidden}
-  .card.glow{border-color:#2c5a8a;background:linear-gradient(160deg,#143862,#102544)}
+  .card.glow{border-color:#2c6a70;background:linear-gradient(160deg,#0e4048,#0d2f37)}
   .card .etq{font-size:13px;color:var(--suave);font-weight:600}
   .card .valor{font-size:32px;font-weight:800;margin-top:8px;letter-spacing:-1px}
   .card .sub{font-size:12px;color:var(--suave);margin-top:6px}
@@ -58,7 +59,7 @@
   .plat .nom{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
   .plat .nom b{font-weight:700}
   .plat .nom .ses{color:var(--suave);font-weight:600}
-  .pista{background:#0e1626;border-radius:8px;height:11px;overflow:hidden}
+  .pista{background:#07242b;border-radius:8px;height:11px;overflow:hidden}
   .relleno{height:100%;border-radius:8px;transition:width .4s}
 
   /* Dispositivos (donut) */
@@ -97,7 +98,7 @@
   .tabla-citas td{padding:8px 6px;border-bottom:1px solid var(--borde);vertical-align:top}
   .tabla-citas td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:#fff;white-space:nowrap}
   .tabla-citas td.q{color:#eaf1fb;line-height:1.35}
-  .tabla-citas a{color:#7cc6f2;text-decoration:none}
+  .tabla-citas a{color:#9ce6e6;text-decoration:none}
   .tabla-citas a:hover{text-decoration:underline}
   .tabla-citas tr:hover td{background:rgba(255,255,255,.03)}
   .soa-banner{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
@@ -159,7 +160,7 @@
 
   const num = n => Number(n||0).toLocaleString('es-ES');
   const metric = name => { const m=(C.datos||[]).find(x=>x.metricName===name); return m?m.information:[]; };
-  const colorDisp = d => ({PC:'#34a0d9', Mobile:'#1f9d6b', Tablet:'#e08a2b', Other:'#7c93b0'}[d]||'#7c93b0');
+  const colorDisp = d => ({PC:'#44c2c9', Mobile:'#1f9d6b', Tablet:'#e08a2b', Other:'#7c93b0'}[d]||'#7c93b0');
   const nombreDisp = d => ({PC:'Ordenador', Mobile:'Móvil', Tablet:'Tablet', Other:'Otros'}[d]||d);
 
   const traffic = metric('Traffic');
@@ -245,13 +246,13 @@
     const ys=H.map(d=>Hg-pad-(d.sesiones/maxV)*(Hg-2*pad));
     const pts=xs.map((x,i)=>x+','+ys[i]).join(' ');
     const area=pts+' '+xs[xs.length-1]+','+(Hg-pad)+' '+xs[0]+','+(Hg-pad);
-    let dots=xs.map((x,i)=>'<circle cx="'+x+'" cy="'+ys[i]+'" r="4.5" fill="#34a0d9"></circle>'+
+    let dots=xs.map((x,i)=>'<circle cx="'+x+'" cy="'+ys[i]+'" r="4.5" fill="#44c2c9"></circle>'+
       '<text x="'+x+'" y="'+(ys[i]-12)+'" text-anchor="middle" font-size="12" fill="#eaf1fb">'+num(H[i].sesiones)+'</text>'+
       '<text x="'+x+'" y="'+(Hg-pad+22)+'" text-anchor="middle" font-size="11" fill="#93a7c4">'+H[i].fecha.slice(5)+'</text>').join('');
     return '<div class="panel"><h3>Evolución de sesiones reales</h3><svg width="100%" viewBox="0 0 '+W+' '+Hg+'">'+
-      '<defs><linearGradient id="gh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#34a0d9" stop-opacity="0.28"/><stop offset="100%" stop-color="#34a0d9" stop-opacity="0"/></linearGradient></defs>'+
+      '<defs><linearGradient id="gh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#44c2c9" stop-opacity="0.28"/><stop offset="100%" stop-color="#44c2c9" stop-opacity="0"/></linearGradient></defs>'+
       '<polygon points="'+area+'" fill="url(#gh)"></polygon>'+
-      '<polyline points="'+pts+'" fill="none" stroke="#34a0d9" stroke-width="2.5"></polyline>'+dots+'</svg></div>';
+      '<polyline points="'+pts+'" fill="none" stroke="#44c2c9" stroke-width="2.5"></polyline>'+dots+'</svg></div>';
   }
 })();
 </script>
@@ -318,13 +319,13 @@
     const ys=H.map(d=>Hg-pad-(d.sesionesIA/maxV)*(Hg-2*pad));
     const pts=xs.map((x,i)=>x+','+ys[i]).join(' ');
     const area=pts+' '+xs[xs.length-1]+','+(Hg-pad)+' '+xs[0]+','+(Hg-pad);
-    let dots=xs.map((x,i)=>'<circle cx="'+x+'" cy="'+ys[i]+'" r="4.5" fill="#5ec2f0"></circle>'+
+    let dots=xs.map((x,i)=>'<circle cx="'+x+'" cy="'+ys[i]+'" r="4.5" fill="#7ad8d8"></circle>'+
       '<text x="'+x+'" y="'+(ys[i]-12)+'" text-anchor="middle" font-size="12" fill="#e9eef7">'+num(H[i].sesionesIA)+'</text>'+
       '<text x="'+x+'" y="'+(Hg-pad+22)+'" text-anchor="middle" font-size="11" fill="#8da2c0">'+H[i].fecha.slice(5)+'</text>').join('');
     return '<div class="panel"><h3>Sesiones diarias desde IA</h3><svg width="100%" viewBox="0 0 '+W+' '+Hg+'">'+
-      '<defs><linearGradient id="gi" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5ec2f0" stop-opacity="0.35"/><stop offset="100%" stop-color="#5ec2f0" stop-opacity="0"/></linearGradient></defs>'+
+      '<defs><linearGradient id="gi" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7ad8d8" stop-opacity="0.35"/><stop offset="100%" stop-color="#7ad8d8" stop-opacity="0"/></linearGradient></defs>'+
       '<polygon points="'+area+'" fill="url(#gi)"></polygon>'+
-      '<polyline points="'+pts+'" fill="none" stroke="#5ec2f0" stroke-width="2.5"></polyline>'+dots+'</svg></div>';
+      '<polyline points="'+pts+'" fill="none" stroke="#7ad8d8" stroke-width="2.5"></polyline>'+dots+'</svg></div>';
   }
 })();
 </script>
@@ -342,7 +343,7 @@
   if(typeof window.CITAS === 'undefined'){
     c.innerHTML = '<div class="panel" style="color:var(--suave);font-size:14px;line-height:1.6">📑 Aquí aparecerán los <b>grounding queries</b> y tus <b>páginas citadas</b> por la IA. '+
       'Descarga el CSV en Clarity (AI Visibility → Citation), guárdalo en la carpeta del proyecto y ejecuta «Actualizar datos». '+
-      '<a href="'+claUrl+'" target="_blank" rel="noopener" style="color:#7cc6f2">Abrir Clarity ↗</a></div>';
+      '<a href="'+claUrl+'" target="_blank" rel="noopener" style="color:#9ce6e6">Abrir Clarity ↗</a></div>';
     return;
   }
   const C = window.CITAS;
