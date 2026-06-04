@@ -6,8 +6,8 @@
 <title>Captación de Leads · HubSpot · INGESCO</title>
 <link rel="icon" type="image/png" href="assets/favicon.ico.png">
 <style>
-  :root{--navy:#13294b;--azul:#1f5f9b;--cielo:#34a0d9;--fondo:#f4f6f9;
-    --tarjeta:#fff;--texto:#13294b;--suave:#6b7688;--borde:#e3e8ef;
+  :root{--navy:#7a3300;--azul:#ec7a1a;--cielo:#f7a93a;--fondo:#fff1e3;
+    --tarjeta:#fffaf4;--texto:#3a2000;--suave:#9a7350;--borde:#f4dcc2;
     --verde:#16a34a;--rojo:#dc2626;--naranja:#e08a2b;--lima:#9cb500}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:32px 24px 64px}
@@ -79,7 +79,7 @@
   }
   const L = window.LEADS;
   const num = n => Number(n||0).toLocaleString('es-ES');
-  const colores = ['#1f5f9b','#34a0d9','#13294b','#e08a2b','#16a34a','#9333ea','#dc2626','#0891b2','#65a30d','#6b7688'];
+  const colores = ['#ec7a1a','#f7a93a','#c2410c','#fb923c','#d97706','#b45309','#f97316','#9a3412','#7c2d12','#a87f5a'];
   document.getElementById('actualizado').textContent = 'Actualizado: ' + L.fechaActualizacion;
 
   // Traducción de orígenes de HubSpot
@@ -154,7 +154,7 @@
         f.detalle.forEach(d=>{
           const wd=Math.round(d.valor/maxd*100), pcd=total?Math.round(d.valor/total*100):0;
           h+='<div class="barra"><div class="top"><span>'+nf(d.nombre)+'</span><b>'+num(d.valor)+' · '+pcd+'%</b></div>'+
-             '<div class="pista"><div class="relleno" style="width:'+Math.max(wd,2)+'%;background:#9aa3b2"></div></div></div>';
+             '<div class="pista"><div class="relleno" style="width:'+Math.max(wd,2)+'%;background:#c9a98a"></div></div></div>';
         });
         h+='</div>';
       }
@@ -181,11 +181,11 @@
       const x=pad+i*gap+(gap-bw)/2;
       const bh=(d.valor/max)*(H-2*pad);
       const y=H-pad-bh;
-      bars+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" rx="4" fill="#1f5f9b"></rect>'+
-            '<text x="'+(x+bw/2)+'" y="'+(y-7)+'" text-anchor="middle" font-size="11" fill="#13294b" font-weight="700">'+d.valor+'</text>'+
+      bars+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" rx="4" fill="#ec7a1a"></rect>'+
+            '<text x="'+(x+bw/2)+'" y="'+(y-7)+'" text-anchor="middle" font-size="11" fill="#3a2000" font-weight="700">'+d.valor+'</text>'+
             '<text x="'+(x+bw/2)+'" y="'+(H-pad+18)+'" text-anchor="middle" font-size="10.5" fill="#6b7688">'+mesLabel(d.nombre)+'</text>';
     });
-    return '<svg width="100%" viewBox="0 0 '+W+' '+H+'"><text x="'+pad+'" y="22" font-size="12" fill="#13294b" font-weight="700">Leads nuevos por mes (últimos 12)</text>'+bars+'</svg>';
+    return '<svg width="100%" viewBox="0 0 '+W+' '+H+'"><text x="'+pad+'" y="22" font-size="12" fill="#3a2000" font-weight="700">Leads nuevos por mes (últimos 12)</text>'+bars+'</svg>';
   }
 })();
 </script>
