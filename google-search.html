@@ -8,14 +8,12 @@
 <style>
   :root{--navy:#13294b;--azul:#1f5f9b;--cielo:#34a0d9;--fondo:#f4f6f9;
     --tarjeta:#fff;--texto:#13294b;--suave:#6b7688;--borde:#e3e8ef;
-    --verde:#16a34a;--rojo:#dc2626}
+    --verde:#16a34a;--rojo:#dc2626;--ambar:#d97706}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);
-    color:var(--texto);padding:32px 24px 64px}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:32px 24px 64px}
   .contenedor{max-width:1120px;margin:0 auto}
-  a{text-decoration:none}
-  header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
-    margin-bottom:26px;border-bottom:3px solid var(--navy);padding-bottom:18px}
+  a{text-decoration:none;color:inherit}
+  header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:26px;border-bottom:3px solid var(--navy);padding-bottom:18px}
   .titulo{display:flex;align-items:center;gap:18px}
   .titulo .logo{height:50px;width:auto}
   .titulo .sep{width:1px;height:44px;background:var(--borde)}
@@ -25,23 +23,42 @@
   .btn-inicio{background:var(--navy);color:#fff;padding:9px 15px;border-radius:10px;font-weight:700;font-size:13px;display:inline-block;margin-bottom:8px}
   .btn-inicio:hover{filter:brightness(1.15)}
   h2.seccion{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--suave);margin:32px 0 14px;font-weight:700}
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
   .kpi{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
   .kpi .etq{font-size:13px;color:var(--suave);font-weight:600}
-  .kpi .valor{font-size:30px;font-weight:800;margin-top:8px;color:var(--navy)}
+  .kpi .valor{font-size:32px;font-weight:800;margin-top:6px;color:var(--navy);line-height:1}
   .kpi .delta{font-size:12px;font-weight:700;margin-top:6px}
   .kpi .delta.up{color:var(--verde)} .kpi .delta.down{color:var(--rojo)} .kpi .delta.flat{color:var(--suave)}
+  .kpi .tot{font-size:12.5px;color:var(--suave);margin-top:10px;padding-top:8px;border-top:1px dashed var(--borde)}
+  .kpi .tot b{color:var(--navy);font-weight:800}
   .panel{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .panel h3{font-size:16px;margin-bottom:14px}
   table{width:100%;border-collapse:collapse;font-size:13.5px}
-  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--borde)}
+  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--borde)}
   th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--suave)}
   td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
-  td.clave{font-weight:600;color:var(--navy);max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  td.clave{font-weight:600;color:var(--navy);max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   tr:hover td{background:#f8fafc}
-  .rejilla{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:860px){.rejilla{grid-template-columns:1fr}}
   .vacio{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:24px;border-radius:14px}
   footer{margin-top:40px;text-align:center;color:var(--suave);font-size:12px}
+  /* Indexación */
+  .idx-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:16px}
+  .idx-card{border-radius:14px;padding:20px;border:1px solid var(--borde)}
+  .idx-card.ok{background:#ecfdf5;border-color:#a7f3d0}
+  .idx-card.no{background:#fef2f2;border-color:#fecaca}
+  .idx-card .etq{font-size:13px;font-weight:700}
+  .idx-card.ok .etq{color:#047857} .idx-card.no .etq{color:#b91c1c}
+  .idx-card .valor{font-size:34px;font-weight:800;margin-top:4px;color:var(--navy)}
+  .desple{border:1px solid var(--borde);border-radius:10px;margin:8px 0;overflow:hidden}
+  .desple-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none;font-size:14px}
+  .desple-h:hover{background:#f8fafc}
+  .desple-h .izq{display:flex;align-items:center;gap:9px}
+  .desple-h .flecha{color:var(--cielo);font-size:12px;width:12px}
+  .desple-h b{font-weight:700}
+  .desple-h .cnt{font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}
+  .url-list{display:none;max-height:320px;overflow:auto;border-top:1px solid var(--borde);background:#fbfcfe}
+  .url-list a{display:block;padding:7px 16px;font-size:12.5px;color:var(--azul);border-bottom:1px solid #eef2f7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .url-list a:hover{background:#eef5ff;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -67,7 +84,13 @@
 </div>
 
 <script src="datos/gsc.js"></script>
+<script src="datos/indexacion.js"></script>
 <script>
+  window.toggleDesple=function(id){
+    var e=document.getElementById(id), f=document.getElementById('f'+id);
+    if(!e)return; var open=e.style.display==='block';
+    e.style.display=open?'none':'block'; if(f)f.textContent=open?'▸':'▾';
+  };
 (function(){
   const cont = document.getElementById('contenido');
   if(typeof window.GSC === 'undefined'){
@@ -76,63 +99,96 @@
   }
   const G = window.GSC;
   const num = n => Number(n||0).toLocaleString('es-ES');
-  document.getElementById('periodo').textContent = 'Periodo: ' + G.periodo.ini + ' – ' + G.periodo.fin;
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  document.getElementById('periodo').textContent = 'Último mes: ' + G.periodo.ini + ' – ' + G.periodo.fin;
   document.getElementById('actualizado').textContent = 'Actualizado: ' + G.fechaActualizacion;
 
-  const t = G.totales;
+  const t = G.totales, tl = G.totalesLargo || {};
   function delta(cur,prev){
     if(!prev) return '<div class="delta flat">—</div>';
-    const d = (cur-prev)/prev*100;
-    const cls = d>=0?'up':'down';
-    const fl = d>=0?'▲':'▼';
-    return '<div class="delta '+cls+'">'+fl+' '+Math.abs(d).toFixed(1).replace('.',',')+'% vs. periodo anterior</div>';
+    const d=(cur-prev)/prev*100, cls=d>=0?'up':'down', fl=d>=0?'▲':'▼';
+    return '<div class="delta '+cls+'">'+fl+' '+Math.abs(d).toFixed(1).replace('.',',')+'% vs. mes anterior</div>';
   }
 
-  let html = '<div class="kpis">';
-  html += '<div class="kpi"><div class="etq">🖱️ Clics</div><div class="valor">'+num(t.clicks)+'</div>'+delta(t.clicks,t.clicksPrev)+'</div>';
-  html += '<div class="kpi"><div class="etq">👁️ Impresiones</div><div class="valor">'+num(t.impressions)+'</div>'+delta(t.impressions,t.impressionsPrev)+'</div>';
-  html += '<div class="kpi"><div class="etq">📊 CTR medio</div><div class="valor">'+String(t.ctr).replace('.',',')+'%</div><div class="delta flat">clics ÷ impresiones</div></div>';
-  html += '<div class="kpi"><div class="etq">📍 Posición media</div><div class="valor">'+String(t.position).replace('.',',')+'</div><div class="delta flat">más baja = mejor</div></div>';
-  html += '</div>';
+  // ===== BLOQUE 1: RENDIMIENTO (último mes grande + totales pequeño) =====
+  let html='<h2 class="seccion">Rendimiento</h2><div class="kpis">';
+  html+=kpi('🖱️ Clics', num(t.clicks), delta(t.clicks,t.clicksPrev), 'Totales (desde '+(tl.desde||'—')+'): <b>'+num(tl.clicks)+'</b>');
+  html+=kpi('👁️ Impresiones', num(t.impressions), delta(t.impressions,t.impressionsPrev), 'Totales: <b>'+num(tl.impressions)+'</b>');
+  html+=kpi('📊 CTR medio', String(t.ctr).replace('.',',')+'%', '<div class="delta flat">clics ÷ impresiones</div>', 'Total: <b>'+String(tl.ctr||0).replace('.',',')+'%</b>');
+  html+=kpi('📍 Posición media', String(t.position).replace('.',','), '<div class="delta flat">más baja = mejor</div>', 'Total: <b>'+String(tl.position||0).replace('.',',')+'</b>');
+  html+='</div>';
 
-  // Evolución diaria de clics
-  html += '<h2 class="seccion">Evolución diaria</h2><div class="panel">'+grafico(G.porDia)+'</div>';
+  // Evolución
+  html+='<h2 class="seccion">Evolución diaria (clics)</h2><div class="panel">'+grafico(G.porDia)+'</div>';
 
-  // Tablas
-  html += '<h2 class="seccion">Detalle</h2><div class="rejilla">';
-  html += tabla('Top búsquedas (consultas)', G.queries, 'Consulta');
-  html += tabla('Páginas más vistas en Google', G.paginas, 'Página', true);
-  html += '</div>';
+  // ===== BLOQUE 2: INDEXACIÓN =====
+  html+='<h2 class="seccion">Páginas en el índice de Google</h2>'+bloqueIndexacion();
+
+  // ===== BLOQUE 3: CONSULTAS =====
+  html+='<h2 class="seccion">Consultas (por qué te buscan)</h2>';
+  html+=tablaQueries(G.queries||[]);
+
+  // Páginas
+  html+='<h2 class="seccion">Páginas con mejor rendimiento</h2>';
+  html+=tablaPaginas(G.paginas||[]);
 
   cont.innerHTML = html;
 
-  function tabla(titulo, filas, etqClave, esUrl){
-    let h = '<div class="panel"><h3 style="margin-bottom:12px;font-size:16px">'+titulo+'</h3><table><tr><th>'+etqClave+'</th><th class="num">Clics</th><th class="num">Impr.</th><th class="num">Pos.</th></tr>';
-    (filas||[]).forEach(f=>{
-      let clave = f.clave;
-      if(esUrl){ clave = clave.replace(/^https?:\/\/[^/]+/,'') || '/'; }
-      h += '<tr><td class="clave" title="'+f.clave+'">'+clave+'</td><td class="num">'+num(f.clicks)+'</td><td class="num">'+num(f.impressions)+'</td><td class="num">'+String(f.position).replace('.',',')+'</td></tr>';
-    });
-    h += '</table></div>';
+  // ---------- componentes ----------
+  function kpi(etq,val,delta,tot){
+    return '<div class="kpi"><div class="etq">'+etq+'</div><div class="valor">'+val+'</div>'+delta+'<div class="tot">'+tot+'</div></div>';
+  }
+
+  function bloqueIndexacion(){
+    const I = window.INDEX;
+    if(typeof I === 'undefined'){
+      return '<div class="panel" style="color:var(--suave);font-size:14px;line-height:1.6">⏳ Las páginas indexadas/no indexadas se calculan <b>una vez por semana</b> (es un proceso lento que inspecciona ~1.000 páginas). Aparecerán aquí en cuanto termine la primera comprobación.</div>';
+    }
+    let h='<div class="panel"><div class="idx-kpis">'+
+      '<div class="idx-card ok"><div class="etq">✅ Indexadas en Google</div><div class="valor">'+num(I.indexadas)+'</div></div>'+
+      '<div class="idx-card no"><div class="etq">🚫 No indexadas</div><div class="valor">'+num(I.noIndexadas)+'</div></div>'+
+      '<div class="idx-card" style="background:#f8fafc"><div class="etq" style="color:var(--suave)">Páginas comprobadas</div><div class="valor">'+num(I.total)+'</div></div>'+
+      '</div>';
+    // Desplegable: indexadas
+    h+=desple('idx_ok', '✅ Ver páginas indexadas', I.indexadas, (I.listaIndexadas||[]));
+    // Desplegables: no indexadas por motivo
+    (I.motivos||[]).forEach((m,i)=>{ h+=desple('idx_no'+i, '🚫 '+esc(m.motivo), m.total, (m.urls||[])); });
+    h+='</div>';
+    return h;
+  }
+  function desple(id, titulo, cnt, urls){
+    let h='<div class="desple"><div class="desple-h" onclick="toggleDesple(\''+id+'\')">'+
+      '<span class="izq"><span class="flecha" id="f'+id+'">▸</span><b>'+titulo+'</b></span><span class="cnt">'+num(cnt)+'</span></div>'+
+      '<div class="url-list" id="'+id+'">';
+    (urls||[]).forEach(u=>{ const uu=esc(u); h+='<a href="'+uu+'" target="_blank" rel="noopener" title="'+uu+'">'+uu.replace(/^https?:\/\/[^/]+/,'')+'</a>'; });
+    if(!urls||urls.length===0) h+='<a style="color:var(--suave)">(sin URLs)</a>';
+    h+='</div></div>';
     return h;
   }
 
+  function tablaQueries(filas){
+    let h='<div class="panel"><table><tr><th>Consulta</th><th class="num">Clics</th><th class="num">Impresiones</th><th class="num">CTR</th><th class="num">Pos.</th></tr>';
+    filas.forEach(f=>{ h+='<tr><td class="clave" title="'+esc(f.clave)+'">'+esc(f.clave)+'</td><td class="num">'+num(f.clicks)+'</td><td class="num">'+num(f.impressions)+'</td><td class="num">'+String(f.ctr).replace('.',',')+'%</td><td class="num">'+String(f.position).replace('.',',')+'</td></tr>'; });
+    return h+'</table></div>';
+  }
+  function tablaPaginas(filas){
+    let h='<div class="panel"><table><tr><th>Página</th><th class="num">Clics</th><th class="num">Impr.</th><th class="num">Pos.</th></tr>';
+    filas.forEach(f=>{ const u=esc(f.clave), ruta=u.replace(/^https?:\/\/[^/]+/,'')||'/';
+      h+='<tr><td class="clave"><a href="'+u+'" target="_blank" rel="noopener" title="'+u+'" style="color:var(--azul)">'+ruta+' ↗</a></td><td class="num">'+num(f.clicks)+'</td><td class="num">'+num(f.impressions)+'</td><td class="num">'+String(f.position).replace('.',',')+'</td></tr>'; });
+    return h+'</table></div>';
+  }
   function grafico(dias){
-    if(!dias || dias.length<2) return '<p style="color:var(--suave)">Sin datos suficientes.</p>';
-    const W=1060, H=240, pad=44;
+    if(!dias||dias.length<2) return '<p style="color:var(--suave)">Sin datos suficientes.</p>';
+    const W=1060,H=240,pad=44;
     const xs=dias.map((d,i)=>pad+i*(W-2*pad)/(dias.length-1));
     const maxV=Math.max(...dias.map(d=>d.clicks))*1.15||1;
     const ys=dias.map(d=>H-pad-(d.clicks/maxV)*(H-2*pad));
     const pts=xs.map((x,i)=>x+','+ys[i]).join(' ');
     const area=pts+' '+xs[xs.length-1]+','+(H-pad)+' '+xs[0]+','+(H-pad);
-    // etiquetas: primera, media y última fecha
-    const idxs=[0, Math.floor(dias.length/2), dias.length-1];
-    let labels=idxs.map(i=>'<text x="'+xs[i]+'" y="'+(H-pad+20)+'" text-anchor="middle" font-size="11" fill="#6b7688">'+dias[i].fecha.slice(5)+'</text>').join('');
-    return '<svg width="100%" viewBox="0 0 '+W+' '+H+'">'+
-      '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#34a0d9" stop-opacity="0.30"/><stop offset="100%" stop-color="#34a0d9" stop-opacity="0"/></linearGradient></defs>'+
-      '<polygon points="'+area+'" fill="url(#g)"></polygon>'+
-      '<polyline points="'+pts+'" fill="none" stroke="#1f5f9b" stroke-width="2.5"></polyline>'+labels+
-      '<text x="'+pad+'" y="24" font-size="12" fill="#13294b" font-weight="700">Clics por día</text></svg>';
+    const idxs=[0,Math.floor(dias.length/2),dias.length-1];
+    const labels=idxs.map(i=>'<text x="'+xs[i]+'" y="'+(H-pad+20)+'" text-anchor="middle" font-size="11" fill="#6b7688">'+dias[i].fecha.slice(5)+'</text>').join('');
+    return '<svg width="100%" viewBox="0 0 '+W+' '+H+'"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#34a0d9" stop-opacity="0.30"/><stop offset="100%" stop-color="#34a0d9" stop-opacity="0"/></linearGradient></defs>'+
+      '<polygon points="'+area+'" fill="url(#g)"></polygon><polyline points="'+pts+'" fill="none" stroke="#1f5f9b" stroke-width="2.5"></polyline>'+labels+'</svg>';
   }
 })();
 </script>
