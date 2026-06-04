@@ -45,6 +45,16 @@
   .estado.activo{background:rgba(52,201,138,.16);color:var(--verde);border:1px solid rgba(52,201,138,.4)}
   .estado.pronto{background:rgba(224,179,65,.14);color:var(--ambar);border:1px solid rgba(224,179,65,.4)}
 
+  /* Accesos secundarios (FAQ / Peticiones) */
+  .extra{display:flex;gap:18px;justify-content:center;align-items:stretch;flex-wrap:wrap;
+    margin-top:30px;max-width:1180px;width:100%}
+  .btn-extra{flex:1 1 0;min-width:240px;max-width:380px;display:inline-flex;align-items:center;
+    justify-content:center;gap:11px;text-decoration:none;color:#fff;font-size:15.5px;font-weight:800;
+    background:var(--ingazul);border:2px solid var(--lima);border-radius:16px;padding:18px 28px;
+    transition:.18s;box-shadow:0 8px 24px rgba(222,220,0,.18)}
+  .btn-extra:hover{transform:translateY(-3px);box-shadow:0 14px 38px rgba(222,220,0,.36)}
+  .btn-extra .ic{font-size:22px;line-height:1}
+
   footer{margin-top:50px;color:var(--suave);font-size:12.5px;text-align:center}
   footer b{color:#cfe0f5}
 </style>
@@ -95,6 +105,11 @@
       <span class="ir">Entrar →</span>
     </a>
 
+  </div>
+
+  <div class="extra">
+    <a class="btn-extra" href="faq.html"><span class="ic">❓</span> Preguntas frecuentes</a>
+    <a class="btn-extra" href="peticiones.html"><span class="ic">📝</span> Peticiones</a>
   </div>
 
   <footer>
