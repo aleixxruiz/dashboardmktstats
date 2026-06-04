@@ -138,27 +138,39 @@
 
   cont.innerHTML = html;
 
-  // ---- Pintar el mapa (si la librería cargó) ----
-  const valores={}, valEsc={};
-  paises.forEach(p=>{ if(p.code){ valores[p.code]=p.valor; valEsc[p.code]=Math.sqrt(p.valor); } });
+  // ---- Pintar el mapa: calculamos NOSOTROS el color de cada país ----
+  const valores={};
+  paises.forEach(p=>{ if(p.code){ valores[p.code]=p.valor; } });
+  const maxV = Math.max(...Object.values(valores), 1);
+  const C0=[214,233,255], C1=[37,99,235]; // #d6e9ff (claro) -> #2563eb (azul)
+  function colorFor(v){
+    const t=Math.min(1, Math.sqrt(v)/Math.sqrt(maxV));   // raíz: que los pequeños también se vean
+    const r=Math.round(C0[0]+(C1[0]-C0[0])*t), g=Math.round(C0[1]+(C1[1]-C0[1])*t), b=Math.round(C0[2]+(C1[2]-C0[2])*t);
+    return 'rgb('+r+','+g+','+b+')';
+  }
+  function fallback(msg){ const m=document.getElementById('mapa'); if(m) m.innerHTML='<div style="padding:30px;color:var(--suave);text-align:center">🌐 '+msg+' Consulta el «Top países».</div>'; }
   try{
     if(window.jsVectorMap){
       new window.jsVectorMap({
-        selector:'#mapa', map:'world', zoomButtons:true, zoomOnScroll:false,
-        backgroundColor:'transparent',
+        selector:'#mapa', map:'world', zoomButtons:true, zoomOnScroll:false, backgroundColor:'transparent',
         regionStyle:{ initial:{ fill:'#eef2f7', stroke:'#ffffff', strokeWidth:0.5 }, hover:{ fillOpacity:0.85 } },
-        series:{ regions:[{ attribute:'fill', scale:['#d6e9ff','#2563eb'], normalizeFunction:'polynomial', values: valores }] },
         onRegionTooltipShow(event, tooltip, code){
           const v = valores[code];
           tooltip.text(tooltip.text() + (v!=null ? (' · '+num(v)+' usuarios') : ' · sin visitas'), true);
         }
       });
-    } else {
-      document.getElementById('mapa').innerHTML='<div style="padding:30px;color:var(--suave);text-align:center">🌐 Mapa no disponible (sin conexión). Consulta el «Top países» de la derecha.</div>';
-    }
-  }catch(e){
-    document.getElementById('mapa').innerHTML='<div style="padding:30px;color:var(--suave);text-align:center">🌐 No se pudo dibujar el mapa. Consulta el «Top países».</div>';
-  }
+      // Coloreamos cada país directamente sobre su <path>
+      setTimeout(function(){
+        const paths=document.querySelectorAll('#mapa path');
+        let pintados=0;
+        paths.forEach(function(p){
+          const code=(p.getAttribute('data-code')||p.id||'').toUpperCase();
+          if(code && valores[code]!=null){ p.style.fill=colorFor(valores[code]); pintados++; }
+        });
+        if(pintados===0) fallback('No se pudieron colorear los países.');
+      }, 80);
+    } else { fallback('Mapa no disponible (sin conexión).'); }
+  }catch(e){ fallback('No se pudo dibujar el mapa.'); }
 
   // ---------- componentes ----------
   function listaPaises(arr){
