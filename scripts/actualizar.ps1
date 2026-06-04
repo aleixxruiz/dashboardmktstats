@@ -181,6 +181,12 @@ if ((Test-Path $scriptHs) -and $config.hubspot -and $config.hubspot.token) {
     & $scriptHs -Silencioso
 }
 
+# --- Procesar citas de IA (grounding queries / cited pages) desde el CSV de Clarity, si lo hay ---
+$scriptCitas = Join-Path $PSScriptRoot "actualizar-citas.ps1"
+if (Test-Path $scriptCitas) {
+    & $scriptCitas -Silencioso
+}
+
 # --- Subir los datos nuevos a la web (GitHub Pages), si esta configurado ---
 $scriptSubir = Join-Path $PSScriptRoot "subir-github.ps1"
 $ghCfg = $config.github
