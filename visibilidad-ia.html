@@ -7,13 +7,13 @@
 <link rel="icon" type="image/png" href="assets/favicon.ico.png">
 <style>
   :root{
-    /* Paleta turquesa suave (color de marca de Microsoft Clarity) */
-    --fondo:#08222a; --tarjeta:#0d2f37; --borde:#1c4b54;
-    --texto:#e9f6f7; --suave:#8fbac1; --acento:#44c2c9; --acento2:#7ad8d8;
+    /* Paleta azul muy claro */
+    --fondo:#e9f3fb; --tarjeta:#ffffff; --borde:#cfe0ef;
+    --texto:#13294b; --suave:#5e7387; --acento:#1f8a93; --acento2:#157f86;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
-    background:radial-gradient(1200px 600px at 20% -10%,#0e4a54,transparent),var(--fondo);
+    background:radial-gradient(1200px 600px at 20% -10%,#d6e9fb,transparent),var(--fondo);
     color:var(--texto);padding:32px 24px 64px;min-height:100vh}
   .contenedor{max-width:1100px;margin:0 auto}
   a{color:inherit;text-decoration:none}
@@ -21,14 +21,14 @@
   header{display:flex;justify-content:space-between;align-items:center;
     flex-wrap:wrap;gap:16px;margin-bottom:30px;border-bottom:3px solid var(--acento);padding-bottom:18px}
   .titulo{display:flex;align-items:center;gap:18px}
-  .titulo .logo{height:52px;width:auto;filter:brightness(0) invert(1)}
+  .titulo .logo{height:52px;width:auto}
   .titulo h1{font-size:24px;font-weight:800;letter-spacing:-.5px;
-    background:linear-gradient(90deg,#fff,#9ce6e6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    background:linear-gradient(90deg,#13294b,#1f8a93);-webkit-background-clip:text;background-clip:text;color:transparent}
   .titulo p{color:var(--suave);font-size:13.5px;margin-top:6px}
   .nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
   .btn{border:1px solid var(--borde);background:var(--tarjeta);padding:8px 14px;border-radius:10px;
     font-size:13px;font-weight:600;color:var(--suave);transition:.15s}
-  .btn:hover{border-color:var(--acento);color:#fff}
+  .btn:hover{border-color:var(--acento);color:var(--acento)}
   .btn-cita{background:var(--acento);border-color:var(--acento);color:#fff}
   .btn-cita:hover{filter:brightness(1.12);color:#fff}
   .fecha{font-size:12px;color:var(--suave);width:100%;text-align:right;margin-top:4px}
@@ -39,7 +39,7 @@
   .hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:16px}
   .card{background:var(--tarjeta);border:1px solid var(--borde);border-radius:16px;padding:22px;
     position:relative;overflow:hidden}
-  .card.glow{border-color:#2c6a70;background:linear-gradient(160deg,#0e4048,#0d2f37)}
+  .card.glow{border-color:#9ad3d8;background:linear-gradient(160deg,#e3f6f7,#ffffff)}
   .card .etq{font-size:13px;color:var(--suave);font-weight:600}
   .card .valor{font-size:32px;font-weight:800;margin-top:8px;letter-spacing:-1px}
   .card .sub{font-size:12px;color:var(--suave);margin-top:6px}
@@ -59,7 +59,7 @@
   .plat .nom{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
   .plat .nom b{font-weight:700}
   .plat .nom .ses{color:var(--suave);font-weight:600}
-  .pista{background:#07242b;border-radius:8px;height:11px;overflow:hidden}
+  .pista{background:#e6eef6;border-radius:8px;height:11px;overflow:hidden}
   .relleno{height:100%;border-radius:8px;transition:width .4s}
 
   /* Dispositivos (donut) */
@@ -67,13 +67,13 @@
   .leyenda{list-style:none;font-size:14px;flex:1;min-width:200px}
   .leyenda li{display:flex;align-items:center;gap:10px;margin:9px 0}
   .punto{width:12px;height:12px;border-radius:3px;display:inline-block}
-  .leyenda .n{font-weight:700;margin-left:auto;padding-left:18px;color:#fff}
+  .leyenda .n{font-weight:700;margin-left:auto;padding-left:18px;color:var(--texto)}
   .leyenda .pct{color:var(--suave);font-size:12px;width:46px;text-align:right}
 
   /* Engagement */
   .barra-fila{margin:14px 0}
   .barra-fila .top{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
-  .barra-fila .top b{font-weight:700;color:#fff}
+  .barra-fila .top b{font-weight:700;color:var(--texto)}
 
   /* Señales UX */
   .senales{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
@@ -82,7 +82,7 @@
   .senal.aviso{border-left-color:#d99a2b}
   .senal.alerta{border-left-color:#d64545}
   .senal .etq{font-size:13px;color:var(--suave);font-weight:600}
-  .senal .valor{font-size:26px;font-weight:800;margin-top:6px;color:#fff}
+  .senal .valor{font-size:26px;font-weight:800;margin-top:6px;color:var(--texto)}
   .senal .desc{font-size:11px;color:var(--suave);margin-top:6px;line-height:1.4}
 
   .vacio{background:var(--tarjeta);border:1px dashed var(--borde);border-radius:16px;padding:28px;
@@ -96,11 +96,11 @@
   .tabla-citas{width:100%;border-collapse:collapse;font-size:13px}
   .tabla-citas th{text-align:left;color:var(--suave);font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:8px 6px;border-bottom:1px solid var(--borde)}
   .tabla-citas td{padding:8px 6px;border-bottom:1px solid var(--borde);vertical-align:top}
-  .tabla-citas td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:#fff;white-space:nowrap}
-  .tabla-citas td.q{color:#eaf1fb;line-height:1.35}
-  .tabla-citas a{color:#9ce6e6;text-decoration:none}
+  .tabla-citas td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--texto);white-space:nowrap}
+  .tabla-citas td.q{color:var(--texto);line-height:1.35}
+  .tabla-citas a{color:var(--acento);text-decoration:none}
   .tabla-citas a:hover{text-decoration:underline}
-  .tabla-citas tr:hover td{background:rgba(255,255,255,.03)}
+  .tabla-citas tr:hover td{background:rgba(31,138,147,.07)}
   .soa-banner{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
   .soa-num{font-size:40px;font-weight:800;color:var(--acento2);line-height:1}
 </style>
@@ -219,8 +219,8 @@
       ley+='<li><span class="punto" style="background:'+colorDisp(d)+'"></span>'+nombreDisp(d)+'<span class="n">'+num(porDisp[d])+'</span><span class="pct">'+pc+'%</span></li>'; });
     ley+='</ul>';
     return '<div class="panel"><h3>Sesiones por dispositivo</h3><div class="donut-wrap"><svg width="180" height="180" viewBox="0 0 180 180">'+circles+
-      '<text x="90" y="84" text-anchor="middle" font-size="15" fill="#93a7c4">Total</text>'+
-      '<text x="90" y="106" text-anchor="middle" font-size="22" font-weight="700" fill="#fff">'+num(total)+'</text></svg>'+ley+'</div></div>';
+      '<text x="90" y="84" text-anchor="middle" font-size="15" fill="#5e7387">Total</text>'+
+      '<text x="90" y="106" text-anchor="middle" font-size="22" font-weight="700" fill="#13294b">'+num(total)+'</text></svg>'+ley+'</div></div>';
   }
 
   function panelEngagement(){
@@ -246,9 +246,9 @@
     const ys=H.map(d=>Hg-pad-(d.sesiones/maxV)*(Hg-2*pad));
     const pts=xs.map((x,i)=>x+','+ys[i]).join(' ');
     const area=pts+' '+xs[xs.length-1]+','+(Hg-pad)+' '+xs[0]+','+(Hg-pad);
-    let dots=xs.map((x,i)=>'<circle cx="'+x+'" cy="'+ys[i]+'" r="4.5" fill="#44c2c9"></circle>'+
-      '<text x="'+x+'" y="'+(ys[i]-12)+'" text-anchor="middle" font-size="12" fill="#eaf1fb">'+num(H[i].sesiones)+'</text>'+
-      '<text x="'+x+'" y="'+(Hg-pad+22)+'" text-anchor="middle" font-size="11" fill="#93a7c4">'+H[i].fecha.slice(5)+'</text>').join('');
+    let dots=xs.map((x,i)=>'<circle cx="'+x+'" cy="'+ys[i]+'" r="4.5" fill="#1f8a93"></circle>'+
+      '<text x="'+x+'" y="'+(ys[i]-12)+'" text-anchor="middle" font-size="12" fill="#13294b">'+num(H[i].sesiones)+'</text>'+
+      '<text x="'+x+'" y="'+(Hg-pad+22)+'" text-anchor="middle" font-size="11" fill="#5e7387">'+H[i].fecha.slice(5)+'</text>').join('');
     return '<div class="panel"><h3>Evolución de sesiones reales</h3><svg width="100%" viewBox="0 0 '+W+' '+Hg+'">'+
       '<defs><linearGradient id="gh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#44c2c9" stop-opacity="0.28"/><stop offset="100%" stop-color="#44c2c9" stop-opacity="0"/></linearGradient></defs>'+
       '<polygon points="'+area+'" fill="url(#gh)"></polygon>'+
@@ -319,13 +319,13 @@
     const ys=H.map(d=>Hg-pad-(d.sesionesIA/maxV)*(Hg-2*pad));
     const pts=xs.map((x,i)=>x+','+ys[i]).join(' ');
     const area=pts+' '+xs[xs.length-1]+','+(Hg-pad)+' '+xs[0]+','+(Hg-pad);
-    let dots=xs.map((x,i)=>'<circle cx="'+x+'" cy="'+ys[i]+'" r="4.5" fill="#7ad8d8"></circle>'+
-      '<text x="'+x+'" y="'+(ys[i]-12)+'" text-anchor="middle" font-size="12" fill="#e9eef7">'+num(H[i].sesionesIA)+'</text>'+
-      '<text x="'+x+'" y="'+(Hg-pad+22)+'" text-anchor="middle" font-size="11" fill="#8da2c0">'+H[i].fecha.slice(5)+'</text>').join('');
+    let dots=xs.map((x,i)=>'<circle cx="'+x+'" cy="'+ys[i]+'" r="4.5" fill="#157f86"></circle>'+
+      '<text x="'+x+'" y="'+(ys[i]-12)+'" text-anchor="middle" font-size="12" fill="#13294b">'+num(H[i].sesionesIA)+'</text>'+
+      '<text x="'+x+'" y="'+(Hg-pad+22)+'" text-anchor="middle" font-size="11" fill="#5e7387">'+H[i].fecha.slice(5)+'</text>').join('');
     return '<div class="panel"><h3>Sesiones diarias desde IA</h3><svg width="100%" viewBox="0 0 '+W+' '+Hg+'">'+
-      '<defs><linearGradient id="gi" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7ad8d8" stop-opacity="0.35"/><stop offset="100%" stop-color="#7ad8d8" stop-opacity="0"/></linearGradient></defs>'+
+      '<defs><linearGradient id="gi" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2aa7ae" stop-opacity="0.30"/><stop offset="100%" stop-color="#2aa7ae" stop-opacity="0"/></linearGradient></defs>'+
       '<polygon points="'+area+'" fill="url(#gi)"></polygon>'+
-      '<polyline points="'+pts+'" fill="none" stroke="#7ad8d8" stroke-width="2.5"></polyline>'+dots+'</svg></div>';
+      '<polyline points="'+pts+'" fill="none" stroke="#2aa7ae" stroke-width="2.5"></polyline>'+dots+'</svg></div>';
   }
 })();
 </script>
@@ -343,7 +343,7 @@
   if(typeof window.CITAS === 'undefined'){
     c.innerHTML = '<div class="panel" style="color:var(--suave);font-size:14px;line-height:1.6">📑 Aquí aparecerán los <b>grounding queries</b> y tus <b>páginas citadas</b> por la IA. '+
       'Descarga el CSV en Clarity (AI Visibility → Citation), guárdalo en la carpeta del proyecto y ejecuta «Actualizar datos». '+
-      '<a href="'+claUrl+'" target="_blank" rel="noopener" style="color:#9ce6e6">Abrir Clarity ↗</a></div>';
+      '<a href="'+claUrl+'" target="_blank" rel="noopener" style="color:#1f8a93">Abrir Clarity ↗</a></div>';
     return;
   }
   const C = window.CITAS;
@@ -353,7 +353,7 @@
   let h = '<div class="panel"><div class="soa-banner">'+
     '<div><div style="font-size:12px;color:var(--suave);font-weight:600">CUOTA DE AUTORIDAD (Share of Authority)</div>'+
     '<div class="soa-num">'+String(C.soa).replace('.',',')+'%</div></div>'+
-    '<div style="flex:1;min-width:200px;font-size:13px;color:var(--suave)">Tu peso frente a la competencia en las respuestas de IA · Periodo <b style="color:#eaf1fb">'+esc(C.periodo)+'</b> · Solo Copilot/Bing</div>'+
+    '<div style="flex:1;min-width:200px;font-size:13px;color:var(--suave)">Tu peso frente a la competencia en las respuestas de IA · Periodo <b style="color:#13294b">'+esc(C.periodo)+'</b> · Solo Copilot/Bing</div>'+
     '<a class="btn-cita" style="padding:12px 18px;font-size:14px" href="'+claUrl+'" target="_blank" rel="noopener">📑 Abrir detalle en Clarity ↗</a>'+
     '</div></div>';
 
