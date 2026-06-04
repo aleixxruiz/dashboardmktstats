@@ -6,8 +6,8 @@
 <title>Visibilidad en Google · Search Console · INGESCO</title>
 <link rel="icon" type="image/png" href="assets/favicon.ico.png">
 <style>
-  :root{--navy:#13294b;--azul:#1f5f9b;--cielo:#34a0d9;--fondo:#f4f6f9;
-    --tarjeta:#fff;--texto:#13294b;--suave:#6b7688;--borde:#e3e8ef;
+  :root{--navy:#0f4d2e;--azul:#15803d;--cielo:#34c759;--fondo:#e7f6ec;
+    --tarjeta:#f8fdfa;--texto:#10341f;--suave:#5c7a67;--borde:#c9e7d3;
     --verde:#16a34a;--rojo:#dc2626;--ambar:#d97706}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:32px 24px 64px}
@@ -187,8 +187,8 @@
     const area=pts+' '+xs[xs.length-1]+','+(H-pad)+' '+xs[0]+','+(H-pad);
     const idxs=[0,Math.floor(dias.length/2),dias.length-1];
     const labels=idxs.map(i=>'<text x="'+xs[i]+'" y="'+(H-pad+20)+'" text-anchor="middle" font-size="11" fill="#6b7688">'+dias[i].fecha.slice(5)+'</text>').join('');
-    return '<svg width="100%" viewBox="0 0 '+W+' '+H+'"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#34a0d9" stop-opacity="0.30"/><stop offset="100%" stop-color="#34a0d9" stop-opacity="0"/></linearGradient></defs>'+
-      '<polygon points="'+area+'" fill="url(#g)"></polygon><polyline points="'+pts+'" fill="none" stroke="#1f5f9b" stroke-width="2.5"></polyline>'+labels+'</svg>';
+    return '<svg width="100%" viewBox="0 0 '+W+' '+H+'"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#34c759" stop-opacity="0.32"/><stop offset="100%" stop-color="#34c759" stop-opacity="0"/></linearGradient></defs>'+
+      '<polygon points="'+area+'" fill="url(#g)"></polygon><polyline points="'+pts+'" fill="none" stroke="#15803d" stroke-width="2.5"></polyline>'+labels+'</svg>';
   }
 })();
 </script>
