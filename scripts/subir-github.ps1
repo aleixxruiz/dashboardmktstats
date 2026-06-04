@@ -53,15 +53,21 @@ $todos = @(
     @{ local = "datos\ga.js";                remoto = "datos/ga.js" },
     @{ local = "datos\leads.js";             remoto = "datos/leads.js" },
     @{ local = "datos\citas-ia.js";          remoto = "datos/citas-ia.js" },
+    @{ local = "datos\indexacion.js";        remoto = "datos/indexacion.js" },
     @{ local = "scripts\actualizar.ps1";         remoto = "scripts/actualizar.ps1" },
     @{ local = "scripts\subir-github.ps1";       remoto = "scripts/subir-github.ps1" },
     @{ local = "scripts\lib-google.ps1";         remoto = "scripts/lib-google.ps1" },
     @{ local = "scripts\actualizar-gsc.ps1";     remoto = "scripts/actualizar-gsc.ps1" },
     @{ local = "scripts\actualizar-ga.ps1";      remoto = "scripts/actualizar-ga.ps1" },
     @{ local = "scripts\actualizar-hubspot.ps1"; remoto = "scripts/actualizar-hubspot.ps1" },
-    @{ local = "scripts\actualizar-citas.ps1";   remoto = "scripts/actualizar-citas.ps1" }
+    @{ local = "scripts\actualizar-citas.ps1";   remoto = "scripts/actualizar-citas.ps1" },
+    @{ local = "scripts\actualizar-indexacion.ps1"; remoto = "scripts/actualizar-indexacion.ps1" }
 )
 $soloDatosLista = $todos | Where-Object { $_.remoto -like "datos/*" }
+# La indexacion la gestiona SOLO la nube (1/semana). En local no la subimos para no pisar el dato bueno.
+if ($env:GITHUB_ACTIONS -ne 'true') {
+    $soloDatosLista = $soloDatosLista | Where-Object { $_.remoto -ne 'datos/indexacion.js' }
+}
 $lista = if ($SoloDatos) { $soloDatosLista } else { $todos }
 
 Write-Host ""
