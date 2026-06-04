@@ -7,8 +7,8 @@
 <link rel="icon" type="image/png" href="assets/favicon.ico.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css">
 <style>
-  :root{--navy:#13294b;--azul:#1f5f9b;--cielo:#34a0d9;--fondo:#f4f6f9;
-    --tarjeta:#fff;--texto:#13294b;--suave:#6b7688;--borde:#e3e8ef;
+  :root{--navy:#4a3b00;--azul:#e0a800;--cielo:#f6c800;--fondo:#fcf6d8;
+    --tarjeta:#fffef4;--texto:#2b2300;--suave:#8a7a35;--borde:#ece1a0;
     --verde:#16a34a;--rojo:#dc2626;--naranja:#e08a2b}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:32px 24px 64px}
@@ -44,7 +44,7 @@
   @media(max-width:880px){.mapa-wrap{grid-template-columns:1fr}}
   #mapa{width:100%;height:430px}
   .leyenda-mapa{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:12px;color:var(--suave)}
-  .leyenda-barra{flex:1;height:10px;border-radius:6px;background:linear-gradient(90deg,#d6e9ff,#2563eb)}
+  .leyenda-barra{flex:1;height:10px;border-radius:6px;background:linear-gradient(90deg,#fdf3b0,#c98a00)}
   .pais-row{display:flex;align-items:center;gap:10px;font-size:13.5px;margin:9px 0}
   .pais-row .ban{font-size:18px;width:24px;text-align:center}
   .pais-row .nom{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -60,7 +60,7 @@
   .pag .ir{color:var(--cielo);font-size:14px}
   .vacio{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:24px;border-radius:14px}
   footer{margin-top:40px;text-align:center;color:var(--suave);font-size:12px}
-  .jvm-tooltip{background:#13294b;font-weight:600}
+  .jvm-tooltip{background:#5a4500;font-weight:600}
 </style>
 </head>
 <body>
@@ -97,7 +97,7 @@
   }
   const G = window.GA;
   const num = n => Number(n||0).toLocaleString('es-ES');
-  const colores = ['#1f5f9b','#34a0d9','#13294b','#e08a2b','#16a34a','#9333ea','#dc2626','#0891b2'];
+  const colores = ['#e0a800','#f6c800','#b8860b','#caa200','#8a6d00','#d99a2b','#f2d24b','#9c7a00'];
   document.getElementById('periodo').textContent = 'Periodo: ' + G.periodo.ini + ' – ' + G.periodo.fin;
   document.getElementById('actualizado').textContent = 'Actualizado: ' + G.fechaActualizacion;
 
@@ -142,7 +142,7 @@
   const valores={};
   paises.forEach(p=>{ if(p.code){ valores[p.code]=p.valor; } });
   const maxV = Math.max(...Object.values(valores), 1);
-  const C0=[214,233,255], C1=[37,99,235]; // #d6e9ff (claro) -> #2563eb (azul)
+  const C0=[255,247,200], C1=[201,138,0]; // amarillo claro -> ámbar oscuro
   function colorFor(v){
     const t=Math.min(1, Math.sqrt(v)/Math.sqrt(maxV));   // raíz: que los pequeños también se vean
     const r=Math.round(C0[0]+(C1[0]-C0[0])*t), g=Math.round(C0[1]+(C1[1]-C0[1])*t), b=Math.round(C0[2]+(C1[2]-C0[2])*t);
@@ -153,7 +153,7 @@
     if(window.jsVectorMap){
       new window.jsVectorMap({
         selector:'#mapa', map:'world', zoomButtons:true, zoomOnScroll:false, backgroundColor:'transparent',
-        regionStyle:{ initial:{ fill:'#eef2f7', stroke:'#ffffff', strokeWidth:0.5 }, hover:{ fillOpacity:0.85 } },
+        regionStyle:{ initial:{ fill:'#f1e7ad', stroke:'#fffef4', strokeWidth:0.5 }, hover:{ fillOpacity:0.85 } },
         onRegionTooltipShow(event, tooltip, code){
           const v = valores[code];
           tooltip.text(tooltip.text() + (v!=null ? (' · '+num(v)+' usuarios') : ' · sin visitas'), true);
@@ -208,10 +208,10 @@
     const idxs=[0,Math.floor(dias.length/2),dias.length-1];
     const labels=idxs.map(i=>'<text x="'+xs[i]+'" y="'+(H-pad+20)+'" text-anchor="middle" font-size="11" fill="#6b7688">'+dias[i].fecha.slice(5)+'</text>').join('');
     return '<svg width="100%" viewBox="0 0 '+W+' '+H+'">'+
-      '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1f5f9b" stop-opacity="0.30"/><stop offset="100%" stop-color="#1f5f9b" stop-opacity="0"/></linearGradient></defs>'+
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e0a800" stop-opacity="0.32"/><stop offset="100%" stop-color="#e0a800" stop-opacity="0"/></linearGradient></defs>'+
       '<polygon points="'+area+'" fill="url(#g)"></polygon>'+
-      '<polyline points="'+pts+'" fill="none" stroke="#1f5f9b" stroke-width="2.5"></polyline>'+labels+
-      '<text x="'+pad+'" y="22" font-size="12" fill="#13294b" font-weight="700">Sesiones por día</text></svg>';
+      '<polyline points="'+pts+'" fill="none" stroke="#e0a800" stroke-width="2.5"></polyline>'+labels+
+      '<text x="'+pad+'" y="22" font-size="12" fill="#2b2300" font-weight="700">Sesiones por día</text></svg>';
   }
 })();
 </script>
