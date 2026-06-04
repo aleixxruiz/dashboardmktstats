@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Visibilidad en IA · INGESCO</title>
+<title>Comportamiento & Visibilidad IA · INGESCO</title>
 <link rel="icon" type="image/png" href="assets/favicon.ico.png">
 <style>
   :root{
-    /* Paleta corporativa INGESCO (modo oscuro) */
     --fondo:#0a1830; --tarjeta:#102544; --borde:#1e3a5f;
     --texto:#eaf1fb; --suave:#93a7c4; --acento:#34a0d9; --acento2:#5ec2f0;
   }
@@ -31,35 +30,27 @@
   .btn:hover{border-color:var(--acento);color:#fff}
   .btn-cita{background:var(--acento);border-color:var(--acento);color:#fff}
   .btn-cita:hover{filter:brightness(1.12);color:#fff}
-
-  .citas-panel{background:linear-gradient(160deg,#13345c,#102544);border:1px solid #224a78;
-    border-radius:16px;padding:24px;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
-  .citas-panel .txt{flex:1;min-width:260px}
-  .citas-panel h3{font-size:17px;margin-bottom:8px}
-  .citas-panel p{font-size:13.5px;color:var(--suave);line-height:1.6}
-  .citas-panel ul{margin:10px 0 0 18px;font-size:13px;color:var(--suave);line-height:1.7}
-  .citas-panel .cta{background:var(--acento);color:#fff;padding:12px 20px;border-radius:12px;
-    font-weight:700;font-size:14px;white-space:nowrap}
-  .citas-panel .cta:hover{filter:brightness(1.12)}
-  .badge{display:inline-block;background:#16395f;color:#7cc6f2;font-size:11px;font-weight:700;
-    padding:3px 9px;border-radius:999px;margin-bottom:10px;letter-spacing:.3px}
   .fecha{font-size:12px;color:var(--suave);width:100%;text-align:right;margin-top:4px}
 
   h2.seccion{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--suave);
     margin:34px 0 14px;font-weight:700}
 
-  .hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
+  .hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:16px}
   .card{background:var(--tarjeta);border:1px solid var(--borde);border-radius:16px;padding:22px;
     position:relative;overflow:hidden}
   .card.glow{border-color:#2c5a8a;background:linear-gradient(160deg,#143862,#102544)}
   .card .etq{font-size:13px;color:var(--suave);font-weight:600}
-  .card .valor{font-size:38px;font-weight:800;margin-top:8px;letter-spacing:-1px}
+  .card .valor{font-size:32px;font-weight:800;margin-top:8px;letter-spacing:-1px}
   .card .sub{font-size:12px;color:var(--suave);margin-top:6px}
 
   .panel{background:var(--tarjeta);border:1px solid var(--borde);border-radius:16px;padding:24px}
   .panel h3{font-size:16px;margin-bottom:6px}
   .panel .ayuda{font-size:12.5px;color:var(--suave);margin-bottom:18px;line-height:1.5}
 
+  .rejilla{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:780px){.rejilla{grid-template-columns:1fr}}
+
+  /* Plataformas IA */
   .plat{display:flex;align-items:center;gap:14px;margin:16px 0}
   .plat .logo{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;
     font-size:20px;font-weight:800;color:#fff;flex-shrink:0}
@@ -67,15 +58,38 @@
   .plat .nom{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
   .plat .nom b{font-weight:700}
   .plat .nom .ses{color:var(--suave);font-weight:600}
-  .pista{background:#0e1626;border-radius:8px;height:10px;overflow:hidden}
+  .pista{background:#0e1626;border-radius:8px;height:11px;overflow:hidden}
   .relleno{height:100%;border-radius:8px;transition:width .4s}
+
+  /* Dispositivos (donut) */
+  .donut-wrap{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+  .leyenda{list-style:none;font-size:14px;flex:1;min-width:200px}
+  .leyenda li{display:flex;align-items:center;gap:10px;margin:9px 0}
+  .punto{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .leyenda .n{font-weight:700;margin-left:auto;padding-left:18px;color:#fff}
+  .leyenda .pct{color:var(--suave);font-size:12px;width:46px;text-align:right}
+
+  /* Engagement */
+  .barra-fila{margin:14px 0}
+  .barra-fila .top{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
+  .barra-fila .top b{font-weight:700;color:#fff}
+
+  /* Señales UX */
+  .senales{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+  .senal{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:18px;border-left:5px solid #7c93b0}
+  .senal.ok{border-left-color:#1f9d6b}
+  .senal.aviso{border-left-color:#d99a2b}
+  .senal.alerta{border-left-color:#d64545}
+  .senal .etq{font-size:13px;color:var(--suave);font-weight:600}
+  .senal .valor{font-size:26px;font-weight:800;margin-top:6px;color:#fff}
+  .senal .desc{font-size:11px;color:var(--suave);margin-top:6px;line-height:1.4}
 
   .vacio{background:var(--tarjeta);border:1px dashed var(--borde);border-radius:16px;padding:28px;
     color:var(--suave);font-size:14px;line-height:1.6;text-align:center}
-
-  .hist-nota{font-size:13px;color:var(--suave);line-height:1.6}
+  .hist-nota{font-size:13px;color:var(--suave);line-height:1.6;margin-top:10px}
   footer{margin-top:42px;text-align:center;color:var(--suave);font-size:12px}
 
+  /* Citas */
   .citas-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   @media(max-width:860px){.citas-grid{grid-template-columns:1fr}}
   .tabla-citas{width:100%;border-collapse:collapse;font-size:13px}
@@ -97,136 +111,208 @@
     <div class="titulo">
       <img class="logo" src="assets/logo-ingesco.png" alt="INGESCO">
       <div>
-        <h1>🤖 Visibilidad en IA</h1>
-        <p>Visitantes que llegan desde asistentes de IA (ChatGPT, Perplexity, Copilot, Gemini…)</p>
+        <h1>Comportamiento & Visibilidad IA</h1>
+        <p>Microsoft Clarity · lo que Google Analytics no ve + tu visibilidad en IA</p>
       </div>
     </div>
     <div class="nav">
       <a class="btn" href="index.html">🏠 Inicio</a>
-      <a class="btn" href="dashboard.html">← Dashboard general</a>
       <a class="btn btn-cita" href="https://clarity.microsoft.com/projects/view/ucpc895xla/aivisibility?URL=2%3B6%3B%5Ehttps%3A%2F%2Fwww%5C.ingesco%5C.com%2Fes%28%5C%3F.*%29%3F%24&amp;date=Last+3+days&amp;heatmapDeviceType=2&amp;heatmapType=0" target="_blank" rel="noopener"
-         title="En Clarity: AI Visibility → Citation">📑 Citas y términos (Clarity) ↗</a>
+         title="En Clarity: AI Visibility → Citation">📑 Abrir en Clarity ↗</a>
       <div class="fecha" id="fecha">—</div>
     </div>
   </header>
 
+  <!-- Comportamiento general (Clarity, lo que GA no ve) -->
+  <div id="general"></div>
+
+  <!-- Tráfico desde IA -->
+  <h2 class="seccion">Tráfico desde asistentes de IA</h2>
   <div id="contenido"></div>
 
+  <!-- Citas IA -->
   <h2 class="seccion">Visibilidad en respuestas de IA · Copilot / Bing</h2>
   <div id="citas"></div>
 
   <footer>
-    <b>INGESCO®</b> · Joining sky and ground. Protecting you since 1973 ·
-    Fuente: Microsoft Clarity (canal «AI Platform»)
+    <b>INGESCO®</b> · Joining sky and ground. Protecting you since 1973 · Fuente: Microsoft Clarity
   </footer>
 </div>
 
+<script src="datos/datos.js"></script>
+<script src="datos/historico.js"></script>
 <script src="datos/datos-ia.js"></script>
 <script src="datos/historico-ia.js"></script>
+<script src="datos/citas-ia.js"></script>
+
+<!-- ===== Bloque 1: Comportamiento general (Clarity, dimensión Device) ===== -->
+<script>
+(function(){
+  const cont = document.getElementById('general');
+  if(typeof window.CLARITY === 'undefined'){
+    cont.innerHTML = '<div class="vacio">⚠️ <b>Aún no hay datos de comportamiento.</b> Ejecuta «Actualizar datos».</div>';
+    return;
+  }
+  const C = window.CLARITY;
+  const f = document.getElementById('fecha');
+  if(f) f.textContent = 'Actualizado: ' + C.fechaActualizacion + ' · últimos ' + C.dias + ' días';
+
+  const num = n => Number(n||0).toLocaleString('es-ES');
+  const metric = name => { const m=(C.datos||[]).find(x=>x.metricName===name); return m?m.information:[]; };
+  const colorDisp = d => ({PC:'#34a0d9', Mobile:'#1f9d6b', Tablet:'#e08a2b', Other:'#7c93b0'}[d]||'#7c93b0');
+  const nombreDisp = d => ({PC:'Ordenador', Mobile:'Móvil', Tablet:'Tablet', Other:'Otros'}[d]||d);
+
+  const traffic = metric('Traffic');
+  let sesiones=0, usuarios=0, bots=0, ppsNum=0; const porDisp={};
+  traffic.forEach(t=>{ const s=parseInt(t.totalSessionCount)||0; sesiones+=s; usuarios+=parseInt(t.distinctUserCount)||0;
+    bots+=parseInt(t.totalBotSessionCount)||0; ppsNum+=s*(parseFloat(t.pagesPerSessionPercentage)||0); porDisp[t.Device]=(porDisp[t.Device]||0)+s; });
+  const pps = sesiones?(ppsNum/sesiones):0;
+  const sesDe = d => porDisp[d]||0;
+
+  let scrollNum=0, scrollDen=0;
+  metric('ScrollDepth').forEach(x=>{ const s=sesDe(x.Device); scrollNum+=s*(parseFloat(x.averageScrollDepth)||0); scrollDen+=s; });
+  const scroll = scrollDen?scrollNum/scrollDen:0;
+
+  let actNum=0, actDen=0; const engPorDisp=[];
+  metric('EngagementTime').forEach(x=>{ const s=sesDe(x.Device); const act=parseFloat(x.activeTime)||0; actNum+=s*act; actDen+=s;
+    engPorDisp.push({d:x.Device, activo:act, total:parseFloat(x.totalTime)||0, s:s}); });
+  const activo = actDen?actNum/actDen:0;
+  const fmtTiempo = seg => { seg=Math.round(seg); const m=Math.floor(seg/60), s=seg%60; return m>0?(m+'m '+s+'s'):(s+'s'); };
+
+  function pctMetrica(name){ let con=0,tot=0; metric(name).forEach(x=>{ const s=parseInt(x.sessionsCount)||0; const p=parseFloat(x.sessionsWithMetricPercentage)||0; con+=s*p/100; tot+=s; }); return tot?(con/tot*100):0; }
+  const deadPct=pctMetrica('DeadClickCount'), ragePct=pctMetrica('RageClickCount'),
+        errPct=pctMetrica('ScriptErrorCount'), quickPct=pctMetrica('QuickbackClick');
+  const nivel = (v,a,al) => v>=al?'alerta':(v>=a?'aviso':'ok');
+
+  let html='<div class="hero">';
+  html+=kpi('👥','Sesiones reales',num(sesiones),bots+' bots descartados');
+  html+=kpi('🧑‍💼','Usuarios únicos',num(usuarios),'visitantes distintos');
+  html+=kpi('📄','Páginas por sesión',pps.toFixed(2).replace('.',','),'navegación media');
+  html+=kpi('⏱️','Tiempo activo medio',fmtTiempo(activo),'interacción real por sesión');
+  html+=kpi('📜','Scroll medio',Math.round(scroll)+'%','cuánto bajan en la página');
+  html+='</div>';
+
+  html+='<h2 class="seccion">Cómo nos visitan</h2><div class="rejilla">'+panelDispositivos()+panelEngagement()+'</div>';
+
+  html+='<h2 class="seccion">Señales de experiencia (lo que GA no ve)</h2><div class="senales">';
+  html+=senal('🖱️','Clics muertos',deadPct,'Clics en algo que no responde (parece botón y no lo es).',nivel(deadPct,10,20));
+  html+=senal('😤','Clics de frustración',ragePct,'Clics repetidos y rápidos: algo no funciona como esperan.',nivel(ragePct,2,5));
+  html+=senal('⚠️','Errores de script',errPct,'Sesiones donde la web lanzó un error técnico de JavaScript.',nivel(errPct,5,10));
+  html+=senal('↩️','Vuelta rápida atrás',quickPct,'Entran y vuelven enseguida: contenido que no encaja.',nivel(quickPct,5,10));
+  html+='</div>';
+
+  html+='<h2 class="seccion">Evolución de sesiones</h2>'+panelHistorico();
+  cont.innerHTML = html;
+
+  function kpi(ic,etq,val,sub){ return '<div class="card"><div class="etq">'+ic+' '+etq+'</div><div class="valor">'+val+'</div><div class="sub">'+sub+'</div></div>'; }
+
+  function panelDispositivos(){
+    const total=Object.values(porDisp).reduce((a,b)=>a+b,0)||1;
+    const orden=Object.keys(porDisp).sort((a,b)=>porDisp[b]-porDisp[a]);
+    const R=70, C2=2*Math.PI*R; let offset=0, circles='';
+    orden.forEach(d=>{ const len=porDisp[d]/total*C2;
+      circles+='<circle r="'+R+'" cx="90" cy="90" fill="transparent" stroke="'+colorDisp(d)+'" stroke-width="26" stroke-dasharray="'+len+' '+(C2-len)+'" stroke-dashoffset="'+(-offset)+'" transform="rotate(-90 90 90)"></circle>';
+      offset+=len; });
+    let ley='<ul class="leyenda">';
+    orden.forEach(d=>{ const pc=Math.round(porDisp[d]/total*100);
+      ley+='<li><span class="punto" style="background:'+colorDisp(d)+'"></span>'+nombreDisp(d)+'<span class="n">'+num(porDisp[d])+'</span><span class="pct">'+pc+'%</span></li>'; });
+    ley+='</ul>';
+    return '<div class="panel"><h3>Sesiones por dispositivo</h3><div class="donut-wrap"><svg width="180" height="180" viewBox="0 0 180 180">'+circles+
+      '<text x="90" y="84" text-anchor="middle" font-size="15" fill="#93a7c4">Total</text>'+
+      '<text x="90" y="106" text-anchor="middle" font-size="22" font-weight="700" fill="#fff">'+num(total)+'</text></svg>'+ley+'</div></div>';
+  }
+
+  function panelEngagement(){
+    const maxT=Math.max(...engPorDisp.map(e=>e.total),1);
+    const orden=engPorDisp.filter(e=>e.s>0).sort((a,b)=>b.s-a.s);
+    let filas='';
+    orden.forEach(e=>{ const w=Math.round(e.activo/maxT*100);
+      filas+='<div class="barra-fila"><div class="top"><span>'+nombreDisp(e.d)+'</span><span><b>'+fmtTiempo(e.activo)+'</b> activo · '+fmtTiempo(e.total)+' total</span></div>'+
+        '<div class="pista"><div class="relleno" style="width:'+Math.max(w,3)+'%;background:'+colorDisp(e.d)+'"></div></div></div>'; });
+    return '<div class="panel"><h3>Tiempo por sesión y dispositivo</h3>'+filas+'<div class="hist-nota">Barra = tiempo <b>activo</b> (interacción real) por dispositivo.</div></div>';
+  }
+
+  function senal(ic,etq,val,desc,clase){
+    return '<div class="senal '+clase+'"><div class="etq">'+ic+' '+etq+'</div><div class="valor">'+val.toFixed(1).replace('.',',')+'%</div><div class="desc">'+desc+'</div></div>';
+  }
+
+  function panelHistorico(){
+    const H=(window.CLARITY_HISTORICO||[]);
+    if(H.length<2){ return '<div class="panel"><h3>Evolución de sesiones reales</h3><div class="hist-nota">📈 La tendencia día a día se irá rellenando sola (un punto por día).</div></div>'; }
+    const W=1040,Hg=240,pad=44;
+    const xs=H.map((d,i)=>pad+i*(W-2*pad)/(H.length-1));
+    const maxV=Math.max(...H.map(d=>d.sesiones))*1.15||1;
+    const ys=H.map(d=>Hg-pad-(d.sesiones/maxV)*(Hg-2*pad));
+    const pts=xs.map((x,i)=>x+','+ys[i]).join(' ');
+    const area=pts+' '+xs[xs.length-1]+','+(Hg-pad)+' '+xs[0]+','+(Hg-pad);
+    let dots=xs.map((x,i)=>'<circle cx="'+x+'" cy="'+ys[i]+'" r="4.5" fill="#34a0d9"></circle>'+
+      '<text x="'+x+'" y="'+(ys[i]-12)+'" text-anchor="middle" font-size="12" fill="#eaf1fb">'+num(H[i].sesiones)+'</text>'+
+      '<text x="'+x+'" y="'+(Hg-pad+22)+'" text-anchor="middle" font-size="11" fill="#93a7c4">'+H[i].fecha.slice(5)+'</text>').join('');
+    return '<div class="panel"><h3>Evolución de sesiones reales</h3><svg width="100%" viewBox="0 0 '+W+' '+Hg+'">'+
+      '<defs><linearGradient id="gh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#34a0d9" stop-opacity="0.28"/><stop offset="100%" stop-color="#34a0d9" stop-opacity="0"/></linearGradient></defs>'+
+      '<polygon points="'+area+'" fill="url(#gh)"></polygon>'+
+      '<polyline points="'+pts+'" fill="none" stroke="#34a0d9" stroke-width="2.5"></polyline>'+dots+'</svg></div>';
+  }
+})();
+</script>
+
+<!-- ===== Bloque 2: Tráfico desde IA (Clarity, dimensión Channel+Source) ===== -->
 <script>
 (function(){
   const cont = document.getElementById('contenido');
   if(typeof window.CLARITY_IA === 'undefined'){
-    cont.innerHTML = '<div class="vacio">⚠️ <b>Aún no hay datos de IA.</b><br>Ejecuta «Actualizar datos» y vuelve a abrir esta página.</div>';
+    cont.innerHTML = '<div class="vacio">⚠️ <b>Aún no hay datos de IA.</b> Ejecuta «Actualizar datos».</div>';
     return;
   }
   const IA = window.CLARITY_IA;
-  document.getElementById('fecha').textContent = 'Actualizado: ' + IA.fechaActualizacion + ' · últimos ' + IA.dias + ' días';
-
   const num = n => Number(n||0).toLocaleString('es-ES');
-
-  // --- Definición de plataformas IA ---
-  const PLAT = {
-    ChatGPT:    {color:'#10a37f', ic:'G'},
-    Perplexity: {color:'#20b8cd', ic:'P'},
-    Copilot:    {color:'#0a7bd4', ic:'C'},
-    Gemini:     {color:'#4285f4', ic:'✦'},
-    Claude:     {color:'#d97757', ic:'A'},
-    'Otras IA': {color:'#7c93b0', ic:'∎'}
-  };
-
-  // Clasifica una fila (Channel, Source) -> nombre de plataforma IA o null
+  const PLAT = { ChatGPT:{color:'#10a37f',ic:'G'}, Perplexity:{color:'#20b8cd',ic:'P'}, Copilot:{color:'#0a7bd4',ic:'C'},
+    Gemini:{color:'#4285f4',ic:'✦'}, Claude:{color:'#d97757',ic:'A'}, 'Otras IA':{color:'#7c93b0',ic:'∎'} };
   function clasificar(row){
-    const s = String(row.Source||'').toLowerCase();
-    const ch = String(row.Channel||'');
+    const s=String(row.Source||'').toLowerCase(), ch=String(row.Channel||'');
     const esCanalIA = ch.indexOf('Ai')===0 || ch.indexOf('PaidAi')===0;
-    if(s.indexOf('chatgpt')>=0 || s==='openai') return 'ChatGPT';
+    if(s.indexOf('chatgpt')>=0||s==='openai') return 'ChatGPT';
     if(s.indexOf('perplexity')>=0) return 'Perplexity';
     if(s.indexOf('copilot')>=0) return 'Copilot';
-    if(s.indexOf('gemini')>=0 || s.indexOf('bard')>=0) return 'Gemini';
-    if(s==='google' && esCanalIA) return 'Gemini';
+    if(s.indexOf('gemini')>=0||s.indexOf('bard')>=0) return 'Gemini';
+    if(s==='google'&&esCanalIA) return 'Gemini';
     if(s.indexOf('claude')>=0) return 'Claude';
     if(esCanalIA) return 'Otras IA';
     return null;
   }
-
-  // --- Agregar ---
-  const porPlat = {};
-  let sesIA=0, usrIA=0, sesTotal=0;
-  (IA.datos||[]).forEach(row=>{
-    const s = parseInt(row.totalSessionCount)||0;
-    sesTotal += s;
-    const p = clasificar(row);
-    if(p){
-      porPlat[p] = (porPlat[p]||0) + s;
-      sesIA += s;
-      usrIA += parseInt(row.distinctUserCount)||0;
-    }
-  });
-  const pct = sesTotal ? (sesIA/sesTotal*100) : 0;
+  const porPlat={}; let sesIA=0, usrIA=0, sesTotal=0;
+  (IA.datos||[]).forEach(row=>{ const s=parseInt(row.totalSessionCount)||0; sesTotal+=s; const p=clasificar(row);
+    if(p){ porPlat[p]=(porPlat[p]||0)+s; sesIA+=s; usrIA+=parseInt(row.distinctUserCount)||0; } });
+  const pct = sesTotal?(sesIA/sesTotal*100):0;
   const nPlat = Object.keys(porPlat).filter(k=>porPlat[k]>0).length;
 
-  // ================= RENDER =================
-  let html = '';
+  let html='<div class="hero">';
+  html+=card('🤖','Sesiones desde IA',num(sesIA),'en los últimos '+IA.dias+' días',true);
+  html+=card('📊','% del tráfico total',pct.toFixed(2).replace('.',',')+'%',num(sesIA)+' de '+num(sesTotal)+' sesiones',false);
+  html+=card('🧑‍💼','Usuarios desde IA',num(usrIA),'personas distintas',false);
+  html+=card('🔌','Plataformas detectadas',nPlat,'asistentes que te citan',false);
+  html+='</div>';
 
-  html += '<div class="hero">';
-  html += card('🤖','Sesiones desde IA', num(sesIA), 'en los últimos '+IA.dias+' días', true);
-  html += card('📊','% del tráfico total', pct.toFixed(2).replace('.',',')+'%', num(sesIA)+' de '+num(sesTotal)+' sesiones', false);
-  html += card('🧑‍💼','Usuarios desde IA', num(usrIA), 'personas distintas', false);
-  html += card('🔌','Plataformas detectadas', nPlat, 'asistentes que te citan', false);
-  html += '</div>';
-
-  // Desglose por plataforma
-  html += '<h2 class="seccion">¿Desde qué IA llegan?</h2>';
   if(sesIA===0){
-    html += '<div class="vacio">Todavía no se han detectado sesiones procedentes de IA en este periodo.<br>'+
-      'A medida que la gente pregunte por INGESCO a ChatGPT, Perplexity, etc., irán apareciendo aquí.</div>';
+    html+='<div class="vacio" style="margin-top:16px">Todavía no hay sesiones procedentes de IA en este periodo.</div>';
   } else {
-    const orden = Object.keys(porPlat).filter(k=>porPlat[k]>0).sort((a,b)=>porPlat[b]-porPlat[a]);
-    const maxV = Math.max(...orden.map(k=>porPlat[k]));
+    const orden=Object.keys(porPlat).filter(k=>porPlat[k]>0).sort((a,b)=>porPlat[b]-porPlat[a]);
+    const maxV=Math.max(...orden.map(k=>porPlat[k]));
     let filas='';
-    orden.forEach(k=>{
-      const v=porPlat[k], col=(PLAT[k]||{}).color||'#7c93b0', ic=(PLAT[k]||{}).ic||'•';
-      const w=Math.round(v/maxV*100);
-      const pc=Math.round(v/sesIA*100);
-      filas+='<div class="plat"><div class="logo" style="background:'+col+'">'+ic+'</div>'+
-        '<div class="cuerpo"><div class="nom"><b>'+k+'</b><span class="ses">'+num(v)+' ses. · '+pc+'%</span></div>'+
-        '<div class="pista"><div class="relleno" style="width:'+Math.max(w,3)+'%;background:'+col+'"></div></div></div></div>';
-    });
-    html += '<div class="panel"><h3>Reparto por asistente de IA</h3>'+
-      '<div class="ayuda">Sesiones de personas que llegaron a ingesco.com tras una conversación con cada IA.</div>'+
-      filas+'</div>';
+    orden.forEach(k=>{ const v=porPlat[k], col=(PLAT[k]||{}).color||'#7c93b0', ic=(PLAT[k]||{}).ic||'•';
+      const w=Math.round(v/maxV*100), pc=Math.round(v/sesIA*100);
+      filas+='<div class="plat"><div class="logo" style="background:'+col+'">'+ic+'</div><div class="cuerpo"><div class="nom"><b>'+k+'</b><span class="ses">'+num(v)+' ses. · '+pc+'%</span></div><div class="pista"><div class="relleno" style="width:'+Math.max(w,3)+'%;background:'+col+'"></div></div></div></div>'; });
+    html+='<div class="panel" style="margin-top:16px"><h3>Reparto por asistente de IA</h3><div class="ayuda">Sesiones de personas que llegaron a ingesco.com tras hablar con cada IA.</div>'+filas+'</div>';
   }
 
-  // Evolución
-  html += '<h2 class="seccion">Evolución</h2>';
-  html += panelHistorico();
-
+  html+='<h2 class="seccion">Evolución del tráfico de IA</h2>'+panelHistorico();
   cont.innerHTML = html;
 
-  function card(ic,etq,val,sub,glow){
-    return '<div class="card'+(glow?' glow':'')+'"><div class="etq">'+ic+' '+etq+'</div>'+
-      '<div class="valor">'+val+'</div><div class="sub">'+sub+'</div></div>';
-  }
-
+  function card(ic,etq,val,sub,glow){ return '<div class="card'+(glow?' glow':'')+'"><div class="etq">'+ic+' '+etq+'</div><div class="valor">'+val+'</div><div class="sub">'+sub+'</div></div>'; }
   function panelHistorico(){
-    const H = (window.CLARITY_IA_HISTORICO||[]);
-    if(H.length < 2){
-      return '<div class="vacio">📈 Aquí verás la <b>evolución diaria de las visitas desde IA</b>.<br>'+
-        'De momento hay '+H.length+' registro'+(H.length===1?'':'s')+'. '+
-        'Cuando activemos la actualización automática diaria (Paso 4), esta gráfica crecerá sola y podrás enseñar la tendencia.</div>';
-    }
-    const W=1040, Hg=240, pad=44;
+    const H=(window.CLARITY_IA_HISTORICO||[]);
+    if(H.length<2){ return '<div class="vacio">📈 La evolución diaria de las visitas desde IA se irá rellenando sola.</div>'; }
+    const W=1040,Hg=240,pad=44;
     const xs=H.map((d,i)=>pad+i*(W-2*pad)/(H.length-1));
     const maxV=Math.max(...H.map(d=>d.sesionesIA),1)*1.2;
     const ys=H.map(d=>Hg-pad-(d.sesionesIA/maxV)*(Hg-2*pad));
@@ -235,19 +321,15 @@
     let dots=xs.map((x,i)=>'<circle cx="'+x+'" cy="'+ys[i]+'" r="4.5" fill="#5ec2f0"></circle>'+
       '<text x="'+x+'" y="'+(ys[i]-12)+'" text-anchor="middle" font-size="12" fill="#e9eef7">'+num(H[i].sesionesIA)+'</text>'+
       '<text x="'+x+'" y="'+(Hg-pad+22)+'" text-anchor="middle" font-size="11" fill="#8da2c0">'+H[i].fecha.slice(5)+'</text>').join('');
-    return '<div class="panel"><h3>Sesiones diarias desde IA</h3>'+
-      '<svg width="100%" viewBox="0 0 '+W+' '+Hg+'">'+
-      '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">'+
-      '<stop offset="0%" stop-color="#5ec2f0" stop-opacity="0.35"/>'+
-      '<stop offset="100%" stop-color="#5ec2f0" stop-opacity="0"/></linearGradient></defs>'+
-      '<polygon points="'+area+'" fill="url(#g)"></polygon>'+
+    return '<div class="panel"><h3>Sesiones diarias desde IA</h3><svg width="100%" viewBox="0 0 '+W+' '+Hg+'">'+
+      '<defs><linearGradient id="gi" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5ec2f0" stop-opacity="0.35"/><stop offset="100%" stop-color="#5ec2f0" stop-opacity="0"/></linearGradient></defs>'+
+      '<polygon points="'+area+'" fill="url(#gi)"></polygon>'+
       '<polyline points="'+pts+'" fill="none" stroke="#5ec2f0" stroke-width="2.5"></polyline>'+dots+'</svg></div>';
   }
 })();
 </script>
 
-<!-- Citas en IA (grounding queries + cited pages), desde el CSV de Clarity -->
-<script src="datos/citas-ia.js"></script>
+<!-- ===== Bloque 3: Citas en IA (grounding queries + cited pages, desde CSV) ===== -->
 <script>
 (function(){
   const c = document.getElementById('citas');
@@ -255,6 +337,7 @@
   const claUrl = "https://clarity.microsoft.com/projects/view/ucpc895xla/aivisibility?date=Last+3+days";
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const acorta = u => u.replace(/^https?:\/\/[^/]+/,'') || '/';
+  const num = n => Number(n||0).toLocaleString('es-ES');
 
   if(typeof window.CITAS === 'undefined'){
     c.innerHTML = '<div class="panel" style="color:var(--suave);font-size:14px;line-height:1.6">📑 Aquí aparecerán los <b>grounding queries</b> y tus <b>páginas citadas</b> por la IA. '+
@@ -282,8 +365,7 @@
   h += '<div class="panel"><h3 style="margin-bottom:12px">📄 Mis páginas citadas</h3>'+
        '<table class="tabla-citas"><tr><th>Página</th><th class="num">Citas</th></tr>';
   P.forEach(p=>{ h+='<tr><td><a href="'+esc(p.url)+'" target="_blank" rel="noopener" title="'+esc(p.url)+'">'+esc(acorta(p.url))+'</a></td><td class="num">'+p.citations+'</td></tr>'; });
-  h += '</table></div>';
-  h += '</div>';
+  h += '</table></div></div>';
 
   c.innerHTML = h;
 })();
