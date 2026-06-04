@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Visibilidad en Web · Google Analytics · INGESCO</title>
 <link rel="icon" type="image/png" href="assets/favicon.ico.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css">
 <style>
   :root{--navy:#13294b;--azul:#1f5f9b;--cielo:#34a0d9;--fondo:#f4f6f9;
     --tarjeta:#fff;--texto:#13294b;--suave:#6b7688;--borde:#e3e8ef;
@@ -38,13 +39,28 @@
   .barra .top b{font-weight:700}
   .pista{background:#eef2f7;border-radius:7px;height:11px;overflow:hidden}
   .relleno{height:100%;border-radius:7px}
-  table{width:100%;border-collapse:collapse;font-size:13.5px}
-  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--borde)}
-  th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--suave)}
-  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
-  td.clave{font-weight:600;color:var(--navy);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  /* Mapa */
+  .mapa-wrap{display:grid;grid-template-columns:1fr 280px;gap:18px}
+  @media(max-width:880px){.mapa-wrap{grid-template-columns:1fr}}
+  #mapa{width:100%;height:430px}
+  .leyenda-mapa{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:12px;color:var(--suave)}
+  .leyenda-barra{flex:1;height:10px;border-radius:6px;background:linear-gradient(90deg,#cfe2f3,#13294b)}
+  .pais-row{display:flex;align-items:center;gap:10px;font-size:13.5px;margin:9px 0}
+  .pais-row .ban{font-size:18px;width:24px;text-align:center}
+  .pais-row .nom{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pais-row .val{font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+  /* Páginas (enlaces) */
+  .pag{display:flex;align-items:center;gap:12px;padding:10px 6px;border-bottom:1px solid var(--borde)}
+  .pag:hover{background:#f8fafc}
+  .pag .rank{font-weight:800;color:var(--cielo);width:22px;text-align:center}
+  .pag .cuerpo{flex:1;min-width:0}
+  .pag .tit{font-weight:600;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+  .pag .url{font-size:11.5px;color:var(--suave);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+  .pag .vis{font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pag .ir{color:var(--cielo);font-size:14px}
   .vacio{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:24px;border-radius:14px}
   footer{margin-top:40px;text-align:center;color:var(--suave);font-size:12px}
+  .jvm-tooltip{background:#13294b;font-weight:600}
 </style>
 </head>
 <body>
@@ -70,6 +86,8 @@
 </div>
 
 <script src="datos/ga.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/jsvectormap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"></script>
 <script>
 (function(){
   const cont = document.getElementById('contenido');
@@ -79,7 +97,7 @@
   }
   const G = window.GA;
   const num = n => Number(n||0).toLocaleString('es-ES');
-  const colores = ['#1f5f9b','#34a0d9','#13294b','#e08a2b','#16a34a','#8a93a3','#6b7688','#9ed3f4'];
+  const colores = ['#1f5f9b','#34a0d9','#13294b','#e08a2b','#16a34a','#9333ea','#dc2626','#0891b2'];
   document.getElementById('periodo').textContent = 'Periodo: ' + G.periodo.ini + ' – ' + G.periodo.fin;
   document.getElementById('actualizado').textContent = 'Actualizado: ' + G.fechaActualizacion;
 
@@ -90,6 +108,7 @@
     return '<div class="delta '+cls+'">'+fl+' '+Math.abs(d).toFixed(1).replace('.',',')+'% vs. periodo anterior</div>';
   }
   const fmtDur = s => { s=Math.round(s); const m=Math.floor(s/60), x=s%60; return m>0?(m+'m '+x+'s'):(x+'s'); };
+  const bandera = code => { if(!code||code.length!==2) return '🌐'; return code.toUpperCase().replace(/./g,c=>String.fromCodePoint(127397+c.charCodeAt(0))); };
 
   let html='<div class="kpis">';
   html+='<div class="kpi"><div class="etq">🧑‍💼 Usuarios</div><div class="valor">'+num(t.usuarios)+'</div>'+delta(t.usuarios,t.usuariosPrev)+'</div>';
@@ -100,32 +119,71 @@
 
   html+='<h2 class="seccion">Evolución diaria</h2><div class="panel">'+grafico(G.porDia)+'</div>';
 
+  // Mapa de países
+  const paises = (G.paises||[]).slice().sort((a,b)=>b.valor-a.valor);
+  html+='<h2 class="seccion">De dónde nos visitan</h2>';
+  html+='<div class="panel"><div class="mapa-wrap"><div>'+
+        '<div id="mapa"></div>'+
+        '<div class="leyenda-mapa"><span>Menos visitas</span><div class="leyenda-barra"></div><span>Más visitas</span></div></div>'+
+        '<div><h3 style="font-size:15px;margin-bottom:8px">Top países</h3>'+listaPaises(paises.slice(0,12))+'</div>'+
+        '</div></div>';
+
   html+='<h2 class="seccion">De dónde viene el tráfico</h2><div class="rejilla">';
   html+=barras('Canales de adquisición', G.canales, 'sesiones');
   html+=barras('Dispositivos', G.dispositivos, 'sesiones');
   html+='</div>';
 
-  html+='<h2 class="seccion">Contenido y audiencia</h2><div class="rejilla">';
-  html+=tablaPaginas('Páginas más vistas', G.paginas);
-  html+=barras('Países', G.paises, 'usuarios');
-  html+='</div>';
+  html+='<h2 class="seccion">Páginas más visitadas</h2>';
+  html+=paginasLinks(G.paginas||[]);
 
   cont.innerHTML = html;
 
-  function barras(titulo, filas, unidad){
-    const max = Math.max(...(filas||[]).map(f=>f.valor),1);
-    let h='<div class="panel"><h3>'+titulo+'</h3>';
-    (filas||[]).forEach((f,i)=>{
-      const w=Math.round(f.valor/max*100);
-      h+='<div class="barra"><div class="top"><span>'+f.nombre+'</span><b>'+num(f.valor)+'</b></div>'+
-         '<div class="pista"><div class="relleno" style="width:'+Math.max(w,2)+'%;background:'+colores[i%colores.length]+'"></div></div></div>';
+  // ---- Pintar el mapa (si la librería cargó) ----
+  const valores={}, valEsc={};
+  paises.forEach(p=>{ if(p.code){ valores[p.code]=p.valor; valEsc[p.code]=Math.sqrt(p.valor); } });
+  try{
+    if(window.jsVectorMap){
+      new window.jsVectorMap({
+        selector:'#mapa', map:'world', zoomButtons:true, zoomOnScroll:false,
+        backgroundColor:'transparent',
+        regionStyle:{ initial:{ fill:'#e1e8f0', stroke:'#ffffff', strokeWidth:0.4 }, hover:{ fillOpacity:0.85 } },
+        series:{ regions:[{ attribute:'fill', scale:['#cfe2f3','#13294b'], normalizeFunction:'linear', values: valEsc }] },
+        onRegionTooltipShow(event, tooltip, code){
+          const v = valores[code];
+          tooltip.text(tooltip.text() + (v!=null ? (' · '+num(v)+' usuarios') : ' · sin visitas'), true);
+        }
+      });
+    } else {
+      document.getElementById('mapa').innerHTML='<div style="padding:30px;color:var(--suave);text-align:center">🌐 Mapa no disponible (sin conexión). Consulta el «Top países» de la derecha.</div>';
+    }
+  }catch(e){
+    document.getElementById('mapa').innerHTML='<div style="padding:30px;color:var(--suave);text-align:center">🌐 No se pudo dibujar el mapa. Consulta el «Top países».</div>';
+  }
+
+  // ---------- componentes ----------
+  function listaPaises(arr){
+    let h='';
+    arr.forEach(p=>{ h+='<div class="pais-row"><span class="ban">'+bandera(p.code)+'</span><span class="nom">'+p.nombre+'</span><span class="val">'+num(p.valor)+'</span></div>'; });
+    return h;
+  }
+  function paginasLinks(filas){
+    const base='https://www.ingesco.com';
+    let h='<div class="panel">';
+    filas.forEach((f,i)=>{
+      const url = base + (f.path||'');
+      h+='<a class="pag" href="'+url+'" target="_blank" rel="noopener">'+
+         '<span class="rank">'+(i+1)+'</span>'+
+         '<span class="cuerpo"><span class="tit">'+(f.titulo||f.path)+'</span><span class="url">'+url+'</span></span>'+
+         '<span class="vis">'+num(f.valor)+'</span><span class="ir">↗</span></a>';
     });
     return h+'</div>';
   }
-  function tablaPaginas(titulo, filas){
-    let h='<div class="panel"><h3>'+titulo+'</h3><table><tr><th>Página</th><th class="num">Vistas</th></tr>';
-    (filas||[]).forEach(f=>{ h+='<tr><td class="clave" title="'+f.nombre+'">'+f.nombre+'</td><td class="num">'+num(f.valor)+'</td></tr>'; });
-    return h+'</table></div>';
+  function barras(titulo, filas, unidad){
+    const max=Math.max(...(filas||[]).map(f=>f.valor),1);
+    let h='<div class="panel"><h3>'+titulo+'</h3>';
+    (filas||[]).forEach((f,i)=>{ const w=Math.round(f.valor/max*100);
+      h+='<div class="barra"><div class="top"><span>'+f.nombre+'</span><b>'+num(f.valor)+'</b></div><div class="pista"><div class="relleno" style="width:'+Math.max(w,2)+'%;background:'+colores[i%colores.length]+'"></div></div></div>'; });
+    return h+'</div>';
   }
   function grafico(dias){
     if(!dias||dias.length<2) return '<p style="color:var(--suave)">Sin datos suficientes.</p>';
@@ -141,7 +199,7 @@
       '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1f5f9b" stop-opacity="0.30"/><stop offset="100%" stop-color="#1f5f9b" stop-opacity="0"/></linearGradient></defs>'+
       '<polygon points="'+area+'" fill="url(#g)"></polygon>'+
       '<polyline points="'+pts+'" fill="none" stroke="#1f5f9b" stroke-width="2.5"></polyline>'+labels+
-      '<text x="'+pad+'" y="24" font-size="12" fill="#13294b" font-weight="700">Sesiones por día</text></svg>';
+      '<text x="'+pad+'" y="22" font-size="12" fill="#13294b" font-weight="700">Sesiones por día</text></svg>';
   }
 })();
 </script>
