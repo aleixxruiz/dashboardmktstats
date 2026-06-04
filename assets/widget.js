@@ -15,8 +15,8 @@
   // ---- Estilos ----
   var css = ''
    + '.asis-btn{position:fixed;right:22px;bottom:22px;z-index:99999;width:58px;height:58px;border-radius:50%;'
-   + 'background:linear-gradient(135deg,#1f5f9b,#34a0d9);color:#fff;border:none;cursor:pointer;font-size:26px;'
-   + 'box-shadow:0 8px 24px rgba(19,41,75,.35);display:flex;align-items:center;justify-content:center;transition:.15s}'
+   + 'background:#DEDC00;color:#1e2b50;border:none;cursor:pointer;font-size:32px;font-weight:800;font-family:Segoe UI,sans-serif;'
+   + 'box-shadow:0 8px 24px rgba(30,43,80,.30);display:flex;align-items:center;justify-content:center;transition:.15s}'
    + '.asis-btn:hover{transform:scale(1.07)}'
    + '.asis-panel{position:fixed;right:22px;bottom:90px;z-index:99999;width:340px;max-width:calc(100vw - 32px);'
    + 'background:#0f2238;color:#eaf1fb;border:1px solid #294a6e;border-radius:16px;box-shadow:0 16px 50px rgba(0,0,0,.5);'
@@ -45,15 +45,15 @@
 
   // ---- HTML ----
   var btn = document.createElement('button');
-  btn.className = 'asis-btn'; btn.innerHTML = '💬'; btn.title = 'Asistente'; document.body.appendChild(btn);
+  btn.className = 'asis-btn'; btn.innerHTML = '?'; btn.title = 'XIELA IA'; document.body.appendChild(btn);
 
   var panel = document.createElement('div');
   panel.className = 'asis-panel';
   panel.innerHTML =
-     '<div class="asis-head"><span>🤖 Asistente</span><span class="x" id="asisX">✕</span></div>'
+     '<div class="asis-head"><span>🤖 XIELA IA</span><span class="x" id="asisX">✕</span></div>'
    + '<div class="asis-body" id="asisMenu">'
    +   '<p style="font-size:13.5px;color:#9fb6d6;margin-bottom:14px">'+CONFIG.titulo+'</p>'
-   +   '<button class="asis-op" id="asisIA"><span class="ic">🤖</span><span><b>Preguntar a la IA</b><span>Resuelve dudas sobre los datos del panel</span></span></button>'
+   +   '<button class="asis-op" id="asisIA"><span class="ic">🤖</span><span><b>Preguntar a XIELA IA</b><span>Resuelve dudas sobre los datos del panel</span></span></button>'
    +   '<button class="asis-op" id="asisTeams"><span class="ic">💬</span><span><b>Escribir por Teams</b><span>Manda un mensaje al responsable</span></span></button>'
    + '</div>'
    + '<div class="asis-chat" id="asisChat">'
