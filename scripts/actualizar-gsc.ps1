@@ -61,6 +61,18 @@ $totales = @{
     impressionsPrev = if ($rTotP) { [int]$rTotP.impressions } else { 0 }
 }
 
+# Totales de periodo largo (~16 meses, el maximo que guarda Search Console)
+$iniLargo = $fin.AddMonths(-16)
+$totL = @(Consultar $iniLargo $fin $null 1)
+$rL = if ($totL.Count -ge 1) { $totL[0] } else { $null }
+$totalesLargo = @{
+    clicks      = if ($rL) { [int]$rL.clicks }      else { 0 }
+    impressions = if ($rL) { [int]$rL.impressions } else { 0 }
+    ctr         = if ($rL) { [math]::Round($rL.ctr * 100, 2) } else { 0 }
+    position    = if ($rL) { [math]::Round($rL.position, 1) }  else { 0 }
+    desde       = $iniLargo.ToString("MM/yyyy")
+}
+
 # Por dia (evolucion real)
 $porDia = @()
 foreach ($row in (Consultar $ini $fin @("date") 1000)) {
@@ -87,6 +99,7 @@ $obj = @{
     sitio    = $site
     periodo  = @{ ini = $ini.ToString("dd/MM/yyyy"); fin = $fin.ToString("dd/MM/yyyy") }
     totales  = $totales
+    totalesLargo = $totalesLargo
     porDia   = $porDia
     queries  = $queries
     paginas  = $paginas
