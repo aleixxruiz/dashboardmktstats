@@ -108,6 +108,9 @@
 
   html+='<h2 class="seccion">Evolución mensual de captación</h2><div class="panel">'+grafico(L.porMes)+'</div>';
 
+  html+='<h2 class="seccion">Captación por formulario</h2>';
+  html+=barras('Sobre '+num(L.conFormulario)+' leads que llegaron por un formulario (los demás entraron por otra vía)', (L.porFormulario||[]), L.conFormulario);
+
   html+='<h2 class="seccion">Segmentación</h2><div class="rejilla">';
   html+=barras('Por origen', (L.porFuente||[]).map(f=>({nombre:nf(f.nombre),valor:f.valor})), L.total);
   html+=barras('Por etapa del ciclo', L.porEtapa||[], L.total);
