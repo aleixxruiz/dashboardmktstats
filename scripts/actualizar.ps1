@@ -187,6 +187,13 @@ if (Test-Path $scriptCitas) {
     & $scriptCitas -Silencioso
 }
 
+# --- Inspeccion de indexacion (LENTA): solo en la nube y como mucho 1 vez/semana ---
+$scriptIdx = Join-Path $PSScriptRoot "actualizar-indexacion.ps1"
+if ((Test-Path $scriptIdx) -and ($env:GITHUB_ACTIONS -eq 'true') -and $config.google_oauth -and $config.google_oauth.refresh_token) {
+    Write-Host "Comprobando indexacion (semanal)..." -ForegroundColor Gray
+    & $scriptIdx -Silencioso
+}
+
 # --- Subir los datos nuevos a la web (GitHub Pages), si esta configurado ---
 $scriptSubir = Join-Path $PSScriptRoot "subir-github.ps1"
 $ghCfg = $config.github
