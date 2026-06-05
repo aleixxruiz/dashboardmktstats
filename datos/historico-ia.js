@@ -1,1 +1,1 @@
-﻿window.CLARITY_IA_HISTORICO = [{"fecha":"2026-06-05","sesionesIA":26,"usuariosIA":26,"sesionesTotal":2969},{"value":[{"fecha":"2026-06-03","sesionesIA":16,"usuariosIA":17,"sesionesTotal":2140},{"fecha":"2026-06-04","sesionesIA":25,"usuariosIA":26,"sesionesTotal":2920}],"Count":2}];
+window.CLARITY_IA_HISTORICO = [{"fecha":"2026-06-05","sesionesIA":25,"usuariosIA":25,"sesionesTotal":3008}];
