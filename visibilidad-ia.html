@@ -246,7 +246,7 @@
   }
 
   function panelHistorico(){
-    const H=(window.CLARITY_HISTORICO||[]);
+    const H=(window.CLARITY_HISTORICO||[]).filter(d=>d&&d.fecha).sort((a,b)=>a.fecha<b.fecha?-1:1);
     if(H.length<2){ return '<div class="panel"><h3>Evolución de sesiones reales</h3><div class="hist-nota">📈 La tendencia día a día se irá rellenando sola (un punto por día).</div></div>'; }
     const W=1040,Hg=240,pad=44;
     const xs=H.map((d,i)=>pad+i*(W-2*pad)/(H.length-1));
@@ -319,7 +319,7 @@
 
   function card(ic,etq,val,sub,glow){ return '<div class="card'+(glow?' glow':'')+'"><div class="etq">'+ic+' '+etq+'</div><div class="valor">'+val+'</div><div class="sub">'+sub+'</div></div>'; }
   function panelHistorico(){
-    const H=(window.CLARITY_IA_HISTORICO||[]);
+    const H=(window.CLARITY_IA_HISTORICO||[]).filter(d=>d&&d.fecha).sort((a,b)=>a.fecha<b.fecha?-1:1);
     if(H.length<2){ return '<div class="vacio">📈 La evolución diaria de las visitas desde IA se irá rellenando sola.</div>'; }
     const W=1040,Hg=240,pad=44;
     const xs=H.map((d,i)=>pad+i*(W-2*pad)/(H.length-1));
