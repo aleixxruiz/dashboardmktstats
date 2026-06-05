@@ -51,6 +51,17 @@ function ClasificarFormulario($raw) {
     return $name
 }
 
+# Detecta el idioma de un formulario por marcadores explicitos de su nombre.
+# Devuelve un CODIGO (ES/EN/FR/PT/OTROS); la pagina lo traduce (asi evitamos acentos en el .ps1).
+function DetectarIdioma($name) {
+    $l = ([string]$name).ToLower()
+    if ($l -like "*prefooter es*" -or $l -like "*espa*") { return "ES" }
+    if ($l -like "*prefooter en*" -or $l -like "*ingl*" -or $l -like "*_en") { return "EN" }
+    if ($l -like "*prefooter fr*" -or $l -like "*franc*") { return "FR" }
+    if ($l -like "*prefooter pt*" -or $l -like "*prefooter br*" -or $l -like "*microsite pt*") { return "PT" }
+    return "OTROS"
+}
+
 # Acumuladores
 $porFuente = @{}; $porMes = @{}; $porEtapa = @{}; $porFormulario = @{}; $sinFormFuente = @{}
 $total = 0; $nuevos30 = 0; $nuevosPrev30 = 0; $conFormulario = 0
@@ -158,6 +169,20 @@ if ($sinTot -gt 0) {
 
 $listaForm = @($listaForm | Sort-Object valor -Descending)
 
+# Agrupar los formularios por idioma (cada formulario cuenta una sola vez)
+$idiTot = @{}; $idiDet = @{}
+foreach ($k in $porFormulario.Keys) {
+    $idi = DetectarIdioma $k
+    if (-not $idiTot.ContainsKey($idi)) { $idiTot[$idi] = 0; $idiDet[$idi] = @() }
+    $idiTot[$idi] += $porFormulario[$k]
+    $idiDet[$idi] += [pscustomobject]@{ nombre = $k; valor = $porFormulario[$k] }
+}
+$listaIdioma = @()
+foreach ($idi in $idiTot.Keys) {
+    $listaIdioma += [pscustomobject]@{ nombre = $idi; valor = $idiTot[$idi]; detalle = @($idiDet[$idi] | Sort-Object valor -Descending) }
+}
+$listaIdioma = @($listaIdioma | Sort-Object valor -Descending)
+
 $obj = @{
     fechaActualizacion = (Get-Date).ToString("dd/MM/yyyy HH:mm")
     total        = $total
@@ -168,6 +193,7 @@ $obj = @{
     porEtapa     = Lista $porEtapa $true
     porMes       = Lista $porMes $false
     porFormulario = $listaForm
+    porIdioma    = $listaIdioma
 }
 $json = $obj | ConvertTo-Json -Depth 6 -Compress
 "window.LEADS = $json;" | Out-File (Join-Path $CarpetaDatos "leads.js") -Encoding utf8
