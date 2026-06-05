@@ -19,22 +19,24 @@
     min-height:100vh;display:flex;flex-direction:column;align-items:center;
     justify-content:center;padding:48px 24px}
   .marca{text-align:center;margin-bottom:14px}
-  .marca .logo{height:82px;width:auto;filter:brightness(0) invert(1)}
+  .marca .logo{height:62px;width:auto;filter:brightness(0) invert(1)}
   h1{font-size:30px;font-weight:800;letter-spacing:-.5px;margin-top:26px;text-align:center;color:#ffffff}
   .sub{color:#ffffff;font-size:15px;text-align:center;margin-top:8px}
 
-  .tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;
-    margin-top:46px;max-width:1180px;width:100%}
-  @media(max-width:520px){.tarjetas{grid-template-columns:1fr}}
+  .tarjetas{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;
+    margin-top:46px;max-width:1340px;width:100%}
+  @media(max-width:1080px){.tarjetas{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.tarjetas{grid-template-columns:1fr}}
 
   .card{position:relative;display:block;text-decoration:none;color:inherit;
     background:var(--ingazul);border:2px solid var(--lima);
-    border-radius:20px;padding:30px 26px;transition:.18s;overflow:hidden;
+    border-radius:18px;padding:24px 20px;transition:.18s;overflow:hidden;
     box-shadow:0 10px 30px rgba(222,220,0,.22)}
   .card:hover{transform:translateY(-4px);box-shadow:0 16px 46px rgba(222,220,0,.42);border-color:var(--lima)}
   .card.proximamente{opacity:.9}
   .card .icono{font-size:42px;line-height:1}
-  .card h2{font-size:17px;font-weight:800;margin-top:18px;color:#ffffff;white-space:nowrap}
+  .card .icono-img{height:44px;width:auto;max-width:160px;object-fit:contain;display:block}
+  .card h2{font-size:16px;font-weight:800;margin-top:16px;color:#ffffff;line-height:1.2}
   .card .fuente{color:var(--lima);font-size:13px;font-weight:800;margin-top:4px;letter-spacing:.3px}
   .card p{color:#c3cee0;font-size:13.5px;line-height:1.5;margin-top:14px;min-height:56px}
   .card .ir{display:inline-flex;align-items:center;gap:6px;margin-top:18px;
@@ -70,7 +72,7 @@
 
     <a class="card" href="visibilidad-ia.html">
       <span class="estado activo">● Activo</span>
-      <div class="icono">🤖</div>
+      <img class="icono-img" src="assets/logo-clarity.png" alt="Microsoft Clarity">
       <h2>Comportamiento en IA</h2>
       <div class="fuente">Microsoft Clarity</div>
       <p>Comportamiento de los visitantes y tráfico que llega desde asistentes de IA (ChatGPT, Perplexity, Copilot…).</p>
@@ -79,7 +81,7 @@
 
     <a class="card" href="analytics.html">
       <span class="estado activo">● Activo</span>
-      <div class="icono">📊</div>
+      <img class="icono-img" src="assets/logo-analytics.png" alt="Google Analytics">
       <h2>Visibilidad en Web</h2>
       <div class="fuente">Google Analytics</div>
       <p>Sesiones, usuarios, fuentes de tráfico y conversiones de la web a lo largo del tiempo.</p>
@@ -88,7 +90,7 @@
 
     <a class="card" href="google-search.html">
       <span class="estado activo">● Activo</span>
-      <div class="icono">🔍</div>
+      <img class="icono-img" src="assets/logo-search-console.svg" alt="Google Search Console">
       <h2>Búsquedas en Google</h2>
       <div class="fuente">Search Console</div>
       <p>Posiciones, impresiones, clics y términos por los que apareces en el buscador de Google.</p>
@@ -97,10 +99,19 @@
 
     <a class="card" href="leads.html">
       <span class="estado activo">● Activo</span>
-      <div class="icono">🧲</div>
+      <img class="icono-img" src="assets/logo-hubspot.png" alt="HubSpot">
       <h2>Captación de Leads</h2>
       <div class="fuente">HubSpot</div>
       <p>Contactos captados, su origen y la evolución de la captación en el tiempo.</p>
+      <span class="ir">Entrar →</span>
+    </a>
+
+    <a class="card proximamente" href="clientes-cualificados.html">
+      <span class="estado pronto">● Próximamente</span>
+      <img class="icono-img" src="assets/logo-sage.png" alt="Sage 200">
+      <h2>Clientes Cualificados</h2>
+      <div class="fuente">Sage 200</div>
+      <p>Conversión de leads a clientes reales: cuántos contactos acaban facturando en el ERP.</p>
       <span class="ir">Entrar →</span>
     </a>
 
