@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clientes Cualificados · Sage 200 · INGESCO</title>
+<link rel="icon" type="image/png" href="assets/favicon.ico.png">
+<style>
+  :root{--navy:#13294b;--violeta:#6d28d9;--violeta2:#8b5cf6;
+    --fondo:#f5f3ff;--tarjeta:#ffffff;--texto:#2e1065;--suave:#6b6486;--borde:#e6e0fb}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:32px 24px 64px}
+  .contenedor{max-width:1000px;margin:0 auto}
+  a{text-decoration:none}
+  header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:26px;border-bottom:3px solid var(--violeta);padding-bottom:18px}
+  .titulo{display:flex;align-items:center;gap:18px}
+  .titulo .logo{height:50px;width:auto}
+  .titulo .sep{width:1px;height:44px;background:var(--borde)}
+  .titulo h1{font-size:22px;font-weight:800;color:var(--violeta)}
+  .titulo p{color:var(--suave);font-size:13px;margin-top:3px}
+  .meta{text-align:right;font-size:12px;color:var(--suave)}
+  .btn-inicio{background:var(--navy);color:#fff;padding:9px 15px;border-radius:10px;font-weight:700;font-size:13px;display:inline-block}
+  .btn-inicio:hover{filter:brightness(1.15)}
+  h2.seccion{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--suave);margin:32px 0 14px;font-weight:700}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+  .kpi{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:20px;box-shadow:0 1px 3px rgba(45,16,101,.05);opacity:.55}
+  .kpi .etq{font-size:13px;color:var(--suave);font-weight:600}
+  .kpi .valor{font-size:30px;font-weight:800;margin-top:8px;color:var(--violeta)}
+  .kpi .sub{font-size:12px;color:var(--suave);margin-top:6px}
+
+  .aviso{background:var(--tarjeta);border:1px solid var(--borde);border-left:5px solid var(--violeta);
+    border-radius:14px;padding:26px;margin-top:24px;box-shadow:0 1px 3px rgba(45,16,101,.05)}
+  .aviso h3{font-size:18px;color:var(--violeta);margin-bottom:10px}
+  .aviso p{font-size:14.5px;line-height:1.65;color:#4b3b73;margin-bottom:10px}
+  .aviso ul{margin:10px 0 4px 20px;font-size:14px;line-height:1.7;color:#4b3b73}
+  .aviso b{color:var(--violeta)}
+  .badge{display:inline-block;background:#ede9fe;color:var(--violeta);font-size:12px;font-weight:800;
+    padding:5px 12px;border-radius:999px;margin-bottom:14px;letter-spacing:.3px}
+
+  footer{margin-top:42px;text-align:center;color:var(--suave);font-size:12px}
+</style>
+</head>
+<body>
+<div class="contenedor">
+  <header>
+    <div class="titulo">
+      <img class="logo" src="assets/logo-ingesco.png" alt="INGESCO">
+      <div class="sep"></div>
+      <div>
+        <h1>🤝 Clientes Cualificados</h1>
+        <p>Sage 200 · conversión de leads a clientes reales</p>
+      </div>
+    </div>
+    <div class="meta">
+      <a class="btn-inicio" href="index.html">← Inicio</a>
+    </div>
+  </header>
+
+  <!-- Vista previa de los KPIs que tendrá la página (en gris hasta conectar Sage) -->
+  <h2 class="seccion">Vista previa</h2>
+  <div class="kpis">
+    <div class="kpi"><div class="etq">🤝 Clientes cualificados</div><div class="valor">—</div><div class="sub">leads convertidos en clientes</div></div>
+    <div class="kpi"><div class="etq">📈 Tasa de conversión</div><div class="valor">—</div><div class="sub">de lead a cliente</div></div>
+    <div class="kpi"><div class="etq">💶 Facturación asociada</div><div class="valor">—</div><div class="sub">de los clientes cualificados</div></div>
+    <div class="kpi"><div class="etq">🆕 Nuevos clientes (30 d)</div><div class="valor">—</div><div class="sub">altas recientes en Sage</div></div>
+  </div>
+
+  <div class="aviso">
+    <span class="badge">⏳ EN CONSTRUCCIÓN</span>
+    <h3>Esta página está lista para conectarse a Sage 200</h3>
+    <p>El diseño y la estructura ya están preparados. Para empezar a mostrar datos reales necesitamos <b>acceso a la API de Sage 200cloud</b>. En cuanto lo tengamos, esta página enseñará la conversión de <b>leads (HubSpot) → clientes reales (Sage)</b>, su facturación y la evolución en el tiempo.</p>
+    <p><b>Qué hace falta pedir</b> (a vuestro partner de Sage o a IT):</p>
+    <ul>
+      <li>Acceso a la <b>API REST de Sage 200</b> (registrar una app en el <i>Sage Developer Portal</i> → <b>Client ID</b> y <b>Client Secret</b>, OAuth 2.0).</li>
+      <li>El <b>identificador de vuestra empresa/subscripción</b> en Sage 200.</li>
+      <li>Permisos de <b>lectura</b> de clientes y facturación de ventas.</li>
+    </ul>
+    <p>También acordaremos juntos <b>qué cuenta como “cliente cualificado”</b> (p. ej. un lead que acaba con factura en Sage).</p>
+  </div>
+
+  <footer><b>INGESCO®</b> · Joining sky and ground. Protecting you since 1973 · Fuente: Sage 200 (pendiente de conexión)</footer>
+</div>
+<script src="assets/widget.js?v=5"></script>
+</body>
+</html>
