@@ -91,6 +91,9 @@
   };
   const nf = k => FUENTES[k] || k;
 
+  // Traducción de los códigos de idioma (los datos guardan ES/EN/… para evitar acentos en el script)
+  const IDIOMAS = { ES:'🇪🇸 Español', EN:'🇬🇧 Inglés', FR:'🇫🇷 Francés', PT:'🇵🇹 Portugués', OTROS:'🌐 Sin idioma definido (app e internos)' };
+
   const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
   const mesLabel = ym => { const p=ym.split('-'); return meses[parseInt(p[1])-1]+' '+p[0].slice(2); };
 
@@ -116,8 +119,14 @@
   html+='<h2 class="seccion">Cómo llegaron los contactos</h2>';
   html+=barrasForm('Todos los contactos ('+num(L.total)+') según cómo entraron — clic en un grupo para desplegar el detalle', (L.porFormulario||[]), L.total);
 
-  html+='<h2 class="seccion">Segmentación</h2>';
-  html+=barras('Por etapa del ciclo', L.porEtapa||[], L.total);
+  html+='<h2 class="seccion">Captación por idioma</h2>';
+  if(L.porIdioma && L.porIdioma.length){
+    const idiomas=L.porIdioma.map(function(g){ return {nombre:(IDIOMAS[g.nombre]||g.nombre), valor:g.valor, detalle:g.detalle}; });
+    const baseIdi=L.conFormulario||L.total;
+    html+=barrasForm('Formularios agrupados por idioma ('+num(baseIdi)+' contactos con formulario) — clic en un idioma para ver sus formularios', idiomas, baseIdi, 'idi');
+  } else {
+    html+='<div class="panel" style="color:var(--suave)">El desglose por idioma aparecerá tras la próxima actualización de datos de HubSpot.</div>';
+  }
 
   cont.innerHTML = html;
 
@@ -134,7 +143,7 @@
   }
 
   // Como 'barras' pero con grupos desplegables (los que tienen .detalle)
-  function barrasForm(titulo, filas, total){
+  function barrasForm(titulo, filas, total, pref){
     const max=Math.max(...filas.map(f=>f.valor),1);
     let h='<div class="panel"><h3>'+titulo+'</h3>';
     filas.forEach((f,i)=>{
@@ -142,7 +151,7 @@
       const pc=total?Math.round(f.valor/total*100):0;
       const col=colores[i%colores.length];
       const det=f.detalle&&f.detalle.length;
-      const id='g'+i;
+      const id=(pref||'g')+i;
       h+='<div class="barra'+(det?' desplegable':'')+'"'+(det?(" onclick=\"toggleDet('"+id+"')\""):"")+'>'+
          '<div class="top"><span>'+(det?'<span class="flecha" id="fl'+id+'">▸</span> ':'')+f.nombre+
          (det?' <small style="color:var(--suave);font-weight:600">('+f.detalle.length+' formularios)</small>':'')+
