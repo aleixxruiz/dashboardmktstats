@@ -96,10 +96,15 @@ foreach ($t in $traffic) {
 $rutaHistJson = Join-Path $CarpetaDatos "historico.json"
 $historico = @()
 if (Test-Path $rutaHistJson) {
-    $historico = @(Get-Content $rutaHistJson -Raw | ConvertFrom-Json)
+    $crudo = Get-Content $rutaHistJson -Raw | ConvertFrom-Json
+    foreach ($it in @($crudo)) {
+        # Auto-reparacion: desenvolver arrays anidados ({value:[...],Count:N}) y conservar solo entradas con fecha
+        if ($it -and ($it.PSObject.Properties.Name -contains 'value') -and $it.value) { $historico += @($it.value) }
+        elseif ($it -and $it.fecha) { $historico += $it }
+    }
 }
-# Si ya hay un punto de hoy, lo reemplazamos; si no, lo anadimos
-$historico = @($historico | Where-Object { $_.fecha -ne $fechaDia })
+# Quitar entradas sin fecha y el punto de hoy (se re-anade abajo)
+$historico = @($historico | Where-Object { $_.fecha -and $_.fecha -ne $fechaDia })
 $historico += [pscustomobject]@{ fecha = $fechaDia; sesiones = $sesiones; usuarios = $usuarios; bots = $bots }
 $historico = @($historico | Sort-Object fecha)
 
@@ -148,8 +153,14 @@ foreach ($row in $trafficIA) {
 # Acumular historico de IA (un punto por dia)
 $rutaHistIA = Join-Path $CarpetaDatos "historico-ia.json"
 $histIA = @()
-if (Test-Path $rutaHistIA) { $histIA = @(Get-Content $rutaHistIA -Raw | ConvertFrom-Json) }
-$histIA = @($histIA | Where-Object { $_.fecha -ne $fechaDia })
+if (Test-Path $rutaHistIA) {
+    $crudoIA = Get-Content $rutaHistIA -Raw | ConvertFrom-Json
+    foreach ($it in @($crudoIA)) {
+        if ($it -and ($it.PSObject.Properties.Name -contains 'value') -and $it.value) { $histIA += @($it.value) }
+        elseif ($it -and $it.fecha) { $histIA += $it }
+    }
+}
+$histIA = @($histIA | Where-Object { $_.fecha -and $_.fecha -ne $fechaDia })
 $histIA += [pscustomobject]@{ fecha = $fechaDia; sesionesIA = $sesionesIA; usuariosIA = $usuariosIA; sesionesTotal = $sesionesTotal }
 $histIA = @($histIA | Sort-Object fecha)
 $histIA | ConvertTo-Json -Depth 5 | Out-File $rutaHistIA -Encoding utf8
