@@ -11,6 +11,12 @@
   var KEY = 'panel_unlocked_v1';
   var HASH = '0b6052da2bd037546068c80c8471cbc9d99126df58b68d81e8a5f37c3300022e';
 
+  // En local (file://) NO pedimos contraseña: son tus propios archivos en tu PC.
+  // La barrera solo tiene sentido en la web publicada (http/https).
+  if (location.protocol === 'file:') return;
+  // Si el navegador no soporta hashing (contexto no seguro), no bloqueamos para no dejar la pagina inaccesible.
+  if (!(window.crypto && window.crypto.subtle)) return;
+
   try { if (sessionStorage.getItem(KEY) === '1') return; } catch(e){}
 
   // Ocultar la página de inmediato para evitar parpadeo
