@@ -270,36 +270,42 @@
 <script>
 (function(){
   const cont = document.getElementById('contenido');
-  if(typeof window.CLARITY_IA === 'undefined'){
-    cont.innerHTML = '<div class="vacio">⚠️ <b>Aún no hay datos de IA.</b> Ejecuta «Actualizar datos».</div>';
-    return;
-  }
-  const IA = window.CLARITY_IA;
   const num = n => Number(n||0).toLocaleString('es-ES');
   const PLAT = { ChatGPT:{color:'#10a37f',ic:'G'}, Perplexity:{color:'#20b8cd',ic:'P'}, Copilot:{color:'#0a7bd4',ic:'C'},
     Gemini:{color:'#4285f4',ic:'✦'}, Claude:{color:'#d97757',ic:'A'}, 'Otras IA':{color:'#7c93b0',ic:'∎'} };
-  function clasificar(row){
-    const s=String(row.Source||'').toLowerCase(), ch=String(row.Channel||'');
-    const esCanalIA = ch.indexOf('Ai')===0 || ch.indexOf('PaidAi')===0;
-    if(s.indexOf('chatgpt')>=0||s==='openai') return 'ChatGPT';
-    if(s.indexOf('perplexity')>=0) return 'Perplexity';
-    if(s.indexOf('copilot')>=0) return 'Copilot';
-    if(s.indexOf('gemini')>=0||s.indexOf('bard')>=0) return 'Gemini';
-    if(s==='google'&&esCanalIA) return 'Gemini';
-    if(s.indexOf('claude')>=0) return 'Claude';
-    if(esCanalIA) return 'Otras IA';
-    return null;
+
+  // Histórico diario acumulado (un punto por día, con reparto 'plat'). Tomamos los últimos 7 días.
+  const Hall = (window.CLARITY_IA_HISTORICO||[]).filter(d=>d&&d.fecha).sort((a,b)=>a.fecha<b.fecha?-1:1);
+  const G = Hall.filter(d=>d.plat).slice(-7);
+
+  let sesIA=0, usrIA=0, sesTotal=0; const porPlat={}; let dias=0, fuente='hist';
+  if(G.length){
+    dias = G.length;
+    G.forEach(d=>{ sesIA+=parseInt(d.sesionesIA)||0; usrIA+=parseInt(d.usuariosIA)||0; sesTotal+=parseInt(d.sesionesTotal)||0;
+      Object.keys(d.plat||{}).forEach(k=>{ porPlat[k]=(porPlat[k]||0)+(parseInt(d.plat[k])||0); }); });
+  } else if(typeof window.CLARITY_IA !== 'undefined'){
+    // Fallback: foto actual de la API, hasta que se acumulen días con reparto
+    fuente='snap';
+    const IA=window.CLARITY_IA;
+    const clasificar=row=>{ const s=String(row.Source||'').toLowerCase(), ch=String(row.Channel||''); const ia=ch.indexOf('Ai')===0||ch.indexOf('PaidAi')===0;
+      if(s.indexOf('chatgpt')>=0||s==='openai')return'ChatGPT'; if(s.indexOf('perplexity')>=0)return'Perplexity'; if(s.indexOf('copilot')>=0)return'Copilot';
+      if(s.indexOf('gemini')>=0||s.indexOf('bard')>=0)return'Gemini'; if(s==='google'&&ia)return'Gemini'; if(s.indexOf('claude')>=0)return'Claude'; if(ia)return'Otras IA'; return null; };
+    (IA.datos||[]).forEach(row=>{ const s=parseInt(row.totalSessionCount)||0; sesTotal+=s; const p=clasificar(row);
+      if(p){ porPlat[p]=(porPlat[p]||0)+s; sesIA+=s; usrIA+=parseInt(row.distinctUserCount)||0; } });
+    dias = IA.dias||1;
+  } else {
+    cont.innerHTML='<div class="vacio">📊 Estamos empezando a recoger el tráfico de IA <b>día a día</b>. Esta sección se irá llenando hasta mostrar los <b>últimos 7 días</b>.</div>';
+    return;
   }
-  const porPlat={}; let sesIA=0, usrIA=0, sesTotal=0;
-  (IA.datos||[]).forEach(row=>{ const s=parseInt(row.totalSessionCount)||0; sesTotal+=s; const p=clasificar(row);
-    if(p){ porPlat[p]=(porPlat[p]||0)+s; sesIA+=s; usrIA+=parseInt(row.distinctUserCount)||0; } });
+
   const pct = sesTotal?(sesIA/sesTotal*100):0;
   const nPlat = Object.keys(porPlat).filter(k=>porPlat[k]>0).length;
+  const periodo = (fuente==='hist') ? 'en los últimos 7 días' : ('en los últimos '+dias+' días');
 
   let html='<div class="hero">';
-  html+=card('🤖','Sesiones desde IA',num(sesIA),'en los últimos '+IA.dias+' días',true);
+  html+=card('🤖','Sesiones desde IA',num(sesIA),periodo,true);
   html+=card('📊','% del tráfico total',pct.toFixed(2).replace('.',',')+'%',num(sesIA)+' de '+num(sesTotal)+' sesiones',false);
-  html+=card('🧑‍💼','Usuarios desde IA',num(usrIA),'personas distintas',false);
+  html+=card('🧑‍💼','Usuarios desde IA',num(usrIA),'personas',false);
   html+=card('🔌','Plataformas detectadas',nPlat,'asistentes que te citan',false);
   html+='</div>';
 
@@ -312,7 +318,7 @@
     orden.forEach(k=>{ const v=porPlat[k], col=(PLAT[k]||{}).color||'#7c93b0', ic=(PLAT[k]||{}).ic||'•';
       const w=Math.round(v/maxV*100), pc=Math.round(v/sesIA*100);
       filas+='<div class="plat"><div class="logo" style="background:'+col+'">'+ic+'</div><div class="cuerpo"><div class="nom"><b>'+k+'</b><span class="ses">'+num(v)+' ses. · '+pc+'%</span></div><div class="pista"><div class="relleno" style="width:'+Math.max(w,3)+'%;background:'+col+'"></div></div></div></div>'; });
-    html+='<div class="panel" style="margin-top:16px"><h3>Reparto por asistente de IA</h3><div class="ayuda">Sesiones de personas que llegaron a ingesco.com tras hablar con cada IA.</div>'+filas+'</div>';
+    html+='<div class="panel" style="margin-top:16px"><h3>Reparto por asistente de IA</h3><div class="ayuda">Sesiones de personas que llegaron a ingesco.com tras hablar con cada IA ('+periodo+').</div>'+filas+'</div>';
   }
 
   html+='<h2 class="seccion">Evolución del tráfico de IA</h2>'+panelHistorico();
@@ -320,18 +326,17 @@
 
   function card(ic,etq,val,sub,glow){ return '<div class="card'+(glow?' glow':'')+'"><div class="etq">'+ic+' '+etq+'</div><div class="valor">'+val+'</div><div class="sub">'+sub+'</div></div>'; }
   function panelHistorico(){
-    const H=(window.CLARITY_IA_HISTORICO||[]).filter(d=>d&&d.fecha).sort((a,b)=>a.fecha<b.fecha?-1:1);
-    if(H.length<2){ return '<div class="vacio">📈 La evolución diaria de las visitas desde IA se irá rellenando sola.</div>'; }
+    if(G.length<2){ return '<div class="vacio">📈 La evolución diaria desde IA se irá rellenando (un punto por día, hasta 7).</div>'; }
     const W=1040,Hg=240,pad=44;
-    const xs=H.map((d,i)=>pad+i*(W-2*pad)/(H.length-1));
-    const maxV=Math.max(...H.map(d=>d.sesionesIA),1)*1.2;
-    const ys=H.map(d=>Hg-pad-(d.sesionesIA/maxV)*(Hg-2*pad));
+    const xs=G.map((d,i)=>pad+i*(W-2*pad)/(G.length-1));
+    const maxV=Math.max(...G.map(d=>d.sesionesIA),1)*1.2;
+    const ys=G.map(d=>Hg-pad-(d.sesionesIA/maxV)*(Hg-2*pad));
     const pts=xs.map((x,i)=>x+','+ys[i]).join(' ');
     const area=pts+' '+xs[xs.length-1]+','+(Hg-pad)+' '+xs[0]+','+(Hg-pad);
     let dots=xs.map((x,i)=>'<circle cx="'+x+'" cy="'+ys[i]+'" r="4.5" fill="#157f86"></circle>'+
-      '<text x="'+x+'" y="'+(ys[i]-12)+'" text-anchor="middle" font-size="12" fill="#13294b">'+num(H[i].sesionesIA)+'</text>'+
-      '<text x="'+x+'" y="'+(Hg-pad+22)+'" text-anchor="middle" font-size="11" fill="#5e7387">'+H[i].fecha.slice(5)+'</text>').join('');
-    return '<div class="panel"><h3>Sesiones diarias desde IA</h3><svg width="100%" viewBox="0 0 '+W+' '+Hg+'">'+
+      '<text x="'+x+'" y="'+(ys[i]-12)+'" text-anchor="middle" font-size="12" fill="#13294b">'+num(G[i].sesionesIA)+'</text>'+
+      '<text x="'+x+'" y="'+(Hg-pad+22)+'" text-anchor="middle" font-size="11" fill="#5e7387">'+G[i].fecha.slice(5)+'</text>').join('');
+    return '<div class="panel"><h3>Sesiones diarias desde IA (últimos 7 días)</h3><svg width="100%" viewBox="0 0 '+W+' '+Hg+'">'+
       '<defs><linearGradient id="gi" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2aa7ae" stop-opacity="0.30"/><stop offset="100%" stop-color="#2aa7ae" stop-opacity="0"/></linearGradient></defs>'+
       '<polygon points="'+area+'" fill="url(#gi)"></polygon>'+
       '<polyline points="'+pts+'" fill="none" stroke="#2aa7ae" stroke-width="2.5"></polyline>'+dots+'</svg></div>';
