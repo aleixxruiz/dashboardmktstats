@@ -87,6 +87,10 @@
   }
   const L = window.LEADS;
   const num = n => Number(n||0).toLocaleString('es-ES');
+  if(!L.total){
+    cont.innerHTML = '<div class="vacio">⚠️ <b>De momento no hay datos de HubSpot.</b><br>La última actualización no devolvió contactos (probablemente el token de HubSpot caducó o se reemplazó). En cuanto se restablezca el token, los datos volverán a aparecer aquí.</div>';
+    return;
+  }
   const colores = ['#ec7a1a','#f7a93a','#c2410c','#fb923c','#d97706','#b45309','#f97316','#9a3412','#7c2d12','#a87f5a'];
   document.getElementById('actualizado').textContent = 'Actualizado: ' + L.fechaActualizacion;
 
@@ -188,7 +192,8 @@
   };
 
   function grafico(porMes){
-    if(!porMes||porMes.length<2) return '<p style="color:var(--suave)">Sin datos suficientes.</p>';
+    porMes = Array.isArray(porMes)?porMes:[];
+    if(porMes.length<2) return '<p style="color:var(--suave)">Sin datos suficientes.</p>';
     const datos = porMes.slice(-12);
     const W=1060,H=260,pad=46;
     const n=datos.length, bw=(W-2*pad)/n*0.62, gap=(W-2*pad)/n;
