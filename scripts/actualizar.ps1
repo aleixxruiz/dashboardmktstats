@@ -117,7 +117,7 @@ if ($historico.Count -eq 1) { $jsonHist = "[$jsonHist]" }
 # ============================================================
 #  SEGUNDA LLAMADA: tráfico por Canal + Fuente (para la pagina de IA)
 # ============================================================
-$urlIA = "https://www.clarity.ms/export-data/api/v1/project-live-insights?numOfDays=3&dimension1=Channel&dimension2=Source"
+$urlIA = "https://www.clarity.ms/export-data/api/v1/project-live-insights?numOfDays=1&dimension1=Channel&dimension2=Source"
 Write-Host "Consultando trafico de IA (canal/fuente)..." -ForegroundColor Gray
 try {
     $respIA = Invoke-RestMethod -Uri $urlIA -Headers $headers -Method Get -ErrorAction Stop
@@ -135,19 +135,34 @@ $trafficIA = ($respIA | Where-Object { $_.metricName -eq "Traffic" }).informatio
 # Guardar datos-ia.js (lo que lee la pagina de IA)
 $jsonIA = $trafficIA | ConvertTo-Json -Depth 8 -Compress
 if ($trafficIA.Count -eq 1) { $jsonIA = "[$jsonIA]" }
-"window.CLARITY_IA = { fechaActualizacion: `"$fechaTexto`", dias: 3, datos: $jsonIA };" |
+"window.CLARITY_IA = { fechaActualizacion: `"$fechaTexto`", dias: 1, datos: $jsonIA };" |
     Out-File (Join-Path $CarpetaDatos "datos-ia.js") -Encoding utf8
 
-# Clasificar y sumar las sesiones que vienen de IA (para el historico de IA)
-$dominiosIA = @('chatgpt.com','openai','perplexity.ai','copilot.microsoft.com','gemini.google.com','claude.ai','bard.google.com','poe.com','you.com')
+# Clasificar las sesiones de IA por plataforma (mismo criterio que la pagina)
+function ClasificarPlataformaIA($source, $channel) {
+    $s = ([string]$source).ToLower(); $ch = [string]$channel
+    $esCanalIA = ($ch -like 'Ai*') -or ($ch -like 'PaidAi*')
+    if ($s -like '*chatgpt*' -or $s -eq 'openai') { return 'ChatGPT' }
+    if ($s -like '*perplexity*') { return 'Perplexity' }
+    if ($s -like '*copilot*')    { return 'Copilot' }
+    if ($s -like '*gemini*' -or $s -like '*bard*') { return 'Gemini' }
+    if ($s -eq 'google' -and $esCanalIA) { return 'Gemini' }
+    if ($s -like '*claude*')     { return 'Claude' }
+    if ($esCanalIA)              { return 'Otras IA' }
+    return $null
+}
+# Un punto por DIA (numOfDays=1): asi el total de 7 dias se suma sin solaparse.
+$platDia = @{}
 $sesionesIA = 0; $usuariosIA = 0; $sesionesTotal = 0
 foreach ($row in $trafficIA) {
     $s = [int]$row.totalSessionCount
     $sesionesTotal += $s
-    $esIA = $false
-    if ($row.Channel -like 'Ai*' -or $row.Channel -like 'PaidAi*') { $esIA = $true }
-    elseif ($dominiosIA -contains ([string]$row.Source).ToLower()) { $esIA = $true }
-    if ($esIA) { $sesionesIA += $s; $usuariosIA += [int]$row.distinctUserCount }
+    $plat = ClasificarPlataformaIA $row.Source $row.Channel
+    if ($plat) {
+        $sesionesIA += $s
+        $usuariosIA += [int]$row.distinctUserCount
+        if ($platDia.ContainsKey($plat)) { $platDia[$plat] += $s } else { $platDia[$plat] = $s }
+    }
 }
 
 # Acumular historico de IA (un punto por dia)
@@ -161,7 +176,7 @@ if (Test-Path $rutaHistIA) {
     }
 }
 $histIA = @($histIA | Where-Object { $_.fecha -and $_.fecha -ne $fechaDia })
-$histIA += [pscustomobject]@{ fecha = $fechaDia; sesionesIA = $sesionesIA; usuariosIA = $usuariosIA; sesionesTotal = $sesionesTotal }
+$histIA += [pscustomobject]@{ fecha = $fechaDia; sesionesIA = $sesionesIA; usuariosIA = $usuariosIA; sesionesTotal = $sesionesTotal; plat = $platDia }
 $histIA = @($histIA | Sort-Object fecha)
 $histIA | ConvertTo-Json -Depth 5 | Out-File $rutaHistIA -Encoding utf8
 $jsonHistIA = $histIA | ConvertTo-Json -Depth 5 -Compress
