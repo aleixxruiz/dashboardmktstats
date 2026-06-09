@@ -62,8 +62,18 @@ function DetectarIdioma($name) {
     return "OTROS"
 }
 
+# Agrupa un formulario en su categoria (igual que el bloque "Como llegaron los contactos")
+function GrupoFormulario($form) {
+    if ([string]::IsNullOrWhiteSpace($form)) { return "Sin formulario" }
+    $l = $form.ToLower()
+    if ($l -like "*alculus*")           { return "Calculus" }
+    if ($l -like "*prefooter*")         { return "Prefooter" }
+    if ($form -eq "Formulario Webinar") { return "Formulario Webinar" }
+    return "Otros"
+}
+
 # Acumuladores
-$porFuente = @{}; $porMes = @{}; $porEtapa = @{}; $porFormulario = @{}; $sinFormFuente = @{}
+$porFuente = @{}; $porMes = @{}; $porEtapa = @{}; $porFormulario = @{}; $sinFormFuente = @{}; $porMesForm = @{}
 $total = 0; $nuevos30 = 0; $nuevosPrev30 = 0; $conFormulario = 0
 $hoy = [datetime]::UtcNow
 $h30 = $hoy.AddDays(-30); $h60 = $hoy.AddDays(-60)
@@ -94,16 +104,20 @@ do {
         else { $etLabel = $et }
         if ($porEtapa.ContainsKey($etLabel)) { $porEtapa[$etLabel]++ } else { $porEtapa[$etLabel] = 1 }
 
+        $form = ClasificarFormulario $p.first_conversion_event_name
+        $grupo = if ($form) { GrupoFormulario $form } else { "Sin formulario" }
+
         if (-not [string]::IsNullOrWhiteSpace($p.createdate)) {
             try {
                 $cd = [datetimeoffset]::Parse($p.createdate).UtcDateTime
                 $mes = $cd.ToString("yyyy-MM")
                 if ($porMes.ContainsKey($mes)) { $porMes[$mes]++ } else { $porMes[$mes] = 1 }
+                if (-not $porMesForm.ContainsKey($mes)) { $porMesForm[$mes] = @{} }
+                if ($porMesForm[$mes].ContainsKey($grupo)) { $porMesForm[$mes][$grupo]++ } else { $porMesForm[$mes][$grupo] = 1 }
                 if ($cd -ge $h30) { $nuevos30++ } elseif ($cd -ge $h60) { $nuevosPrev30++ }
             } catch {}
         }
 
-        $form = ClasificarFormulario $p.first_conversion_event_name
         if ($form) {
             $conFormulario++
             if ($porFormulario.ContainsKey($form)) { $porFormulario[$form]++ } else { $porFormulario[$form] = 1 }
@@ -183,6 +197,17 @@ foreach ($idi in $idiTot.Keys) {
 }
 $listaIdioma = @($listaIdioma | Sort-Object valor -Descending)
 
+# Evolucion mensual con desglose por grupo de formulario (para el desplegable de cada mes)
+$listaMes = @()
+foreach ($k in ($porMes.Keys | Sort-Object)) {
+    $det = @()
+    if ($porMesForm.ContainsKey($k)) {
+        foreach ($g in $porMesForm[$k].Keys) { $det += [pscustomobject]@{ nombre = $g; valor = $porMesForm[$k][$g] } }
+        $det = @($det | Sort-Object valor -Descending)
+    }
+    $listaMes += [pscustomobject]@{ nombre = $k; valor = $porMes[$k]; detalle = $det }
+}
+
 $obj = @{
     fechaActualizacion = (Get-Date).ToString("dd/MM/yyyy HH:mm")
     total        = $total
@@ -191,7 +216,7 @@ $obj = @{
     conFormulario = $conFormulario
     porFuente    = Lista $porFuente $true
     porEtapa     = Lista $porEtapa $true
-    porMes       = Lista $porMes $false
+    porMes       = $listaMes
     porFormulario = $listaForm
     porIdioma    = $listaIdioma
 }
