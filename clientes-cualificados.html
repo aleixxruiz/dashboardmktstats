@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clientes Cualificados · Sage 200 · INGESCO</title>
+<title>Oportunidades comerciales · Sage CRM · INGESCO</title>
 <link rel="icon" type="image/png" href="assets/favicon.ico.png">
 <script src="assets/gate.js"></script>
 <style>
   :root{--navy:#13294b;--violeta:#6d28d9;--violeta2:#8b5cf6;
-    --fondo:#f5f3ff;--tarjeta:#ffffff;--texto:#2e1065;--suave:#6b6486;--borde:#e6e0fb}
+    --fondo:#f5f3ff;--tarjeta:#ffffff;--texto:#2e1065;--suave:#6b6486;--borde:#e6e0fb;
+    --verde:#16a34a;--rojo:#dc2626}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:32px 24px 64px}
-  .contenedor{max-width:1000px;margin:0 auto}
+  .contenedor{max-width:1100px;margin:0 auto}
   a{text-decoration:none}
   header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:26px;border-bottom:3px solid var(--violeta);padding-bottom:18px}
   .titulo{display:flex;align-items:center;gap:18px}
@@ -20,31 +21,37 @@
   .titulo h1{font-size:22px;font-weight:800;color:var(--violeta)}
   .titulo p{color:var(--suave);font-size:13px;margin-top:3px}
   .meta{text-align:right;font-size:12px;color:var(--suave)}
-  .btn-inicio{background:var(--navy);color:#fff;padding:9px 15px;border-radius:10px;font-weight:700;font-size:13px;display:inline-block}
+  .btn-inicio{background:var(--navy);color:#fff;padding:9px 15px;border-radius:10px;font-weight:700;font-size:13px;display:inline-block;margin-bottom:8px}
   .btn-inicio:hover{filter:brightness(1.15)}
   h2.seccion{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--suave);margin:32px 0 14px;font-weight:700}
 
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
-  .kpi{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:20px;box-shadow:0 1px 3px rgba(45,16,101,.05);opacity:.55}
+  .kpi{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:20px;box-shadow:0 1px 3px rgba(45,16,101,.05)}
   .kpi .etq{font-size:13px;color:var(--suave);font-weight:600}
-  .kpi .valor{font-size:30px;font-weight:800;margin-top:8px;color:var(--violeta)}
+  .kpi .valor{font-size:30px;font-weight:800;margin-top:8px;color:var(--violeta);letter-spacing:-1px}
   .kpi .sub{font-size:12px;color:var(--suave);margin-top:6px}
 
-  .aviso{background:var(--tarjeta);border:1px solid var(--borde);border-left:5px solid var(--violeta);
-    border-radius:14px;padding:26px;margin-top:24px;box-shadow:0 1px 3px rgba(45,16,101,.05)}
-  .aviso h3{font-size:18px;color:var(--violeta);margin-bottom:10px}
-  .aviso p{font-size:14.5px;line-height:1.65;color:#4b3b73;margin-bottom:10px}
-  .aviso ul{margin:10px 0 4px 20px;font-size:14px;line-height:1.7;color:#4b3b73}
-  .aviso b{color:var(--violeta)}
-  .badge{display:inline-block;background:#ede9fe;color:var(--violeta);font-size:12px;font-weight:800;
-    padding:5px 12px;border-radius:999px;margin-bottom:14px;letter-spacing:.3px}
+  .panel{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:22px;box-shadow:0 1px 3px rgba(45,16,101,.05)}
+  .panel h3{font-size:16px;margin-bottom:6px;color:var(--texto)}
+  .panel .ayuda{font-size:12.5px;color:var(--suave);margin-bottom:16px;line-height:1.5}
 
+  .barra{margin:11px 0}
+  .barra .top{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px;gap:10px}
+  .barra .top .nom{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .barra .top b{font-weight:700;white-space:nowrap}
+  .pista{background:#efeafe;border-radius:7px;height:12px;overflow:hidden}
+  .relleno{height:100%;border-radius:7px;background:var(--violeta2)}
+  .barra.din .top .nom{color:var(--violeta);font-weight:800}
+  .barra.din .relleno{background:#e08a2b}
+  .barra.din .top b{color:#b9700f}
+
+  .vacio{background:#fff;border:1px dashed var(--borde);border-radius:14px;padding:26px;color:var(--suave);font-size:14px;line-height:1.6}
   footer{margin-top:42px;text-align:center;color:var(--suave);font-size:12px}
   @media(max-width:600px){
     body{padding:22px 14px 48px}
     .titulo h1{font-size:19px}
     .titulo .logo{height:40px}
-    .aviso{padding:20px}
+    .panel{overflow-x:auto}
   }
 </style>
 </head>
@@ -55,39 +62,100 @@
       <img class="logo" src="assets/logo-ingesco.png" alt="INGESCO">
       <div class="sep"></div>
       <div>
-        <h1>🤝 Clientes Cualificados</h1>
-        <p>Sage 200 · conversión de leads a clientes reales</p>
+        <h1>📈 Oportunidades comerciales</h1>
+        <p>Sage CRM · pipeline y origen</p>
       </div>
     </div>
     <div class="meta">
-      <a class="btn-inicio" href="index.html">← Inicio</a>
+      <a class="btn-inicio" href="index.html">← Inicio</a><br>
+      <span id="actualizado">—</span>
     </div>
   </header>
 
-  <!-- Vista previa de los KPIs que tendrá la página (en gris hasta conectar Sage) -->
-  <h2 class="seccion">Vista previa</h2>
-  <div class="kpis">
-    <div class="kpi"><div class="etq">🤝 Clientes cualificados</div><div class="valor">—</div><div class="sub">leads convertidos en clientes</div></div>
-    <div class="kpi"><div class="etq">📈 Tasa de conversión</div><div class="valor">—</div><div class="sub">de lead a cliente</div></div>
-    <div class="kpi"><div class="etq">💶 Facturación asociada</div><div class="valor">—</div><div class="sub">de los clientes cualificados</div></div>
-    <div class="kpi"><div class="etq">🆕 Nuevos clientes (30 d)</div><div class="valor">—</div><div class="sub">altas recientes en Sage</div></div>
-  </div>
+  <div id="contenido"></div>
 
-  <div class="aviso">
-    <span class="badge">⏳ EN CONSTRUCCIÓN</span>
-    <h3>Esta página está lista para conectarse a Sage 200</h3>
-    <p>El diseño y la estructura ya están preparados. Para empezar a mostrar datos reales necesitamos <b>acceso a la API de Sage 200cloud</b>. En cuanto lo tengamos, esta página enseñará la conversión de <b>leads (HubSpot) → clientes reales (Sage)</b>, su facturación y la evolución en el tiempo.</p>
-    <p><b>Qué hace falta pedir</b> (a vuestro partner de Sage o a IT):</p>
-    <ul>
-      <li>Acceso a la <b>API REST de Sage 200</b> (registrar una app en el <i>Sage Developer Portal</i> → <b>Client ID</b> y <b>Client Secret</b>, OAuth 2.0).</li>
-      <li>El <b>identificador de vuestra empresa/subscripción</b> en Sage 200.</li>
-      <li>Permisos de <b>lectura</b> de clientes y facturación de ventas.</li>
-    </ul>
-    <p>También acordaremos juntos <b>qué cuenta como “cliente cualificado”</b> (p. ej. un lead que acaba con factura en Sage).</p>
-  </div>
-
-  <footer><b>INGESCO®</b> · Joining sky and ground. Protecting you since 1973 · Fuente: Sage 200 (pendiente de conexión)</footer>
+  <footer><b>INGESCO®</b> · Joining sky and ground. Protecting you since 1973 · Fuente: Sage CRM</footer>
 </div>
+
+<script src="datos/sage.js"></script>
+<script>
+(function(){
+  const cont = document.getElementById('contenido');
+  if(typeof window.SAGE === 'undefined' || !window.SAGE.total){
+    cont.innerHTML = '<div class="vacio">⚠️ <b>Aún no hay datos de oportunidades.</b> Ejecuta «Actualizar datos» (Sage CRM) y recarga.</div>';
+    return;
+  }
+  const S = window.SAGE;
+  const num = n => Number(n||0).toLocaleString('es-ES');
+  const eur = n => Number(n||0).toLocaleString('es-ES') + ' €';
+  document.getElementById('actualizado').textContent = 'Actualizado: ' + S.fechaActualizacion;
+
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const mesLabel = ym => { const p=String(ym).split('-'); return meses[parseInt(p[1])-1]+' '+p[0].slice(2); };
+
+  // Traducción / prettify de orígenes
+  const ORIG = { 'DIN':'🏭 DirectIndustry', '(sin origen)':'Sin origen', 'Telephone':'Teléfono',
+    'intranet_web':'Web (intranet)', 'infoweb':'Web (info)', 'Trade_Press':'Prensa especializada',
+    'Tradeshow':'Feria', 'Letter':'Carta', 'Advertisement':'Publicidad', 'Referral':'Referencia',
+    'webinar':'Webinar', 'Formulari_SEM':'Formulario SEM', 'concurso':'Concurso', 'almacen':'Almacén',
+    'construdatos':'Construdatos', 'Import':'Importación masiva', 'Employee':'Empleado' };
+  const no = k => ORIG[k] || k;
+
+  const tasa = (S.ganadas+S.perdidas) ? Math.round(S.ganadas/(S.ganadas+S.perdidas)*100) : 0;
+
+  let html = '<div class="kpis">';
+  html += kpi('📋','Oportunidades', num(S.total), 'en el CRM (histórico)');
+  html += kpi('💶','Valor total', eur(S.valorTotal), 'suma de importes');
+  html += kpi('🏆','Ganadas', num(S.ganadas), tasa+'% de tasa de éxito');
+  html += kpi('❌','Perdidas', num(S.perdidas), num(S.abiertas)+' abiertas/otras');
+  html += '</div>';
+
+  // Evolución mensual (últimos 24 meses)
+  html += '<h2 class="seccion">Evolución mensual de oportunidades</h2><div class="panel">'+grafico(S.porMes||[])+'</div>';
+
+  // Por origen
+  html += '<h2 class="seccion">Oportunidades por origen</h2>';
+  html += panelOrigen(S.porOrigen||[]);
+
+  cont.innerHTML = html;
+
+  function kpi(ic,etq,val,sub){ return '<div class="kpi"><div class="etq">'+ic+' '+etq+'</div><div class="valor">'+val+'</div><div class="sub">'+sub+'</div></div>'; }
+
+  function panelOrigen(filas){
+    const max = Math.max.apply(null, filas.map(f=>f.valor).concat([1]));
+    let h = '<div class="panel"><div class="ayuda">Reparto de las '+num(S.total)+' oportunidades según su origen. «Sin origen» e «Importación masiva» son datos heredados/cargados en bloque. <b style="color:var(--violeta)">DirectIndustry</b> aparece resaltado.</div>';
+    filas.forEach(f=>{
+      const w = Math.round(f.valor/max*100);
+      const pc = S.total ? Math.round(f.valor/S.total*100) : 0;
+      const din = (f.nombre==='DIN') ? ' din' : '';
+      h += '<div class="barra'+din+'"><div class="top"><span class="nom">'+no(f.nombre)+'</span>'+
+           '<b>'+num(f.valor)+' ops · '+pc+'% · '+eur(f.importe)+'</b></div>'+
+           '<div class="pista"><div class="relleno" style="width:'+Math.max(w,2)+'%"></div></div></div>';
+    });
+    return h+'</div>';
+  }
+
+  function grafico(porMes){
+    porMes = Array.isArray(porMes)?porMes:[];
+    if(porMes.length<2) return '<p style="color:var(--suave)">Sin datos suficientes.</p>';
+    const datos = porMes.slice(-24);
+    const W=1060,H=260,pad=46;
+    const n=datos.length, bw=(W-2*pad)/n*0.6, gap=(W-2*pad)/n;
+    const max=Math.max.apply(null, datos.map(d=>d.valor).concat([1]))*1.15;
+    let bars='';
+    datos.forEach((d,i)=>{
+      const x=pad+i*gap+(gap-bw)/2;
+      const bh=(d.valor/max)*(H-2*pad);
+      const y=H-pad-bh;
+      bars+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+Math.max(bh,1)+'" rx="3" fill="#8b5cf6"></rect>';
+      if(i%3===0 || i===n-1){
+        bars+='<text x="'+(x+bw/2)+'" y="'+(H-pad+18)+'" text-anchor="middle" font-size="10.5" fill="#6b6486">'+mesLabel(d.nombre)+'</text>';
+      }
+    });
+    return '<svg width="100%" viewBox="0 0 '+W+' '+H+'"><text x="'+pad+'" y="22" font-size="12" fill="#2e1065" font-weight="700">Oportunidades abiertas por mes (últimos 24)</text>'+bars+'</svg>';
+  }
+})();
+</script>
 <script src="assets/widget.js?v=5"></script>
 </body>
 </html>
