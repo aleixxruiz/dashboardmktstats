@@ -207,6 +207,13 @@ if ((Test-Path $scriptHs) -and $config.hubspot -and $config.hubspot.token) {
     & $scriptHs -Silencioso
 }
 
+# --- Actualizar Sage CRM (oportunidades), si esta configurado ---
+$scriptSage = Join-Path $PSScriptRoot "actualizar-sage.ps1"
+if ((Test-Path $scriptSage) -and $config.sage -and $config.sage.usuario) {
+    Write-Host "Actualizando Sage CRM (oportunidades)..." -ForegroundColor Gray
+    try { & $scriptSage -Silencioso } catch { Write-Host ("(aviso) Sage fallo: "+$_.Exception.Message) -ForegroundColor DarkYellow }
+}
+
 # --- Procesar citas de IA (grounding queries / cited pages) desde el CSV de Clarity, si lo hay ---
 $scriptCitas = Join-Path $PSScriptRoot "actualizar-citas.ps1"
 if (Test-Path $scriptCitas) {
