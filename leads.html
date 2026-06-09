@@ -126,7 +126,9 @@
   html+='<div class="kpi"><div class="etq">📅 Captados este mes</div><div class="valor">'+num(esteMes)+'</div><div class="delta flat">mes en curso</div></div>';
   html+='</div>';
 
-  html+='<h2 class="seccion">Evolución mensual de captación</h2><div class="panel">'+grafico(L.porMes)+'</div>';
+  html+='<h2 class="seccion">Evolución mensual de captación</h2><div class="panel">'+grafico(L.porMes)+
+        '<div style="color:var(--suave);font-size:12.5px;margin-top:6px">👆 Haz clic en un mes para ver por qué formularios se captaron esos leads.</div>'+
+        '<div id="mesDetalle" style="display:none;margin-top:14px;border-top:1px dashed var(--borde);padding-top:14px"></div></div>';
 
   html+='<h2 class="seccion">Cómo llegaron los contactos</h2>';
   html+=barrasForm('Todos los contactos ('+num(L.total)+') según cómo entraron — clic en un grupo para desplegar el detalle', (L.porFormulario||[]), L.total);
@@ -191,6 +193,26 @@
     if(f)f.textContent=open?'▸':'▾';
   };
 
+  // Muestra el desglose por formulario del mes seleccionado en la gráfica mensual
+  window.mostrarMesForm=function(mes){
+    var det=document.getElementById('mesDetalle'); if(!det) return;
+    var m=(L.porMes||[]).filter(function(x){ return x.nombre===mes; })[0];
+    if(!m || !m.detalle || !m.detalle.length){
+      det.style.display='block';
+      det.innerHTML='<div style="color:var(--suave)">Sin desglose de formularios para '+mesLabel(mes)+'.</div>';
+      return;
+    }
+    var total=m.valor||0;
+    var max=Math.max.apply(null, m.detalle.map(function(d){ return d.valor; }).concat([1]));
+    var h='<h3 style="font-size:15px;margin-bottom:12px">Formularios · '+mesLabel(mes)+' <span style="color:var(--suave);font-weight:600">('+num(total)+' leads)</span></h3>';
+    m.detalle.forEach(function(d){
+      var w=Math.round(d.valor/max*100), pc=total?Math.round(d.valor/total*100):0;
+      h+='<div class="barra"><div class="top"><span>'+d.nombre+'</span><b>'+num(d.valor)+' · '+pc+'%</b></div>'+
+         '<div class="pista"><div class="relleno" style="width:'+Math.max(w,2)+'%;background:#ec7a1a"></div></div></div>';
+    });
+    det.innerHTML=h; det.style.display='block';
+  };
+
   function grafico(porMes){
     porMes = Array.isArray(porMes)?porMes:[];
     if(porMes.length<2) return '<p style="color:var(--suave)">Sin datos suficientes.</p>';
@@ -203,9 +225,11 @@
       const x=pad+i*gap+(gap-bw)/2;
       const bh=(d.valor/max)*(H-2*pad);
       const y=H-pad-bh;
-      bars+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" rx="4" fill="#ec7a1a"></rect>'+
-            '<text x="'+(x+bw/2)+'" y="'+(y-7)+'" text-anchor="middle" font-size="11" fill="#3a2000" font-weight="700">'+d.valor+'</text>'+
-            '<text x="'+(x+bw/2)+'" y="'+(H-pad+18)+'" text-anchor="middle" font-size="10.5" fill="#6b7688">'+mesLabel(d.nombre)+'</text>';
+      const cx=pad+i*gap;
+      bars+='<rect x="'+cx+'" y="'+pad+'" width="'+gap+'" height="'+(H-2*pad)+'" fill="transparent" style="cursor:pointer" onclick="mostrarMesForm(\''+d.nombre+'\')"></rect>'+
+            '<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" rx="4" fill="#ec7a1a" style="cursor:pointer" onclick="mostrarMesForm(\''+d.nombre+'\')"></rect>'+
+            '<text x="'+(x+bw/2)+'" y="'+(y-7)+'" text-anchor="middle" font-size="11" fill="#3a2000" font-weight="700" style="pointer-events:none">'+d.valor+'</text>'+
+            '<text x="'+(x+bw/2)+'" y="'+(H-pad+18)+'" text-anchor="middle" font-size="10.5" fill="#6b7688" style="pointer-events:none">'+mesLabel(d.nombre)+'</text>';
     });
     return '<svg width="100%" viewBox="0 0 '+W+' '+H+'"><text x="'+pad+'" y="22" font-size="12" fill="#3a2000" font-weight="700">Leads nuevos por mes (últimos 12)</text>'+bars+'</svg>';
   }
