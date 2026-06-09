@@ -64,12 +64,14 @@ $todos = @(
     @{ local = "datos\leads.js";             remoto = "datos/leads.js" },
     @{ local = "datos\citas-ia.js";          remoto = "datos/citas-ia.js" },
     @{ local = "datos\indexacion.js";        remoto = "datos/indexacion.js" },
+    @{ local = "datos\sage.js";              remoto = "datos/sage.js" },
     @{ local = "scripts\actualizar.ps1";         remoto = "scripts/actualizar.ps1" },
     @{ local = "scripts\subir-github.ps1";       remoto = "scripts/subir-github.ps1" },
     @{ local = "scripts\lib-google.ps1";         remoto = "scripts/lib-google.ps1" },
     @{ local = "scripts\actualizar-gsc.ps1";     remoto = "scripts/actualizar-gsc.ps1" },
     @{ local = "scripts\actualizar-ga.ps1";      remoto = "scripts/actualizar-ga.ps1" },
     @{ local = "scripts\actualizar-hubspot.ps1"; remoto = "scripts/actualizar-hubspot.ps1" },
+    @{ local = "scripts\actualizar-sage.ps1";    remoto = "scripts/actualizar-sage.ps1" },
     @{ local = "scripts\actualizar-citas.ps1";   remoto = "scripts/actualizar-citas.ps1" },
     @{ local = "scripts\actualizar-indexacion.ps1"; remoto = "scripts/actualizar-indexacion.ps1" }
 )
