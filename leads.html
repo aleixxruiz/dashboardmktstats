@@ -6,6 +6,7 @@
 <title>Captación de Leads · HubSpot · INGESCO</title>
 <link rel="icon" type="image/png" href="assets/favicon.ico.png">
 <script src="assets/gate.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css">
 <style>
   :root{--navy:#7a3300;--azul:#ec7a1a;--cielo:#f7a93a;--fondo:#fff1e3;
     --tarjeta:#fffaf4;--texto:#3a2000;--suave:#9a7350;--borde:#f4dcc2;
@@ -46,6 +47,22 @@
   .detalle .barra{margin:8px 0}
   .vacio{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:24px;border-radius:14px}
   footer{margin-top:40px;text-align:center;color:var(--suave);font-size:12px}
+  .mapa-wrap{display:grid;grid-template-columns:1fr 280px;gap:18px}
+  @media(max-width:860px){.mapa-wrap{grid-template-columns:1fr}}
+  .mapa-cont{position:relative;width:100%}
+  #mapa{width:100%;height:440px}
+  .burbuja{position:absolute;transform:translate(-50%,-50%);border-radius:50%;background:rgba(234,122,26,.92);
+    color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #fff;
+    box-shadow:0 2px 6px rgba(0,0,0,.28);font-size:10.5px;pointer-events:none;z-index:4;line-height:1}
+  .burbuja.hl{background:#b91c1c;box-shadow:0 0 0 5px rgba(185,28,28,.30);transform:translate(-50%,-50%) scale(1.4);z-index:9;transition:.2s}
+  .paises-lista{max-height:440px;overflow:auto;padding-right:6px}
+  .pais-row{display:flex;align-items:center;gap:10px;font-size:13.5px;margin:1px 0;padding:6px 8px;border-radius:8px;cursor:pointer}
+  .pais-row:hover{background:#fff3e8}
+  .pais-row.hl{background:#ffe1c2}
+  .pais-row .ban{font-size:18px;width:24px;text-align:center}
+  .pais-row .nom{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pais-row .val{font-weight:800;color:var(--azul);font-variant-numeric:tabular-nums}
+  .jvm-tooltip{background:#7a3300;font-weight:600}
   @media(max-width:600px){
     body{padding:22px 14px 48px}
     .titulo h1{font-size:19px}
@@ -78,6 +95,8 @@
 </div>
 
 <script src="datos/leads.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"></script>
 <script>
 (function(){
   const cont = document.getElementById('contenido');
@@ -126,6 +145,19 @@
   html+='<div class="kpi"><div class="etq">📅 Captados este mes</div><div class="valor">'+num(esteMes)+'</div><div class="delta flat">mes en curso</div></div>';
   html+='</div>';
 
+  // Nombres de país en español (debe estar listo ANTES de construir la lista)
+  var DN=null; try{ DN=new Intl.DisplayNames(['es'],{type:'region'}); }catch(e){}
+
+  // Mapa de contactos por país
+  let paisTotal=0; (L.porPais||[]).forEach(function(p){ paisTotal+=p.valor; });
+  if((L.porPais||[]).length){
+    html+='<h2 class="seccion">Contactos por país</h2>';
+    html+='<div class="panel"><div class="mapa-wrap"><div class="mapa-cont"><div id="mapa"></div></div>'+
+      '<div><h3 style="font-size:15px;margin-bottom:8px">Países ('+L.porPais.length+')</h3>'+
+      '<div class="paises-lista">'+listaPaises(L.porPais||[])+'</div></div></div>'+
+      '<div style="color:var(--suave);font-size:12px;margin-top:10px">Basado en <b>'+num(paisTotal)+'</b> contactos con país conocido (de '+num(L.total)+'). Pasa el ratón por el mapa, o haz clic en un país de la lista para localizarlo.</div></div>';
+  }
+
   html+='<h2 class="seccion">Evolución mensual de captación</h2><div class="panel">'+grafico(L.porMes)+
         '<div style="color:var(--suave);font-size:12.5px;margin-top:6px">👆 Haz clic en un mes para ver por qué formularios se captaron esos leads.</div>'+
         '<div id="mesDetalle" style="display:none;margin-top:14px;border-top:1px dashed var(--borde);padding-top:14px"></div></div>';
@@ -143,6 +175,7 @@
   }
 
   cont.innerHTML = html;
+  if((L.porPais||[]).length) pintarMapa();
 
   function barras(titulo, filas, total){
     const max=Math.max(...filas.map(f=>f.valor),1);
@@ -233,6 +266,53 @@
     });
     return '<svg width="100%" viewBox="0 0 '+W+' '+H+'"><text x="'+pad+'" y="22" font-size="12" fill="#3a2000" font-weight="700">Leads nuevos por mes (últimos 12)</text>'+bars+'</svg>';
   }
+
+  // ---- Mapa de contactos por país ----
+  function nombrePais(code){ try{ return (DN&&DN.of(code))||code; }catch(e){ return code; } }
+  function bandera(code){ if(!code||code.length!==2) return '🌐'; return code.toUpperCase().replace(/./g,function(c){ return String.fromCodePoint(127397+c.charCodeAt(0)); }); }
+  function listaPaises(arr){ let h=''; (arr||[]).forEach(function(p){ const c=(p.code||'').toUpperCase(); h+='<div class="pais-row" id="row-'+c+'" onclick="irPais(\''+c+'\')"><span class="ban">'+bandera(p.code)+'</span><span class="nom">'+nombrePais(p.code)+'</span><span class="val">'+num(p.valor)+'</span></div>'; }); return h; }
+  function shortNum(n){ return n>=1000 ? (n/1000).toFixed(n>=10000?0:1).replace('.0','')+'k' : ''+n; }
+  const burbujas={};
+  function pintarMapa(){
+    const valores={}; (L.porPais||[]).forEach(function(p){ if(p.code) valores[p.code.toUpperCase()]=p.valor; });
+    const maxV=Math.max.apply(null, Object.keys(valores).map(function(k){return valores[k];}).concat([1]));
+    const mapaEl=document.getElementById('mapa');
+    function fallback(msg){ if(mapaEl) mapaEl.innerHTML='<div style="padding:30px;color:var(--suave);text-align:center">🌐 '+msg+'</div>'; }
+    if(!window.jsVectorMap){ fallback('Mapa no disponible (sin conexión).'); return; }
+    try{
+      new window.jsVectorMap({ selector:'#mapa', map:'world', zoomButtons:false, zoomOnScroll:false, draggable:false, backgroundColor:'transparent',
+        regionStyle:{ initial:{ fill:'#e9edf0', stroke:'#ffffff', strokeWidth:0.5 }, hover:{ fill:'#d8dee4' } },
+        onLoaded:function(){ setTimeout(function(){ dibujarBurbujas(valores,maxV); }, 120); },
+        onRegionTooltipShow:function(event,tooltip,code){ const v=valores[code]; if(v!=null) tooltip.text(tooltip.text()+' · '+num(v)+' contactos', true); }
+      });
+      setTimeout(function(){ if(!Object.keys(burbujas).length) dibujarBurbujas(valores,maxV); }, 600);
+      window.addEventListener('resize', function(){ clearTimeout(window._burbT); window._burbT=setTimeout(function(){ dibujarBurbujas(valores,maxV); }, 250); });
+    }catch(e){ fallback('No se pudo dibujar el mapa.'); }
+  }
+  function dibujarBurbujas(valores, maxV){
+    const cont=document.querySelector('.mapa-cont'), mapaEl=document.getElementById('mapa');
+    if(!cont||!mapaEl) return;
+    cont.querySelectorAll('.burbuja').forEach(function(b){ b.remove(); });
+    Object.keys(burbujas).forEach(function(k){ delete burbujas[k]; });
+    const cr=cont.getBoundingClientRect();
+    const byCode={}; mapaEl.querySelectorAll('path').forEach(function(p){ const c=(p.getAttribute('data-code')||p.id||'').toUpperCase(); if(c) byCode[c]=p; });
+    Object.keys(valores).forEach(function(code){
+      const path=byCode[code]; if(!path) return;
+      const r=path.getBoundingClientRect(); if(!r.width) return;
+      const cx=r.left+r.width/2-cr.left, cy=r.top+r.height/2-cr.top;
+      const v=valores[code], size=Math.round(18+Math.sqrt(v)/Math.sqrt(maxV)*24);
+      const b=document.createElement('div'); b.className='burbuja';
+      b.style.left=cx+'px'; b.style.top=cy+'px'; b.style.width=size+'px'; b.style.height=size+'px';
+      b.textContent=shortNum(v); b.title=nombrePais(code)+': '+num(v);
+      cont.appendChild(b); burbujas[code]=b;
+    });
+  }
+  window.irPais=function(code){
+    const cont=document.querySelector('.mapa-cont'); if(cont) cont.scrollIntoView({behavior:'smooth',block:'center'});
+    document.querySelectorAll('.pais-row.hl').forEach(function(r){ r.classList.remove('hl'); });
+    const row=document.getElementById('row-'+code); if(row) row.classList.add('hl');
+    const b=burbujas[code]; if(b){ b.classList.add('hl'); setTimeout(function(){ b.classList.remove('hl'); }, 1800); }
+  };
 })();
 </script>
 <script src="assets/widget.js?v=5"></script>
