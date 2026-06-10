@@ -79,7 +79,8 @@ $todos = @(
     @{ local = "scripts\actualizar-hubspot.ps1"; remoto = "scripts/actualizar-hubspot.ps1" },
     @{ local = "scripts\actualizar-sage.ps1";    remoto = "scripts/actualizar-sage.ps1" },
     @{ local = "scripts\actualizar-citas.ps1";   remoto = "scripts/actualizar-citas.ps1" },
-    @{ local = "scripts\actualizar-indexacion.ps1"; remoto = "scripts/actualizar-indexacion.ps1" }
+    @{ local = "scripts\actualizar-indexacion.ps1"; remoto = "scripts/actualizar-indexacion.ps1" },
+    @{ local = "scripts\cloudflare-worker.js";       remoto = "scripts/cloudflare-worker.js" }
 )
 $soloDatosLista = $todos | Where-Object { $_.remoto -like "datos/*" }
 # La indexacion la gestiona SOLO la nube (1/semana). En local no la subimos para no pisar el dato bueno.
