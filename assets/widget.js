@@ -12,6 +12,16 @@
     titulo: "¿Tienes una duda?"
   };
 
+  // Cargar TODOS los datos del panel (en cualquier página) para que el asistente
+  // tenga la foto completa de todas las fuentes, no solo de la página actual.
+  ['datos/datos.js','datos/datos-ia.js','datos/ga.js','datos/gsc.js','datos/leads.js',
+   'datos/sage.js','datos/directindustry.js','datos/citas-ia.js','datos/indexacion.js',
+   'datos/historico.js','datos/historico-ia.js'].forEach(function(src){
+    if([].some.call(document.scripts, function(s){ return s.src && s.src.indexOf(src) >= 0; })) return;
+    var sc = document.createElement('script'); sc.src = src; sc.async = true; sc.onerror = function(){};
+    document.head.appendChild(sc);
+  });
+
   // ---- Estilos ----
   var css = ''
    + '.asis-btn{position:fixed;right:22px;bottom:22px;z-index:99999;width:58px;height:58px;border-radius:50%;'
@@ -40,7 +50,10 @@
    + '.asis-in input{flex:1;background:#fff;border:1px solid #cdd06a;color:#1e2b50;border-radius:10px;padding:10px;font-size:13.5px;outline:none}'
    + '.asis-in button{background:#1e2b50;border:none;color:#fff;border-radius:10px;padding:0 14px;cursor:pointer;font-weight:700}'
    + '.asis-back{padding:8px 16px;color:#6b7050;cursor:pointer;font-size:12.5px;border-bottom:1px solid #cdd06a}'
-   + '.asis-back:hover{color:#1e2b50}';
+   + '.asis-back:hover{color:#1e2b50}'
+   + '.asis-pet{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;margin-top:2px;'
+   + 'background:#1e2b50;color:#fff;text-decoration:none;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700}'
+   + '.asis-pet:hover{background:#2a3b6b}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   // ---- HTML ----
@@ -76,20 +89,33 @@
 
   // IA
   function verChat(on){ $('asisMenu').style.display = on?'none':'block'; $('asisChat').classList.toggle('on', on); }
-  $('asisIA').onclick = function(){ verChat(true); if(!$('asisMsgs').dataset.init){ addMsg('a','¡Hola! 👋 Pregúntame lo que quieras sobre los datos de este panel (visitas, leads, búsquedas…).'); $('asisMsgs').dataset.init='1'; } };
+  $('asisIA').onclick = function(){ verChat(true); if(!$('asisMsgs').dataset.init){ addMsg('a','¡Hola! 👋 Soy XIELA. Analizo todos los datos del panel (web, IA, búsquedas, leads, oportunidades y DirectIndustry), los cruzo y te doy conclusiones. Pregúntame lo que quieras.'); $('asisMsgs').dataset.init='1'; } };
   $('asisBack').onclick = function(){ verChat(false); };
 
   function addMsg(tipo, texto){ var m=document.createElement('div'); m.className='asis-m '+tipo; m.textContent=texto; $('asisMsgs').appendChild(m); $('asisMsgs').scrollTop=$('asisMsgs').scrollHeight; return m; }
 
-  // Recoge un resumen de los datos cargados en la página actual
+  // Botón para ir a Peticiones (cuando la IA no tiene datos para responder)
+  function botonPeticiones(){
+    if($('asisMsgs').querySelector('.asis-pet-ultimo')) $('asisMsgs').querySelector('.asis-pet-ultimo').classList.remove('asis-pet-ultimo');
+    var a=document.createElement('a'); a.className='asis-pet asis-pet-ultimo'; a.href='peticiones.html';
+    a.innerHTML='📝 Pedirlo en Peticiones';
+    $('asisMsgs').appendChild(a); $('asisMsgs').scrollTop=$('asisMsgs').scrollHeight;
+  }
+
+  // Recoge un resumen de TODOS los datos del panel (todas las fuentes)
+  function corta(a,n){ return Array.isArray(a) ? a.slice(0, n||15) : a; }
   function contexto(){
     var d = {};
     try{ if(window.GA) d.analytics = window.GA; }catch(e){}
-    try{ if(window.GSC) d.searchConsole = {totales:window.GSC.totales, totalesLargo:window.GSC.totalesLargo, queries:(window.GSC.queries||[]).slice(0,10), paginas:(window.GSC.paginas||[]).slice(0,10)}; }catch(e){}
-    try{ if(window.LEADS) d.leads = {total:window.LEADS.total, nuevos30:window.LEADS.nuevos30, porFuente:window.LEADS.porFuente, porEtapa:window.LEADS.porEtapa, porFormulario:window.LEADS.porFormulario}; }catch(e){}
+    try{ if(window.GSC) d.searchConsole = {totales:window.GSC.totales, totalesLargo:window.GSC.totalesLargo, queries:corta(window.GSC.queries,12), paginas:corta(window.GSC.paginas,12)}; }catch(e){}
+    try{ if(window.LEADS) d.leads = {total:window.LEADS.total, nuevos30:window.LEADS.nuevos30, prev30:window.LEADS.prev30, porFuente:window.LEADS.porFuente, porEtapa:window.LEADS.porEtapa, porFormulario:window.LEADS.porFormulario, porMes:window.LEADS.porMes, porPais:corta(window.LEADS.porPais,15)}; }catch(e){}
+    try{ if(window.SAGE) d.oportunidadesSage = {total:window.SAGE.total, ganadas:window.SAGE.ganadas, perdidas:window.SAGE.perdidas, enCurso:window.SAGE.abiertas, porOrigen:window.SAGE.porOrigen, porSector:window.SAGE.porSector, porMes:corta(window.SAGE.porMes,24), empresasConSector:window.SAGE.empresasConSector, actualizado:window.SAGE.fechaActualizacion}; }catch(e){}
+    try{ if(window.DIRECTINDUSTRY){ var di=window.DIRECTINDUSTRY; d.directIndustry={generado:di.generado, rango:di.rango, panel:di.panel, kpis:di.kpis, insignia:di.insignia, porPais:corta(di.porPais,15), porSector:corta(di.porSector,12), porMesVisita:di.porMesVisita, porMesPeticion:di.porMesPeticion, topProductos:corta(di.topProductos,12)}; } }catch(e){}
     try{ if(window.CLARITY_IA) d.traficoIA = window.CLARITY_IA; }catch(e){}
     try{ if(window.CITAS) d.citasIA = window.CITAS; }catch(e){}
     try{ if(window.INDEX) d.indexacion = {indexadas:window.INDEX.indexadas, noIndexadas:window.INDEX.noIndexadas}; }catch(e){}
+    try{ if(window.CLARITY_HISTORICO) d.clarityHistorico = corta(window.CLARITY_HISTORICO,30); }catch(e){}
+    try{ if(window.CLARITY_IA_HISTORICO) d.iaHistorico = corta(window.CLARITY_IA_HISTORICO,30); }catch(e){}
     return d;
   }
 
@@ -101,7 +127,13 @@
     fetch(CONFIG.aiUrl, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ pregunta:q, pagina:document.title, datos:contexto() }) })
       .then(function(r){ return r.json(); })
-      .then(function(j){ cargando.textContent = j.respuesta || j.error || 'Sin respuesta.'; })
+      .then(function(j){
+        var txt = (j.respuesta || j.error || 'Sin respuesta.');
+        var pide = txt.indexOf('##PETICION##') >= 0;
+        txt = txt.replace(/##PETICION##/g,'').trim();
+        cargando.textContent = txt;
+        if(pide) botonPeticiones();
+      })
       .catch(function(){ cargando.textContent='No pude conectar con la IA. Inténtalo más tarde o escribe por Teams.'; });
   }
   $('asisSend').onclick = enviar;
