@@ -30,7 +30,7 @@ try {
     foreach ($op in $pl.options) { $etiquetasEtapa[[string]$op.value] = $op.label }
 } catch { Write-Host "(aviso: no pude traer las etiquetas de etapa)" -ForegroundColor DarkYellow }
 
-$props = "createdate,hs_analytics_source,lifecyclestage,first_conversion_event_name"
+$props = "createdate,hs_analytics_source,lifecyclestage,first_conversion_event_name,ip_country_code"
 $base  = "https://api.hubapi.com/crm/v3/objects/contacts?limit=100&properties=$props&archived=false"
 
 # Clasifica el formulario por el que llego el contacto (primera conversion)
@@ -73,7 +73,7 @@ function GrupoFormulario($form) {
 }
 
 # Acumuladores
-$porFuente = @{}; $porMes = @{}; $porEtapa = @{}; $porFormulario = @{}; $sinFormFuente = @{}; $porMesForm = @{}
+$porFuente = @{}; $porMes = @{}; $porEtapa = @{}; $porFormulario = @{}; $sinFormFuente = @{}; $porMesForm = @{}; $porPais = @{}
 $total = 0; $nuevos30 = 0; $nuevosPrev30 = 0; $conFormulario = 0
 $hoy = [datetime]::UtcNow
 $h30 = $hoy.AddDays(-30); $h60 = $hoy.AddDays(-60)
@@ -97,6 +97,12 @@ do {
 
         $src = $p.hs_analytics_source; if ([string]::IsNullOrWhiteSpace($src)) { $src = "DESCONOCIDO" }
         if ($porFuente.ContainsKey($src)) { $porFuente[$src]++ } else { $porFuente[$src] = 1 }
+
+        $cc = $p.ip_country_code
+        if (-not [string]::IsNullOrWhiteSpace($cc)) {
+            $cc = $cc.ToUpper()
+            if ($porPais.ContainsKey($cc)) { $porPais[$cc]++ } else { $porPais[$cc] = 1 }
+        }
 
         $et = $p.lifecyclestage
         if ([string]::IsNullOrWhiteSpace($et)) { $etLabel = "Sin etapa" }
@@ -208,6 +214,11 @@ foreach ($k in ($porMes.Keys | Sort-Object)) {
     $listaMes += [pscustomobject]@{ nombre = $k; valor = $porMes[$k]; detalle = $det }
 }
 
+# Contactos por pais (codigo ISO2 de ip_country_code) para el mapa coropletico
+$listaPais = @()
+foreach ($k in $porPais.Keys) { $listaPais += [pscustomobject]@{ code = $k; valor = $porPais[$k] } }
+$listaPais = @($listaPais | Sort-Object valor -Descending)
+
 $obj = @{
     fechaActualizacion = (Get-Date).ToString("dd/MM/yyyy HH:mm")
     total        = $total
@@ -219,6 +230,7 @@ $obj = @{
     porMes       = $listaMes
     porFormulario = $listaForm
     porIdioma    = $listaIdioma
+    porPais      = $listaPais
 }
 $json = $obj | ConvertTo-Json -Depth 6 -Compress
 "window.LEADS = $json;" | Out-File (Join-Path $CarpetaDatos "leads.js") -Encoding utf8
