@@ -81,19 +81,33 @@ export default {
       const prompt = "Pregunta del usuario: " + pregunta + "\n\nPagina actual del panel: " + pagina +
         "\n\nDatos del panel (JSON con todas las fuentes disponibles):\n" + JSON.stringify(datos).slice(0, 40000);
 
-      const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + env.GEMINI_API_KEY;
-      const resp = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: sistema }] },
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 1400 }
-        })
+      // Modelos en cadena: si el primero esta saturado, pasa al siguiente (con un reintento breve).
+      const MODELOS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite'];
+      const cuerpo = JSON.stringify({
+        systemInstruction: { parts: [{ text: sistema }] },
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.4, maxOutputTokens: 1400 }
       });
-      const j = await resp.json();
-      const respuesta = (j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts[0].text)
-        || ('No pude generar respuesta. ' + (j.error && j.error.message ? j.error.message : ''));
+      let respuesta = '', ultimoError = '';
+      for (const modelo of MODELOS) {
+        let hecho = false;
+        for (let intento = 0; intento < 2 && !hecho; intento++) {
+          try {
+            const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + modelo + ':generateContent?key=' + env.GEMINI_API_KEY;
+            const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: cuerpo });
+            const j = await resp.json();
+            const txt = j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts && j.candidates[0].content.parts[0].text;
+            if (txt) { respuesta = txt; hecho = true; break; }
+            ultimoError = (j.error && j.error.message) || ('HTTP ' + resp.status);
+            // Saturacion / limite -> espera breve y reintenta; cualquier otro error -> probar siguiente modelo
+            if (resp.status === 503 || resp.status === 429 || /overload|high demand|UNAVAILABLE|RESOURCE_EXHAUSTED/i.test(ultimoError)) {
+              await new Promise(function(r){ setTimeout(r, 700); });
+            } else { break; }
+          } catch (err) { ultimoError = err.message; await new Promise(function(r){ setTimeout(r, 400); }); }
+        }
+        if (respuesta) break;
+      }
+      if (!respuesta) respuesta = 'El servicio de IA esta muy solicitado ahora mismo. Vuelve a intentarlo en unos segundos.';
       return new Response(JSON.stringify({ respuesta }), { headers: { ...cors, 'Content-Type': 'application/json' } });
     } catch (e) {
       return new Response(JSON.stringify({ error: 'Error: ' + e.message }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
