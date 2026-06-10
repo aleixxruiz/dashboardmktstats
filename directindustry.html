@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escaparate B2B · DirectIndustry · INGESCO</title>
+<link rel="icon" type="image/png" href="assets/favicon.ico.png">
+<script src="assets/gate.js"></script>
+<style>
+  :root{--navy:#13294b;--teal:#0e7490;--teal2:#22a3bf;
+    --fondo:#ecfbff;--tarjeta:#ffffff;--texto:#0b3a47;--suave:#5d7e88;--borde:#cdeef5}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:32px 24px 64px}
+  .contenedor{max-width:1040px;margin:0 auto}
+  a{text-decoration:none}
+  header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:26px;border-bottom:3px solid var(--teal);padding-bottom:18px}
+  .titulo{display:flex;align-items:center;gap:18px}
+  .titulo .logo{height:50px;width:auto}
+  .titulo .sep{width:1px;height:44px;background:var(--borde)}
+  .titulo h1{font-size:22px;font-weight:800;color:var(--teal)}
+  .titulo p{color:var(--suave);font-size:13px;margin-top:3px}
+  .meta{text-align:right;font-size:12px;color:var(--suave)}
+  .meta .periodo{margin-bottom:8px}
+  .btn-inicio{background:var(--navy);color:#fff;padding:9px 15px;border-radius:10px;font-weight:700;font-size:13px;display:inline-block}
+  .btn-inicio:hover{filter:brightness(1.15)}
+  h2.seccion{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--suave);margin:34px 0 14px;font-weight:700}
+
+  /* Bloques de SOLICITUDES (arriba) */
+  .solis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:720px){.solis{grid-template-columns:1fr}}
+  .soli{background:var(--tarjeta);border:1px solid var(--borde);border-radius:16px;padding:22px;box-shadow:0 2px 8px rgba(14,116,144,.08);position:relative;overflow:hidden}
+  .soli.acento{border-left:5px solid var(--teal)}
+  .soli.acento2{border-left:5px solid #f0a93b}
+  .soli.mini{border-left:5px solid #9fb6bd}
+  .soli .ic{font-size:26px}
+  .soli .num{font-size:40px;font-weight:800;color:var(--teal);line-height:1;margin:10px 0 6px}
+  .soli.acento2 .num{color:#e07d1a}
+  .soli .tit{font-size:14.5px;font-weight:700;color:#0b3a47}
+  .soli .des{font-size:12px;color:var(--suave);margin-top:5px;line-height:1.45}
+
+  /* Tarjetas de RENDIMIENTO (captura) */
+  .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.cards3{grid-template-columns:1fr}}
+  .perf{border-radius:16px;overflow:hidden;box-shadow:0 3px 12px rgba(14,116,144,.12);color:#fff;display:flex;flex-direction:column}
+  .perf .cab{padding:16px 18px;background:#3a4654}
+  .perf .cab h3{font-size:15px;font-weight:800;letter-spacing:.3px}
+  .perf .cab span{font-size:10.5px;opacity:.85;display:block;margin-top:4px;line-height:1.4;text-transform:uppercase;letter-spacing:.4px}
+  .perf .mitad{padding:18px;display:flex;align-items:center;gap:14px}
+  .perf .mitad .ic{font-size:24px;opacity:.9}
+  .perf .mitad .v{font-size:26px;font-weight:800;line-height:1}
+  .perf .mitad .l{font-size:11px;opacity:.9;text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+  .perf.azul .m1{background:#5b9bd0}.perf.azul .m2{background:#3f7cb0}
+  .perf.verde .m1{background:#3bb0a6}.perf.verde .m2{background:#2c8f86}
+  .perf.malva .m1{background:#b07296}.perf.malva .m2{background:#8f5478}
+
+  /* Banda PROSPECTOS Y TRÁFICO WEB */
+  .banda{background:linear-gradient(135deg,#1d3a5f,#13294b);border-radius:16px;padding:24px;margin-top:16px;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:18px;color:#fff;box-shadow:0 4px 16px rgba(19,41,75,.25)}
+  @media(max-width:680px){.banda{grid-template-columns:repeat(2,1fr)}}
+  .banda .item{display:flex;align-items:center;gap:13px}
+  .banda .item .ic{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .banda .item .v{font-size:24px;font-weight:800;line-height:1}
+  .banda .item .l{font-size:11px;opacity:.82;text-transform:uppercase;letter-spacing:.4px;margin-top:3px;line-height:1.3}
+
+  /* Productos insignia */
+  .insignias{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.insignias{grid-template-columns:1fr}}
+  .ins{background:var(--tarjeta);border:1px solid var(--borde);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(14,116,144,.10);display:flex;flex-direction:column}
+  .ins .foto{height:160px;background:#f3fbfd;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--borde)}
+  .ins .foto img{max-height:140px;max-width:90%;object-fit:contain}
+  .ins .foto .ph{color:#a9c8d1;font-size:13px;text-align:center;padding:0 16px}
+  .ins .cuerpo{padding:18px;display:flex;flex-direction:column;gap:4px;flex:1}
+  .ins .nom{font-size:16px;font-weight:800;color:#0b3a47}
+  .ins .fam{font-size:11.5px;color:var(--suave);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  .ins .big{display:flex;align-items:baseline;gap:8px;margin-top:8px}
+  .ins .big .v{font-size:38px;font-weight:800;color:var(--teal);line-height:1}
+  .ins .big .vl{font-size:12.5px;color:var(--suave);font-weight:600}
+  .ins .vistas{font-size:12px;color:var(--suave);margin-top:2px}
+  .ins select{margin-top:12px;width:100%;padding:9px 11px;border:1.5px solid var(--borde);border-radius:10px;
+    font-size:13px;font-weight:600;color:#0b3a47;background:#f7fdfe;cursor:pointer;font-family:inherit}
+  .ins select:focus{outline:none;border-color:var(--teal)}
+
+  .panel{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:22px;box-shadow:0 1px 3px rgba(14,116,144,.06)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+
+  .chart{display:flex;align-items:flex-end;gap:6px;height:200px;padding-top:10px}
+  .col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px}
+  .col .barra{width:72%;max-width:30px;background:linear-gradient(180deg,var(--teal2),var(--teal));border-radius:5px 5px 0 0;transition:.2s;min-height:2px}
+  .col:hover .barra{filter:brightness(1.12)}
+  .col .num{font-size:11px;font-weight:700;color:var(--teal)}
+  .col .lbl{font-size:10px;color:var(--suave);white-space:nowrap}
+
+  .lista{display:flex;flex-direction:column;gap:9px;max-height:340px;overflow-y:auto}
+  .fila{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px}
+  .fila .barra-fondo{position:relative;background:#e8f6fa;border-radius:7px;height:26px;overflow:hidden}
+  .fila .barra-rell{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#86cfe1,#aee0ee);border-radius:7px}
+  .fila .et{position:absolute;left:10px;top:0;bottom:0;display:flex;align-items:center;font-size:12.5px;font-weight:700;color:#0b3a47;z-index:1;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 16px)}
+  .fila .vl{font-size:13px;font-weight:800;color:var(--teal);min-width:36px;text-align:right}
+
+  footer{margin-top:42px;text-align:center;color:var(--suave);font-size:12px}
+  .nota{font-size:11.5px;color:var(--suave);margin-top:10px;line-height:1.5}
+  @media(max-width:600px){ body{padding:22px 14px 48px} .titulo h1{font-size:19px} .titulo .logo{height:40px} .panel{padding:16px} .col .lbl{font-size:9px} }
+</style>
+</head>
+<body>
+<div class="contenedor">
+  <header>
+    <div class="titulo">
+      <img class="logo" src="assets/logo-ingesco.png" alt="INGESCO">
+      <div class="sep"></div>
+      <div>
+        <h1>🏭 Escaparate B2B</h1>
+        <p>DirectIndustry · rendimiento, solicitudes y visitantes</p>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="periodo" id="periodo">—</div>
+      <a class="btn-inicio" href="index.html">← Inicio</a>
+    </div>
+  </header>
+
+  <h2 class="seccion">Solicitudes recibidas</h2>
+  <div class="solis" id="solis"></div>
+
+  <h2 class="seccion">Rendimiento del escaparate</h2>
+  <div class="cards3" id="cards3"></div>
+  <div class="banda" id="banda"></div>
+
+  <h2 class="seccion">Peticiones por producto insignia</h2>
+  <div class="insignias" id="insignias"></div>
+
+  <h2 class="seccion">Evolución mensual de visitantes</h2>
+  <div class="panel"><div class="chart" id="chartMes"></div>
+    <p class="nota">Empresas identificadas en el escaparate a lo largo del tiempo (del export de contactos).</p>
+  </div>
+
+  <div class="grid2" style="margin-top:24px">
+    <div>
+      <h2 class="seccion" style="margin-top:0">Visitantes por país</h2>
+      <div class="panel"><div class="lista" id="listaPais"></div></div>
+    </div>
+    <div>
+      <h2 class="seccion" style="margin-top:0">Por sector de actividad</h2>
+      <div class="panel"><div class="lista" id="listaSector"></div></div>
+    </div>
+  </div>
+
+  <h2 class="seccion">Productos más vistos</h2>
+  <div class="panel"><div class="lista" id="listaProd"></div></div>
+
+  <h2 class="seccion">Peticiones recibidas por mes</h2>
+  <div class="panel"><div class="chart" id="chartPet"></div>
+    <p class="nota">Contactos comerciales (solicitudes de presupuesto, catálogos o información) recibidos a través del escaparate. Solo totales agregados, sin datos personales.</p>
+  </div>
+
+  <footer><b>INGESCO®</b> · Joining sky and ground. Protecting you since 1973 · Fuente: DirectIndustry</footer>
+</div>
+
+<script src="datos/directindustry.js"></script>
+<script>
+(function(){
+  var D = window.DIRECTINDUSTRY;
+  var $ = function(id){ return document.getElementById(id); };
+  if (!D){ $('solis').innerHTML = '<div class="soli"><div class="tit">Sin datos todavía</div><div class="des">Pendiente de la primera extracción.</div></div>'; return; }
+  var n = function(v){ return (v==null?0:v).toLocaleString('es-ES'); };
+
+  // Periodo
+  function fmt(f){ if(!f) return ''; var p=f.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+  if (D.rango) $('periodo').textContent = 'Datos a ' + fmt(D.rango.hasta);
+
+  // --- SOLICITUDES (arriba) ---
+  var s = (D.panel && D.panel.solicitudes) || {};
+  $('solis').innerHTML =
+    '<div class="soli acento"><div class="ic">🎯</div><div class="num">'+n(s.exclusivas)+'</div>'+
+      '<div class="tit">Solicitudes exclusivas de productos</div>'+
+      '<div class="des">Peticiones que llegan <b>solo a ti</b>, 100% exclusivas de tus productos.</div></div>'+
+    '<div class="soli acento2"><div class="ic">📊</div><div class="num">'+n(s.comparativas)+'</div>'+
+      '<div class="tit">Solicitudes de presupuesto de comparación</div>'+
+      '<div class="des">El comprador pide presupuesto a varias marcas con productos similares.</div></div>'+
+    '<div class="soli mini"><div class="ic">📨</div><div class="num" style="color:#5d7e88">'+n(s.rfq)+'</div>'+
+      '<div class="tit">RFQ</div>'+
+      '<div class="des">Peticiones de oferta (Request For Quotation) recibidas.</div></div>';
+
+  // --- RENDIMIENTO (3 tarjetas) ---
+  var p = D.panel || {};
+  function perf(cls, titulo, sub, kpi){
+    return '<div class="perf '+cls+'"><div class="cab"><h3>'+titulo+'</h3><span>'+sub+'</span></div>'+
+      '<div class="mitad m1"><div class="ic">📊</div><div><div class="v">'+n(kpi.displays)+'</div><div class="l">Visualizaciones</div></div></div>'+
+      '<div class="mitad m2"><div class="ic">👆</div><div><div class="v">'+n(kpi.clicks)+'</div><div class="l">Clics</div></div></div></div>';
+  }
+  $('cards3').innerHTML =
+    perf('azul',  'Contenido del stand', 'Generación de leads · optimización web', p.standContent||{}) +
+    perf('verde', 'Contenido destacado', 'Leads adicionales · promoción de producto', p.standHighlight||{}) +
+    perf('malva', 'Publicidad', 'Notoriedad · promoción de eventos y producto', p.advertisement||{});
+
+  // --- BANDA PROSPECTOS Y TRÁFICO WEB ---
+  var pr = (D.panel && D.panel.prospectos) || {};
+  function item(ic, v, l){ return '<div class="item"><div class="ic">'+ic+'</div><div><div class="v">'+n(v)+'</div><div class="l">'+l+'</div></div></div>'; }
+  $('banda').innerHTML =
+    item('🏢', pr.empresas, 'Empresas identificadas') +
+    item('🖥️', pr.prospectsStand, 'Prospects del stand') +
+    item('🎯', pr.mql, 'Prospects cualificados (MQL)') +
+    item('🔗', pr.clicksWeb, 'Clics hacia tu web');
+
+  // --- PRODUCTOS INSIGNIA ---
+  var ins = D.insignia || {};
+  function fotoHTML(src, alt){ return '<div class="foto"><img src="'+src+'" alt="'+alt+'" onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<div class=&quot;ph&quot;>Imagen no disponible</div>\'"></div>'; }
+  function cardIns(opts){
+    var d = opts.datos || {};
+    var sel = '';
+    if (opts.modelos && opts.modelos.length){
+      sel = '<select onchange="DIpdc(this.value)">' +
+        '<option value="__total">Todos los modelos · '+n(d.peticiones)+' pet.</option>' +
+        opts.modelos.map(function(m){ return '<option value="'+m.modelo+'">PDC '+m.modelo+' · '+n(m.peticiones)+' pet.</option>'; }).join('') +
+        '</select>';
+    }
+    return '<div class="ins">' + fotoHTML(opts.img, opts.nom) +
+      '<div class="cuerpo"><div class="fam">'+opts.fam+'</div><div class="nom">'+opts.nom+'</div>' +
+      '<div class="big" id="'+opts.id+'-big"><div class="v">'+n(d.peticiones)+'</div><div class="vl">peticiones</div></div>' +
+      '<div class="vistas" id="'+opts.id+'-vis">'+n(d.vistas)+' visualizaciones de producto</div>' +
+      sel + '</div></div>';
+  }
+  $('insignias').innerHTML =
+    cardIns({ id:'pdc', fam:'Pararrayos PDC', nom:'INGESCO® PDC', img:'assets/PDC 6.4.png', datos:ins.pdc, modelos:(ins.pdc&&ins.pdc.modelos)||[] }) +
+    cardIns({ id:'prev', fam:'Detector de tormentas', nom:'PREVISTORM®', img:'assets/previstorm.png', datos:ins.previstorm }) +
+    cardIns({ id:'pdce', fam:'Pararrayos electrónico', nom:'INGESCO® PDC.E', img:'assets/PararrayosE.png', datos:ins.pdce });
+
+  // Cambiar la cifra del PDC segun el modelo elegido
+  window.DIpdc = function(modelo){
+    var d = ins.pdc || {}; var pet = d.peticiones, vis = d.vistas;
+    if (modelo !== '__total' && d.modelos){
+      var m = d.modelos.filter(function(x){ return x.modelo === modelo; })[0];
+      if (m){ pet = m.peticiones; vis = m.vistas; }
+    }
+    $('pdc-big').innerHTML = '<div class="v">'+n(pet)+'</div><div class="vl">peticiones</div>';
+    $('pdc-vis').textContent = n(vis) + ' visualizaciones de producto';
+  };
+
+  // --- Detalle (CSV) ---
+  var MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  function etqMes(m){ var q=m.split('-'); return MES[parseInt(q[1],10)-1]+' '+q[0].slice(2); }
+  function pintarChart(cont, serie){
+    var c = $(cont); if(!serie || !serie.length){ c.innerHTML='<p style="color:var(--suave);font-size:13px">Sin datos.</p>'; return; }
+    var max = Math.max.apply(null, serie.map(function(x){return x.valor;})) || 1;
+    c.innerHTML = serie.map(function(x){
+      var h = Math.round((x.valor/max)*150)+'px';
+      return '<div class="col"><div class="num">'+x.valor+'</div><div class="barra" style="height:'+h+'"></div><div class="lbl">'+etqMes(x.mes)+'</div></div>';
+    }).join('');
+  }
+  pintarChart('chartMes', D.porMesVisita);
+  pintarChart('chartPet', D.porMesPeticion);
+
+  function pintarLista(cont, items, campo){
+    var c = $(cont); if(!items || !items.length){ c.innerHTML='<p style="color:var(--suave);font-size:13px">Sin datos.</p>'; return; }
+    var max = Math.max.apply(null, items.map(function(x){return x.valor;})) || 1;
+    c.innerHTML = items.map(function(x){
+      var pct = Math.max(6, Math.round((x.valor/max)*100));
+      var nombre = (x[campo]||'').toString();
+      return '<div class="fila"><div class="barra-fondo"><div class="barra-rell" style="width:'+pct+'%"></div><span class="et" title="'+nombre.replace(/"/g,'&quot;')+'">'+nombre+'</span></div><div class="vl">'+x.valor+'</div></div>';
+    }).join('');
+  }
+  pintarLista('listaPais', D.porPais, 'pais');
+  pintarLista('listaSector', D.porSector, 'sector');
+  pintarLista('listaProd', D.topProductos, 'nombre');
+})();
+</script>
+<script src="assets/widget.js?v=5"></script>
+</body>
+</html>
