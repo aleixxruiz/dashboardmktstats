@@ -63,7 +63,7 @@
       <div class="sep"></div>
       <div>
         <h1>📈 Oportunidades comerciales</h1>
-        <p>Sage CRM · pipeline y origen</p>
+        <p>Sage CRM · pipeline, sectores y origen</p>
       </div>
     </div>
     <div class="meta">
@@ -87,14 +87,13 @@
   }
   const S = window.SAGE;
   const num = n => Number(n||0).toLocaleString('es-ES');
-  const eur = n => Number(n||0).toLocaleString('es-ES') + ' €';
   document.getElementById('actualizado').textContent = 'Actualizado: ' + S.fechaActualizacion;
 
   const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
   const mesLabel = ym => { const p=String(ym).split('-'); return meses[parseInt(p[1])-1]+' '+p[0].slice(2); };
 
   // Traducción / prettify de orígenes
-  const ORIG = { 'DIN':'🏭 DirectIndustry', '(sin origen)':'Sin origen', 'Telephone':'Teléfono',
+  const ORIG = { 'DIN':'DirectIndustry', '(sin origen)':'Sin origen', 'Telephone':'Teléfono',
     'intranet_web':'Web (intranet)', 'infoweb':'Web (info)', 'Trade_Press':'Prensa especializada',
     'Tradeshow':'Feria', 'Letter':'Carta', 'Advertisement':'Publicidad', 'Referral':'Referencia',
     'webinar':'Webinar', 'Formulari_SEM':'Formulario SEM', 'concurso':'Concurso', 'almacen':'Almacén',
@@ -105,13 +104,17 @@
 
   let html = '<div class="kpis">';
   html += kpi('📋','Oportunidades', num(S.total), 'en el CRM (histórico)');
-  html += kpi('💶','Valor total', eur(S.valorTotal), 'suma de importes');
   html += kpi('🏆','Ganadas', num(S.ganadas), tasa+'% de tasa de éxito');
-  html += kpi('❌','Perdidas', num(S.perdidas), num(S.abiertas)+' abiertas/otras');
+  html += kpi('❌','Perdidas', num(S.perdidas), 'no prosperaron');
+  html += kpi('⏳','En curso', num(S.abiertas), 'oportunidades abiertas');
   html += '</div>';
 
   // Evolución mensual (últimos 24 meses)
   html += '<h2 class="seccion">Evolución mensual de oportunidades</h2><div class="panel">'+grafico(S.porMes||[])+'</div>';
+
+  // Empresas por sector
+  html += '<h2 class="seccion">Empresas por sector</h2>';
+  html += panelSector(S.porSector||[]);
 
   // Por origen
   html += '<h2 class="seccion">Oportunidades por origen</h2>';
@@ -119,17 +122,31 @@
 
   cont.innerHTML = html;
 
+  function panelSector(filas){
+    if(!filas.length) return '<div class="vacio">Sin datos de sectores disponibles.</div>';
+    const tot = S.empresasConSector || filas.reduce((a,f)=>a+f.valor,0);
+    const max = Math.max.apply(null, filas.map(f=>f.valor).concat([1]));
+    let h = '<div class="panel"><div class="ayuda">Reparto por sector de las '+num(tot)+' empresas del CRM con sector asignado. «Otros» agrupa el resto de sectores minoritarios.</div>';
+    filas.forEach(f=>{
+      const w = Math.round(f.valor/max*100);
+      const pc = tot ? Math.round(f.valor/tot*100) : 0;
+      h += '<div class="barra"><div class="top"><span class="nom">'+f.nombre+'</span>'+
+           '<b>'+num(f.valor)+' empresas · '+pc+'%</b></div>'+
+           '<div class="pista"><div class="relleno" style="width:'+Math.max(w,2)+'%"></div></div></div>';
+    });
+    return h+'</div>';
+  }
+
   function kpi(ic,etq,val,sub){ return '<div class="kpi"><div class="etq">'+ic+' '+etq+'</div><div class="valor">'+val+'</div><div class="sub">'+sub+'</div></div>'; }
 
   function panelOrigen(filas){
     const max = Math.max.apply(null, filas.map(f=>f.valor).concat([1]));
-    let h = '<div class="panel"><div class="ayuda">Reparto de las '+num(S.total)+' oportunidades según su origen. «Sin origen» e «Importación masiva» son datos heredados/cargados en bloque. <b style="color:var(--violeta)">DirectIndustry</b> aparece resaltado.</div>';
+    let h = '<div class="panel"><div class="ayuda">Reparto de las '+num(S.total)+' oportunidades según su origen, con los nombres tal como aparecen en el CRM. «Otros (antiguos)» agrupa códigos de origen ya retirados del desplegable; «Sin origen» son oportunidades sin origen asignado.</div>';
     filas.forEach(f=>{
       const w = Math.round(f.valor/max*100);
       const pc = S.total ? Math.round(f.valor/S.total*100) : 0;
-      const din = (f.nombre==='DIN') ? ' din' : '';
-      h += '<div class="barra'+din+'"><div class="top"><span class="nom">'+no(f.nombre)+'</span>'+
-           '<b>'+num(f.valor)+' ops · '+pc+'% · '+eur(f.importe)+'</b></div>'+
+      h += '<div class="barra"><div class="top"><span class="nom">'+f.nombre+'</span>'+
+           '<b>'+num(f.valor)+' ops · '+pc+'%</b></div>'+
            '<div class="pista"><div class="relleno" style="width:'+Math.max(w,2)+'%"></div></div></div>';
     });
     return h+'</div>';
