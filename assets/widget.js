@@ -116,6 +116,20 @@
     try{ if(window.INDEX) d.indexacion = {indexadas:window.INDEX.indexadas, noIndexadas:window.INDEX.noIndexadas}; }catch(e){}
     try{ if(window.CLARITY_HISTORICO) d.clarityHistorico = corta(window.CLARITY_HISTORICO,30); }catch(e){}
     try{ if(window.CLARITY_IA_HISTORICO) d.iaHistorico = corta(window.CLARITY_IA_HISTORICO,30); }catch(e){}
+    // Guía para que la IA interprete bien las cifras y NO invente unidades
+    d._guia = {
+      nota: "IMPORTANTE: todas las cifras de este panel son CONTEOS (número de...). NO existe ningún dato de facturación, ventas ni importes en euros: nunca añadas el símbolo € ni inventes valores monetarios. Única excepción de unidad: en searchConsole el CTR es un porcentaje y la posición es la posición media en Google.",
+      campos: {
+        analytics: "Google Analytics (web): usuarios, sesiones y páginas vistas.",
+        searchConsole: "Google Search Console: clics, impresiones, CTR (%) y posición media en Google; queries y páginas con su nº de clics e impresiones.",
+        leads: "HubSpot: total = nº total de contactos; nuevos30 = contactos nuevos en los últimos 30 días (prev30 = los 30 días anteriores); porFuente/porEtapa/porFormulario/porPais = nº de contactos en cada categoría; porMes = contactos nuevos por mes.",
+        oportunidadesSage: "Sage CRM: total/ganadas/perdidas/enCurso = nº de oportunidades; porOrigen = nº de oportunidades por origen; porMes = nº de oportunidades por mes; porSector = NÚMERO DE EMPRESAS por sector (es un conteo de empresas, NO dinero); empresasConSector = nº de empresas con sector asignado.",
+        directIndustry: "DirectIndustry (escaparate B2B): panel.standContent/standHighlight/advertisement = visualizaciones y clics; panel.prospectos = nº de empresas identificadas y prospects; panel.solicitudes = nº de solicitudes (exclusivas, comparativas, RFQ); insignia = nº de peticiones y de vistas por producto (PDC con sus modelos, PREVISTORM, PDC electrónico); porPais/porSector = nº de visitantes; topProductos = nº de veces visto; kpis = conteos de visitantes/peticiones/productos.",
+        traficoIA: "Clarity: sesiones que llegan desde asistentes de IA, por plataforma.",
+        citasIA: "Cuota de autoridad en IA (SoA, en %) y nº de consultas y páginas citadas.",
+        indexacion: "Nº de páginas indexadas y no indexadas en Google."
+      }
+    };
     return d;
   }
 
