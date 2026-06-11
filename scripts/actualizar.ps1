@@ -190,21 +190,21 @@ Escribir-Log ("OK  sesiones={0}  usuarios={1}  IA={2}/{3}" -f $sesiones, $usuari
 $scriptGsc = Join-Path $PSScriptRoot "actualizar-gsc.ps1"
 if ((Test-Path $scriptGsc) -and $config.google_oauth -and $config.google_oauth.refresh_token) {
     Write-Host "Actualizando Search Console..." -ForegroundColor Gray
-    & $scriptGsc -Silencioso
+    try { & $scriptGsc -Silencioso } catch { Write-Host ("(aviso) Search Console fallo: "+$_.Exception.Message) -ForegroundColor DarkYellow; Escribir-Log ("AVISO GSC fallo: "+$_.Exception.Message) }
 }
 
 # --- Actualizar Google Analytics, si esta conectado ---
 $scriptGa = Join-Path $PSScriptRoot "actualizar-ga.ps1"
 if ((Test-Path $scriptGa) -and $config.google_oauth -and $config.google_oauth.refresh_token -and $config.google_oauth.ga4_property_id) {
     Write-Host "Actualizando Google Analytics..." -ForegroundColor Gray
-    & $scriptGa -Silencioso
+    try { & $scriptGa -Silencioso } catch { Write-Host ("(aviso) Google Analytics fallo: "+$_.Exception.Message) -ForegroundColor DarkYellow; Escribir-Log ("AVISO GA fallo: "+$_.Exception.Message) }
 }
 
 # --- Actualizar HubSpot (leads), si esta configurado ---
 $scriptHs = Join-Path $PSScriptRoot "actualizar-hubspot.ps1"
 if ((Test-Path $scriptHs) -and $config.hubspot -and $config.hubspot.token) {
     Write-Host "Actualizando HubSpot (leads)..." -ForegroundColor Gray
-    & $scriptHs -Silencioso
+    try { & $scriptHs -Silencioso } catch { Write-Host ("(aviso) HubSpot fallo: "+$_.Exception.Message) -ForegroundColor DarkYellow; Escribir-Log ("AVISO HubSpot fallo: "+$_.Exception.Message) }
 }
 
 # --- Actualizar Sage CRM (oportunidades), si esta configurado ---
