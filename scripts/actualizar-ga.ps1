@@ -33,7 +33,21 @@ $url = "https://analyticsdata.googleapis.com/v1beta/properties/$prop`:runReport"
 
 function Reporte($obj) {
     $json = $obj | ConvertTo-Json -Depth 8
-    return (Invoke-RestMethod -Uri $url -Headers $h -Method Post -Body $json).rows
+    # Reintentos ante errores temporales de Google (502/503/429/timeout)
+    for ($intento = 1; $intento -le 4; $intento++) {
+        try {
+            return (Invoke-RestMethod -Uri $url -Headers $h -Method Post -Body $json -TimeoutSec 60 -ErrorAction Stop).rows
+        } catch {
+            $code = $null; if ($_.Exception.Response) { $code = [int]$_.Exception.Response.StatusCode }
+            $temporal = (-not $code) -or ($code -ge 500) -or ($code -eq 429)
+            if ($intento -lt 4 -and $temporal) {
+                Write-Host ("  (GA temporal $code, reintento $intento en $([int](4*$intento))s...)") -ForegroundColor DarkYellow
+                Start-Sleep -Seconds (4 * $intento)
+                continue
+            }
+            throw
+        }
+    }
 }
 function V($row, $i) { [double]$row.metricValues[$i].value }
 
