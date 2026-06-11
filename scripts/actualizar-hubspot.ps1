@@ -232,9 +232,13 @@ $obj = @{
     porIdioma    = $listaIdioma
     porPais      = $listaPais
 }
-$json = $obj | ConvertTo-Json -Depth 6 -Compress
-"window.LEADS = $json;" | Out-File (Join-Path $CarpetaDatos "leads.js") -Encoding utf8
-
-Write-Host ""
-Write-Host ("OK  Total leads: {0}  |  Nuevos 30d: {1}  (prev: {2})" -f $total, $nuevos30, $nuevosPrev30) -ForegroundColor Green
-Write-Host "Guardado en datos/leads.js"
+# Solo escribimos si hemos traido contactos (si HubSpot no responde, conservamos el ultimo leads.js bueno)
+if ($total -gt 0) {
+    $json = $obj | ConvertTo-Json -Depth 6 -Compress
+    "window.LEADS = $json;" | Out-File (Join-Path $CarpetaDatos "leads.js") -Encoding utf8
+    Write-Host ""
+    Write-Host ("OK  Total leads: {0}  |  Nuevos 30d: {1}  (prev: {2})" -f $total, $nuevos30, $nuevosPrev30) -ForegroundColor Green
+    Write-Host "Guardado en datos/leads.js"
+} else {
+    Write-Host "AVISO: 0 contactos (HubSpot no accesible?). NO se sobrescribe leads.js." -ForegroundColor Yellow
+}
