@@ -1,1 +1,1 @@
-window.CLARITY_IA_HISTORICO = [{"fecha":"2026-06-23","sesionesIA":10,"usuariosIA":10,"sesionesTotal":1025,"plat":{"ChatGPT":10}}];
+window.CLARITY_IA_HISTORICO = [{"fecha":"2026-06-24","sesionesIA":7,"usuariosIA":7,"sesionesTotal":788,"plat":{"Copilot":1,"ChatGPT":6}}];
