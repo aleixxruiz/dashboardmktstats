@@ -84,9 +84,25 @@
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   @media(max-width:760px){.grid2{grid-template-columns:1fr}}
 
+  /* Comparativa anual (2025 / 2026 / Total) */
+  .compa{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+  @media(max-width:520px){.compa{gap:8px}}
+  .cbox{border-radius:12px;padding:14px 16px;text-align:center;border:1px solid var(--borde)}
+  .cbox .cval{font-size:30px;font-weight:800;line-height:1}
+  @media(max-width:520px){.cbox .cval{font-size:23px}.cbox{padding:11px 8px}}
+  .cbox .clbl{font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-top:6px}
+  .cbox.c25{background:#eafaf7;border-color:#bfe9e2}.cbox.c25 .cval{color:var(--teal)}.cbox.c25 .clbl{color:#2c8f86}
+  .cbox.c26{background:#fdf1e3;border-color:#f4d6ad}.cbox.c26 .cval{color:#e07d1a}.cbox.c26 .clbl{color:#c26a12}
+  .cbox.ctot{background:#eef3fb;border-color:#cfe0f5}.cbox.ctot .cval{color:var(--navy)}.cbox.ctot .clbl{color:#3a5378}
+  .leyenda{display:flex;gap:18px;justify-content:center;margin:12px 0 0;font-size:11.5px;color:var(--suave)}
+  .leyenda span{display:inline-flex;align-items:center;gap:6px}
+  .leyenda i{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .leyenda i.l25{background:var(--teal)} .leyenda i.l26{background:#e07d1a}
+
   .chart{display:flex;align-items:flex-end;gap:6px;height:200px;padding-top:10px}
   .col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px}
   .col .barra{width:72%;max-width:30px;background:linear-gradient(180deg,var(--teal2),var(--teal));border-radius:5px 5px 0 0;transition:.2s;min-height:2px}
+  .col .barra.b26{background:linear-gradient(180deg,#f0a93b,#e07d1a)}
   .col:hover .barra{filter:brightness(1.12)}
   .col .num{font-size:11px;font-weight:700;color:var(--teal)}
   .col .lbl{font-size:10px;color:var(--suave);white-space:nowrap}
@@ -131,7 +147,10 @@
   <div class="insignias" id="insignias"></div>
 
   <h2 class="seccion">Evolución mensual de visitantes</h2>
-  <div class="panel"><div class="chart" id="chartMes"></div>
+  <div class="panel">
+    <div class="compa" id="compaMes"></div>
+    <div class="chart" id="chartMes"></div>
+    <div class="leyenda"><span><i class="l25"></i>2025</span><span><i class="l26"></i>2026</span></div>
     <p class="nota">Empresas identificadas en el escaparate a lo largo del tiempo (del export de contactos).</p>
   </div>
 
@@ -150,7 +169,10 @@
   <div class="panel"><div class="lista" id="listaProd"></div></div>
 
   <h2 class="seccion">Peticiones recibidas por mes</h2>
-  <div class="panel"><div class="chart" id="chartPet"></div>
+  <div class="panel">
+    <div class="compa" id="compaPet"></div>
+    <div class="chart" id="chartPet"></div>
+    <div class="leyenda"><span><i class="l25"></i>2025</span><span><i class="l26"></i>2026</span></div>
     <p class="nota">Contactos comerciales (solicitudes de presupuesto, catálogos o información) recibidos a través del escaparate. Solo totales agregados, sin datos personales.</p>
   </div>
 
@@ -245,11 +267,33 @@
     var max = Math.max.apply(null, serie.map(function(x){return x.valor;})) || 1;
     c.innerHTML = serie.map(function(x){
       var h = Math.round((x.valor/max)*150)+'px';
-      return '<div class="col"><div class="num">'+x.valor+'</div><div class="barra" style="height:'+h+'"></div><div class="lbl">'+etqMes(x.mes)+'</div></div>';
+      var cls = x.mes.slice(0,4) === '2026' ? ' b26' : '';
+      return '<div class="col"><div class="num">'+x.valor+'</div><div class="barra'+cls+'" style="height:'+h+'"></div><div class="lbl">'+etqMes(x.mes)+'</div></div>';
     }).join('');
   }
   pintarChart('chartMes', D.porMesVisita);
   pintarChart('chartPet', D.porMesPeticion);
+
+  // --- Comparativa anual (2025 completo vs 2026 en curso vs Total) ---
+  function resumenAnual(serie){
+    var r = { y2025:0, y2026:0, total:0 };
+    (serie||[]).forEach(function(x){
+      var y = (x.mes||'').slice(0,4);
+      r.total += x.valor;
+      if (y === '2025') r.y2025 += x.valor;
+      else if (y === '2026') r.y2026 += x.valor;
+    });
+    return r;
+  }
+  function pintarCompa(cont, serie){
+    var r = resumenAnual(serie);
+    $(cont).innerHTML =
+      '<div class="cbox c25"><div class="cval">'+n(r.y2025)+'</div><div class="clbl">2025</div></div>'+
+      '<div class="cbox c26"><div class="cval">'+n(r.y2026)+'</div><div class="clbl">2026 (en curso)</div></div>'+
+      '<div class="cbox ctot"><div class="cval">'+n(r.total)+'</div><div class="clbl">Total</div></div>';
+  }
+  pintarCompa('compaMes', D.porMesVisita);
+  pintarCompa('compaPet', D.porMesPeticion);
 
   function pintarLista(cont, items, campo){
     var c = $(cont); if(!items || !items.length){ c.innerHTML='<p style="color:var(--suave);font-size:13px">Sin datos.</p>'; return; }
