@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de certificados · INGESCO</title>
+<link rel="icon" type="image/png" href="assets/favicon.ico.png">
+<script src="assets/gate.js"></script>
+<style>
+  :root{--navy:#1b2a52;--azul:#22366b;--fondo:#eef2f8;--tarjeta:#fff;
+        --texto:#16233f;--suave:#6a7894;--borde:#d3dbe8;--lima:#DEDC00}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:28px 22px 60px}
+  .contenedor{max-width:1500px;margin:0 auto}
+  a{text-decoration:none}
+  header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+    margin-bottom:24px;border-bottom:3px solid var(--navy);padding-bottom:16px}
+  .titulo{display:flex;align-items:center;gap:16px}
+  .titulo .logo{height:46px}
+  .titulo .sep{width:1px;height:40px;background:var(--borde)}
+  .titulo h1{font-size:21px;font-weight:800;color:var(--navy)}
+  .titulo p{color:var(--suave);font-size:13px;margin-top:3px}
+  .btn-inicio{background:var(--navy);color:#fff;padding:9px 15px;border-radius:10px;font-weight:700;font-size:13px}
+  .btn-inicio:hover{filter:brightness(1.2)}
+
+  .layout{display:grid;grid-template-columns:370px 1fr;gap:22px;align-items:start}
+  @media(max-width:1050px){.layout{grid-template-columns:1fr}}
+
+  .panel{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:20px;
+    box-shadow:0 2px 10px rgba(27,42,82,.07)}
+  .panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.7px;color:var(--suave);margin-bottom:14px;font-weight:700}
+
+  .tabs{display:flex;gap:8px;margin-bottom:18px}
+  .tab{flex:1;padding:10px;border:1.5px solid var(--borde);background:#f7f9fc;border-radius:10px;cursor:pointer;
+    font-weight:700;font-size:13px;color:var(--suave);font-family:inherit}
+  .tab.on{background:var(--navy);border-color:var(--navy);color:#fff}
+
+  label{display:block;font-size:12px;font-weight:700;color:var(--suave);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.4px}
+  input[type=text],input[type=date],textarea{width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:10px;
+    font-size:14px;font-family:inherit;color:var(--texto);background:#fbfcfe;outline:none}
+  input:focus,textarea:focus{border-color:var(--navy)}
+  textarea{resize:vertical;line-height:1.45}
+  .pista{font-size:11.5px;color:var(--suave);margin-top:5px;line-height:1.45}
+
+  .acciones{display:flex;gap:10px;margin-top:20px}
+  .btn{flex:1;padding:13px;border:none;border-radius:11px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit}
+  .btn-pri{background:var(--navy);color:#fff}
+  .btn-pri:hover{filter:brightness(1.2)}
+  .btn-sec{background:#e8edf6;color:var(--navy)}
+  .btn-sec:hover{background:#dbe3f1}
+
+  .aviso{background:#fff6e0;border:1px solid #f0d493;color:#7a5b12;border-radius:10px;padding:12px 14px;
+    font-size:12.5px;line-height:1.5;margin-bottom:16px;display:none}
+  .aviso.on{display:block}
+
+  .previo-cab{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .previo-cab h2{margin:0}
+  .contador{font-size:12.5px;color:var(--suave);font-weight:700}
+  .lienzo{width:100%;overflow:hidden;border-radius:10px;border:1px solid var(--borde);background:#fff}
+
+  /* ===========================================================
+     EL CERTIFICADO (A4 apaisado). Todo el texto se pinta aqui;
+     la plantilla (fondo, marco, logo, firma y sello) es la imagen.
+     =========================================================== */
+  .cert{position:relative;width:297mm;height:210mm;background:#fff center/cover no-repeat;
+    transform-origin:top left;overflow:hidden;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+    font-family:Arial,Helvetica,sans-serif;color:#1b2a52}
+  .cert.con-plantilla{background-image:url('assets/cert-plantilla.png')}
+
+  /* Marco de reserva: solo si aun NO existe assets/cert-plantilla.png */
+  .cert.sin-plantilla{background:linear-gradient(135deg,#fdfdfd,#eef1f5)}
+  .cert.sin-plantilla::before{content:'';position:absolute;left:10mm;top:10mm;right:10mm;bottom:10mm;
+    border:1.2mm solid #1b2a52}
+  .cert.sin-plantilla::after{content:'FALTA assets/cert-plantilla.png';position:absolute;left:0;right:0;bottom:3mm;
+    text-align:center;font-size:9pt;color:#c0392b;font-weight:700;letter-spacing:.5px}
+
+  /* --- Posiciones medidas sobre la plantilla real (2000x1414 px = A4 apaisado).
+         Si algo baila un milimetro, se retoca AQUI y ya. --- */
+  .cert .txt{position:absolute;text-align:center;left:0;right:0;line-height:1.2}
+  .c-tit1{top:26mm;font-size:62pt;font-weight:700;letter-spacing:.5mm;line-height:1}
+  .c-tit2{top:49mm;font-size:34pt;font-weight:400;letter-spacing:.4mm;line-height:1}
+  .c-intro{top:79mm;font-size:16pt;line-height:1}
+  .c-intro b{font-weight:700}
+  .c-nombre{top:90mm;font-size:34pt;font-weight:400;letter-spacing:.4mm;line-height:1;
+    padding:0 40mm;white-space:nowrap;overflow:hidden}
+  .c-linea{position:absolute;top:105.5mm;left:89mm;right:89mm;border-bottom:.45mm solid #1b2a52}
+  .c-sub{top:113mm;font-size:14pt;line-height:1}
+  .c-curso{top:120mm;font-size:14pt;font-weight:700;line-height:1.5;padding:0 52mm}
+
+  /* Bloque inferior izquierdo (bajo el logo de la plantilla) */
+  .c-pais{position:absolute;left:55mm;top:167mm;font-size:14pt;font-weight:700;
+    text-decoration:underline;text-underline-offset:3px}
+  .c-dur{position:absolute;left:55mm;top:174mm;font-size:14pt}
+  .c-dur u{text-underline-offset:3px}
+  .c-fecha{position:absolute;left:55mm;top:181mm;font-size:14pt}
+
+  /* Bloque inferior derecho (bajo la firma y el sello de la plantilla) */
+  .c-firmante{position:absolute;right:39mm;width:80mm;top:174mm;text-align:center;
+    font-size:15pt;font-weight:700}
+  .c-cargo{position:absolute;right:39mm;width:80mm;top:181mm;text-align:center;font-size:14pt}
+
+  @media(max-width:1050px){.layout .panel:first-child{order:2}}
+
+  /* ===========================================================
+     IMPRESION -> PDF: solo salen los certificados, a pagina completa
+     =========================================================== */
+  #zonaImpresion{position:absolute;left:-99999px;top:0}
+  @media print{
+    @page{size:A4 landscape;margin:0}
+    html,body{background:#fff;padding:0;margin:0}
+    body>*:not(#zonaImpresion){display:none !important}
+    #zonaImpresion{position:static;left:0}
+    #zonaImpresion .cert{transform:none !important;page-break-after:always;break-after:page}
+    #zonaImpresion .cert:last-child{page-break-after:auto;break-after:auto}
+  }
+</style>
+</head>
+<body>
+<div class="contenedor">
+  <header>
+    <div class="titulo">
+      <img class="logo" src="assets/logo-ingesco.png" alt="INGESCO">
+      <div class="sep"></div>
+      <div>
+        <h1>🎓 Generador de certificados</h1>
+        <p>Capacitación técnica · rellena, revisa y descarga en PDF</p>
+      </div>
+    </div>
+    <a class="btn-inicio" href="index.html">← Inicio</a>
+  </header>
+
+  <div class="layout">
+
+    <!-- ---------- FORMULARIO ---------- -->
+    <div class="panel">
+      <div class="aviso" id="aviso">
+        ⚠️ <b>Falta la plantilla.</b> Guarda el diseño (sin textos) como
+        <b>assets/cert-plantilla.png</b> y recarga. Mientras, verás un marco provisional.
+      </div>
+
+      <div class="tabs">
+        <button class="tab on" id="tabUno">👤 Individual</button>
+        <button class="tab" id="tabLote">📋 Por lotes</button>
+      </div>
+
+      <!-- Datos comunes -->
+      <h2>Datos de la capacitación</h2>
+      <label>Curso / tema</label>
+      <textarea id="fCurso" rows="3">Diseño y cálculo de sistemas de protección frente al rayo mediante software CALCULUS (IEC 62305-2)</textarea>
+      <div class="pista">Se muestra entrecomillado y en negrita. No hace falta poner las comillas.</div>
+
+      <label>Ciudad y país</label>
+      <input type="text" id="fPais" placeholder="Santa Cruz, Bolivia">
+
+      <label>Duración</label>
+      <input type="text" id="fDur" value="2 horas">
+
+      <label>Fecha</label>
+      <input type="date" id="fFecha">
+      <div class="pista" id="fechaPista">—</div>
+
+      <!-- Modo individual -->
+      <div id="modoUno">
+        <h2 style="margin-top:22px">Asistente</h2>
+        <label>Nombre y apellidos</label>
+        <input type="text" id="fNombre" placeholder="LUIS PLAZA">
+        <label>Empresa</label>
+        <input type="text" id="fEmpresa" placeholder="Nombre de la empresa">
+      </div>
+
+      <!-- Modo lotes -->
+      <div id="modoLote" style="display:none">
+        <h2 style="margin-top:22px">Lista de asistentes</h2>
+        <label>Un asistente por línea</label>
+        <textarea id="fLista" rows="9" placeholder="LUIS PLAZA; Empresa Uno S.A.&#10;ANA GÓMEZ; Empresa Dos S.L.&#10;CARLOS DÍAZ; Empresa Tres"></textarea>
+        <div class="pista">
+          Formato: <b>Nombre; Empresa</b> (separados por punto y coma).<br>
+          Si una línea no lleva empresa, se deja en blanco. Todos comparten curso, país, duración y fecha.
+        </div>
+      </div>
+
+      <div class="acciones">
+        <button class="btn btn-pri" id="btnPdf">⬇️ Descargar PDF</button>
+        <button class="btn btn-sec" id="btnImprimir" title="Abrir el diálogo de impresión">🖨️</button>
+        <button class="btn btn-sec" id="btnLimpiar">Limpiar</button>
+      </div>
+      <div class="pista" style="margin-top:10px">
+        <b>Descargar PDF</b> te guarda el archivo directamente (en lotes, un PDF con todas las páginas).
+        El botón 🖨️ abre la impresión normal por si prefieres imprimir en papel.
+      </div>
+    </div>
+
+    <!-- ---------- VISTA PREVIA ---------- -->
+    <div class="panel">
+      <div class="previo-cab">
+        <h2>Vista previa</h2>
+        <span class="contador" id="contador">1 certificado</span>
+      </div>
+      <div class="lienzo" id="lienzo"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Aqui se generan TODOS los certificados que van al PDF -->
+<div id="zonaImpresion"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var hayPlantilla = false;
+
+  // Texto fijo del certificado (va bajo la firma y el sello de la plantilla).
+  // Si algun dia firma otra persona, cambia estas dos lineas (y la firma de la plantilla).
+  var FIRMANTE = 'Ramón Silva';
+  var CARGO    = 'Ingeniero Eléctrico';
+
+  // ¿Existe la plantilla? (si no, marco provisional + aviso)
+  var img = new Image();
+  img.onload  = function(){ hayPlantilla = true;  pintar(); };
+  img.onerror = function(){ hayPlantilla = false; $('aviso').classList.add('on'); pintar(); };
+  img.src = 'assets/cert-plantilla.png';
+
+  // ---------- Fecha ----------
+  var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio',
+               'agosto','septiembre','octubre','noviembre','diciembre'];
+  function hoyISO(){
+    var d = new Date();
+    return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2);
+  }
+  function fechaLarga(iso){
+    if(!iso) return '';
+    var p = iso.split('-');
+    return parseInt(p[2],10) + ' de ' + MESES[parseInt(p[1],10)-1] + ' de ' + p[0];
+  }
+  $('fFecha').value = hoyISO();
+
+  // ---------- Escapado ----------
+  function esc(s){
+    return (s==null?'':String(s))
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  // ---------- Un certificado ----------
+  function certHTML(d){
+    var cls = hayPlantilla ? 'con-plantilla' : 'sin-plantilla';
+    var empresa = d.empresa ? '<b>'+esc(d.empresa)+'</b>' : '<b>—</b>';
+    return '<div class="cert '+cls+'">'
+      + '<div class="txt c-tit1">CERTIFICADO</div>'
+      + '<div class="txt c-tit2">DE CAPACITACIÓN</div>'
+      + '<div class="txt c-intro">INGESCO certifica que el colaborador de la empresa '+empresa+'</div>'
+      + '<div class="txt c-nombre">'+esc(d.nombre||'—')+'</div>'
+      + '<div class="c-linea"></div>'
+      + '<div class="txt c-sub">Ha asistido a la capacitación técnica sobre:</div>'
+      + '<div class="txt c-curso">“'+esc(d.curso)+'”</div>'
+      + '<div class="c-pais">'+esc(d.pais)+'</div>'
+      + '<div class="c-dur"><u>Duración:</u> '+esc(d.dur)+'</div>'
+      + '<div class="c-fecha">'+esc(fechaLarga(d.fecha))+'</div>'
+      + '<div class="c-firmante">'+esc(FIRMANTE)+'</div>'
+      + '<div class="c-cargo">'+esc(CARGO)+'</div>'
+      + '</div>';
+  }
+
+  // Si un nombre es muy largo, encoge la letra hasta que quepa (en vez de cortarlo).
+  function ajustarNombres(cont){
+    var els = cont.querySelectorAll('.c-nombre');
+    for (var i=0;i<els.length;i++){
+      var e = els[i], pt = 34;
+      e.style.fontSize = pt + 'pt';
+      while (e.scrollWidth > e.clientWidth && pt > 16){
+        pt -= 0.5;
+        e.style.fontSize = pt + 'pt';
+      }
+    }
+  }
+
+  // ---------- Datos del formulario ----------
+  function comunes(){
+    return {
+      curso: $('fCurso').value.trim(),
+      pais:  $('fPais').value.trim(),
+      dur:   $('fDur').value.trim(),
+      fecha: $('fFecha').value
+    };
+  }
+  function lista(){
+    var c = comunes(), out = [];
+    if (modo === 'uno'){
+      out.push({ nombre:$('fNombre').value.trim(), empresa:$('fEmpresa').value.trim(),
+                 curso:c.curso, pais:c.pais, dur:c.dur, fecha:c.fecha });
+    } else {
+      $('fLista').value.split('\n').forEach(function(linea){
+        if(!linea.trim()) return;
+        var p = linea.split(';');
+        out.push({ nombre:(p[0]||'').trim(), empresa:(p[1]||'').trim(),
+                   curso:c.curso, pais:c.pais, dur:c.dur, fecha:c.fecha });
+      });
+      if(!out.length) out.push({ nombre:'', empresa:'', curso:c.curso, pais:c.pais, dur:c.dur, fecha:c.fecha });
+    }
+    return out;
+  }
+
+  // ---------- Pintar vista previa (escalada) ----------
+  function pintar(){
+    var l = lista();
+    $('contador').textContent = l.length + (l.length===1 ? ' certificado' : ' certificados');
+    $('fechaPista').textContent = fechaLarga($('fFecha').value) || '—';
+
+    // Previa: solo el primero
+    var lienzo = $('lienzo');
+    lienzo.innerHTML = certHTML(l[0]);
+    var cert = lienzo.querySelector('.cert');
+    var anchoReal = cert.offsetWidth || 1123;          // 297mm en px
+    var altoReal  = cert.offsetHeight || 794;          // 210mm en px
+    ajustarNombres(lienzo);                            // antes de escalar, para medir bien
+    var escala = lienzo.clientWidth / anchoReal;
+    cert.style.transform = 'scale(' + escala + ')';
+    lienzo.style.height = (altoReal * escala) + 'px';
+  }
+
+  // ---------- Modo ----------
+  var modo = 'uno';
+  function setModo(m){
+    modo = m;
+    $('tabUno').classList.toggle('on', m==='uno');
+    $('tabLote').classList.toggle('on', m==='lote');
+    $('modoUno').style.display  = m==='uno'  ? 'block' : 'none';
+    $('modoLote').style.display = m==='lote' ? 'block' : 'none';
+    pintar();
+  }
+  $('tabUno').onclick  = function(){ setModo('uno'); };
+  $('tabLote').onclick = function(){ setModo('lote'); };
+
+  // ---------- Eventos ----------
+  ['fCurso','fPais','fDur','fFecha','fNombre','fEmpresa','fLista'].forEach(function(id){
+    $(id).addEventListener('input', pintar);
+  });
+  window.addEventListener('resize', pintar);
+
+  // ---------- Certificados listos para exportar ----------
+  function paraExportar(){
+    var l = lista();
+    var vacios = l.filter(function(d){ return !d.nombre; }).length;
+    if (vacios === l.length){ alert('Escribe al menos un nombre.'); return null; }
+    if (vacios > 0 && !confirm(vacios+' línea(s) sin nombre se omitirán. ¿Continuar?')) return null;
+    return l.filter(function(d){ return d.nombre; });
+  }
+
+  // Nombre de archivo seguro
+  function limpiarNombre(s){
+    return s.replace(/[\\/:*?"<>|]/g,'').replace(/\s+/g,' ').trim();
+  }
+
+  // ---------- Descargar PDF de verdad (se guarda como archivo) ----------
+  var btnPdf = $('btnPdf');
+  btnPdf.onclick = function(){
+    var l = paraExportar(); if(!l) return;
+    if (!window.html2canvas || !window.jspdf){
+      alert('No se han podido cargar las librerías de PDF (¿sin conexión?).\n' +
+            'Usa el botón 🖨️ y elige «Guardar como PDF».');
+      return;
+    }
+
+    var zona = $('zonaImpresion');
+    btnPdf.disabled = true;
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+
+    // Se generan uno a uno para no reventar la memoria con lotes grandes
+    var i = 0;
+    function siguiente(){
+      if (i >= l.length){
+        var arch = (l.length === 1)
+          ? 'Certificado - ' + limpiarNombre(l[0].nombre) + '.pdf'
+          : 'Certificados (' + l.length + ').pdf';
+        doc.save(arch);
+        zona.innerHTML = '';
+        btnPdf.disabled = false;
+        btnPdf.textContent = '⬇️ Descargar PDF';
+        return;
+      }
+      btnPdf.textContent = 'Generando… ' + (i+1) + '/' + l.length;
+
+      zona.innerHTML = certHTML(l[i]);
+      ajustarNombres(zona);
+      var cert = zona.querySelector('.cert');
+
+      html2canvas(cert, { scale:2.5, useCORS:true, backgroundColor:'#ffffff', logging:false })
+        .then(function(canvas){
+          if (i > 0) doc.addPage('a4','landscape');
+          doc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 297, 210);
+          i++;
+          setTimeout(siguiente, 0);   // deja respirar al navegador
+        })
+        .catch(function(err){
+          alert('Error generando el PDF: ' + err.message);
+          zona.innerHTML = '';
+          btnPdf.disabled = false;
+          btnPdf.textContent = '⬇️ Descargar PDF';
+        });
+    }
+    siguiente();
+  };
+
+  // ---------- Imprimir (alternativa en papel / PDF vectorial) ----------
+  $('btnImprimir').onclick = function(){
+    var l = paraExportar(); if(!l) return;
+    $('zonaImpresion').innerHTML = l.map(certHTML).join('');
+    ajustarNombres($('zonaImpresion'));
+    window.print();
+  };
+
+  $('btnLimpiar').onclick = function(){
+    $('fNombre').value=''; $('fEmpresa').value=''; $('fLista').value=''; $('fPais').value='';
+    pintar();
+  };
+
+  pintar();
+})();
+</script>
+<script src="assets/widget.js?v=7"></script>
+</body>
+</html>
