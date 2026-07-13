@@ -47,6 +47,8 @@ $todos = @(
     @{ local = "peticiones.html";            remoto = "peticiones.html" },
     @{ local = "clientes-cualificados.html"; remoto = "clientes-cualificados.html" },
     @{ local = "directindustry.html";        remoto = "directindustry.html" },
+    @{ local = "certificados.html";          remoto = "certificados.html" },
+    @{ local = "assets\cert-plantilla.png";  remoto = "assets/cert-plantilla.png" },
     @{ local = "assets\logo-ingesco.png";    remoto = "assets/logo-ingesco.png" },
     @{ local = "assets\logo-clarity.png";    remoto = "assets/logo-clarity.png" },
     @{ local = "assets\logo-analytics.png";  remoto = "assets/logo-analytics.png" },
