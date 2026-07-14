@@ -175,8 +175,10 @@
         <label>Un asistente por línea</label>
         <textarea id="fLista" rows="9" placeholder="LUIS PLAZA; Empresa Uno S.A.&#10;ANA GÓMEZ; Empresa Dos S.L.&#10;CARLOS DÍAZ; Empresa Tres"></textarea>
         <div class="pista">
-          Formato: <b>Nombre; Empresa</b> (separados por punto y coma).<br>
-          Si una línea no lleva empresa, se deja en blanco. Todos comparten curso, país, duración y fecha.
+          Formato: <b>Nombre; Empresa</b>. También valen <b>:</b> o un <b>tabulador</b>
+          (puedes pegar dos columnas directamente desde Excel).<br>
+          Todos comparten curso, ciudad, duración y fecha.<br>
+          Se descargará un <b>ZIP con un PDF por asistente</b>.
         </div>
       </div>
 
@@ -186,7 +188,8 @@
         <button class="btn btn-sec" id="btnLimpiar">Limpiar</button>
       </div>
       <div class="pista" style="margin-top:10px">
-        <b>Descargar PDF</b> te guarda el archivo directamente (en lotes, un PDF con todas las páginas).
+        <b>Descargar PDF</b> guarda el archivo directamente: un PDF si es individual, o un
+        <b>ZIP con un PDF por asistente</b> si es un lote.
         El botón 🖨️ abre la impresión normal por si prefieres imprimir en papel.
       </div>
     </div>
@@ -208,6 +211,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 (function(){
   var $ = function(id){ return document.getElementById(id); };
@@ -287,6 +291,14 @@
       fecha: $('fFecha').value
     };
   }
+  // Parte "Nombre ; Empresa". Acepta ; : o tabulador (para pegar desde Excel),
+  // cortando por el PRIMER separador que aparezca.
+  function partirLinea(linea){
+    var i = linea.search(/[;:\t]/);
+    if (i < 0) return { nombre: linea.trim(), empresa: '' };
+    return { nombre: linea.slice(0, i).trim(), empresa: linea.slice(i+1).trim() };
+  }
+
   function lista(){
     var c = comunes(), out = [];
     if (modo === 'uno'){
@@ -295,8 +307,8 @@
     } else {
       $('fLista').value.split('\n').forEach(function(linea){
         if(!linea.trim()) return;
-        var p = linea.split(';');
-        out.push({ nombre:(p[0]||'').trim(), empresa:(p[1]||'').trim(),
+        var p = partirLinea(linea);
+        out.push({ nombre:p.nombre, empresa:p.empresa,
                    curso:c.curso, pais:c.pais, dur:c.dur, fecha:c.fecha });
       });
       if(!out.length) out.push({ nombre:'', empresa:'', curso:c.curso, pais:c.pais, dur:c.dur, fecha:c.fecha });
@@ -355,53 +367,82 @@
     return s.replace(/[\\/:*?"<>|]/g,'').replace(/\s+/g,' ').trim();
   }
 
-  // ---------- Descargar PDF de verdad (se guarda como archivo) ----------
+  // Fuerza la descarga de un Blob
+  function descargar(blob, nombreArchivo){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = nombreArchivo;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  }
+
+  // Genera el PDF (Blob) de UN certificado
+  function pdfDeUno(d){
+    var zona = $('zonaImpresion');
+    zona.innerHTML = certHTML(d);
+    ajustarNombres(zona);
+    var cert = zona.querySelector('.cert');
+    return html2canvas(cert, { scale:2.5, useCORS:true, backgroundColor:'#ffffff', logging:false })
+      .then(function(canvas){
+        var doc = new window.jspdf.jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+        doc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 297, 210);
+        return doc.output('blob');
+      });
+  }
+
+  // ---------- Descargar: 1 PDF (individual) o un ZIP con un PDF por persona (lotes) ----------
   var btnPdf = $('btnPdf');
+  function finPdf(){
+    $('zonaImpresion').innerHTML = '';
+    btnPdf.disabled = false;
+    btnPdf.textContent = '⬇️ Descargar PDF';
+  }
   btnPdf.onclick = function(){
     var l = paraExportar(); if(!l) return;
-    if (!window.html2canvas || !window.jspdf){
-      alert('No se han podido cargar las librerías de PDF (¿sin conexión?).\n' +
+    if (!window.html2canvas || !window.jspdf || !window.JSZip){
+      alert('No se han podido cargar las librerías (¿sin conexión?).\n' +
             'Usa el botón 🖨️ y elige «Guardar como PDF».');
       return;
     }
-
-    var zona = $('zonaImpresion');
     btnPdf.disabled = true;
-    var jsPDF = window.jspdf.jsPDF;
-    var doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
 
-    // Se generan uno a uno para no reventar la memoria con lotes grandes
+    // --- Un solo certificado: PDF directo ---
+    if (l.length === 1){
+      btnPdf.textContent = 'Generando…';
+      pdfDeUno(l[0]).then(function(blob){
+        descargar(blob, 'Certificado - ' + limpiarNombre(l[0].nombre) + '.pdf');
+        finPdf();
+      }).catch(function(err){ alert('Error generando el PDF: ' + err.message); finPdf(); });
+      return;
+    }
+
+    // --- Lote: un PDF por persona, todos dentro de un ZIP ---
+    var zip = new window.JSZip();
+    var usados = {};
     var i = 0;
     function siguiente(){
       if (i >= l.length){
-        var arch = (l.length === 1)
-          ? 'Certificado - ' + limpiarNombre(l[0].nombre) + '.pdf'
-          : 'Certificados (' + l.length + ').pdf';
-        doc.save(arch);
-        zona.innerHTML = '';
-        btnPdf.disabled = false;
-        btnPdf.textContent = '⬇️ Descargar PDF';
+        btnPdf.textContent = 'Comprimiendo…';
+        zip.generateAsync({ type:'blob' }).then(function(blob){
+          descargar(blob, 'Certificados (' + l.length + ').zip');
+          finPdf();
+        }).catch(function(err){ alert('Error creando el ZIP: ' + err.message); finPdf(); });
         return;
       }
       btnPdf.textContent = 'Generando… ' + (i+1) + '/' + l.length;
 
-      zona.innerHTML = certHTML(l[i]);
-      ajustarNombres(zona);
-      var cert = zona.querySelector('.cert');
-
-      html2canvas(cert, { scale:2.5, useCORS:true, backgroundColor:'#ffffff', logging:false })
-        .then(function(canvas){
-          if (i > 0) doc.addPage('a4','landscape');
-          doc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 297, 210);
-          i++;
-          setTimeout(siguiente, 0);   // deja respirar al navegador
-        })
-        .catch(function(err){
-          alert('Error generando el PDF: ' + err.message);
-          zona.innerHTML = '';
-          btnPdf.disabled = false;
-          btnPdf.textContent = '⬇️ Descargar PDF';
-        });
+      pdfDeUno(l[i]).then(function(blob){
+        // Nombre unico dentro del ZIP (por si se repite el nombre)
+        var base = 'Certificado - ' + limpiarNombre(l[i].nombre);
+        usados[base] = (usados[base] || 0) + 1;
+        var arch = base + (usados[base] > 1 ? ' (' + usados[base] + ')' : '') + '.pdf';
+        zip.file(arch, blob);
+        i++;
+        setTimeout(siguiente, 0);   // deja respirar al navegador
+      }).catch(function(err){
+        alert('Error generando el certificado de "' + l[i].nombre + '": ' + err.message);
+        finPdf();
+      });
     }
     siguiente();
   };
