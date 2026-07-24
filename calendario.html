@@ -356,6 +356,7 @@
 
   // Fondo de una publicación según sus canales: 1 color, o franjas iguales si son varios
   function fondoCanales(ids){
+    if(typeof ids === 'string'){ ids = [ids]; }   // por si vino como texto (JSON de 1 elemento)
     ids = (ids||[]).filter(Boolean);
     if(!ids.length) return canal('otro').color;
     if(ids.length===1) return canal(ids[0]).color;
@@ -366,6 +367,7 @@
   // Compatibilidad: normaliza una publicación al nuevo formato (canales = array)
   function normaliza(p){
     if(!p.canales){ p.canales = p.canal ? [p.canal] : []; }
+    else if(typeof p.canales === 'string'){ p.canales = [p.canales]; }  // JSON de 1 elemento llega como texto
     return p;
   }
 
