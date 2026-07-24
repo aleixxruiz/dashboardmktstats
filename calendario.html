@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendario de contenido · INGESCO</title>
+<link rel="icon" type="image/png" href="assets/favicon.ico.png">
+<script src="assets/gate.js"></script>
+<style>
+  :root{
+    --navy:#13294b;--azul:#1f5f9b;--cielo:#34a0d9;
+    --fondo:#eef2f8;--tarjeta:#fff;--texto:#16233f;--suave:#6a7894;--borde:#d6deea;
+    --verde:#2fa36b;--ambar:#e0a326;--rojo:#d1495b;--lima:#DEDC00;
+    /* canales */
+    --c-linkedin:#0a66c2;--c-instagram:#d6336c;--c-facebook:#1877f2;--c-x:#111827;
+    --c-blog:#2fa36b;--c-newsletter:#7c53c3;--c-youtube:#e0342b;--c-otro:#6a7894;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:24px 20px 60px}
+  .contenedor{max-width:1320px;margin:0 auto}
+  a{text-decoration:none}
+  header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+    margin-bottom:20px;border-bottom:3px solid var(--navy);padding-bottom:14px}
+  .titulo{display:flex;align-items:center;gap:16px}
+  .titulo .logo{height:44px}
+  .titulo .sep{width:1px;height:40px;background:var(--borde)}
+  .titulo h1{font-size:20px;font-weight:800;color:var(--navy)}
+  .titulo p{color:var(--suave);font-size:13px;margin-top:3px}
+  .btn-inicio{background:var(--navy);color:#fff;padding:9px 15px;border-radius:10px;font-weight:700;font-size:13px}
+  .btn-inicio:hover{filter:brightness(1.2)}
+
+  /* Barra de control */
+  .barra{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .nav{display:flex;align-items:center;gap:8px}
+  .nav button{width:38px;height:38px;border:1px solid var(--borde);background:var(--tarjeta);border-radius:10px;
+    cursor:pointer;font-size:17px;color:var(--navy);font-weight:800}
+  .nav button:hover{background:#f0f4fa}
+  .mesActual{font-size:19px;font-weight:800;color:var(--navy);min-width:190px;text-align:center;text-transform:capitalize}
+  .btn{padding:10px 15px;border:none;border-radius:10px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit}
+  .btn-pri{background:var(--navy);color:#fff}.btn-pri:hover{filter:brightness(1.2)}
+  .btn-sec{background:#e6ecf6;color:var(--navy)}.btn-sec:hover{background:#d9e2f1}
+  .btn-hoy{background:var(--tarjeta);border:1px solid var(--borde);color:var(--navy)}
+  .espacio{flex:1}
+  .filtros{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .filtros select{padding:9px 11px;border:1px solid var(--borde);border-radius:10px;font-size:13px;
+    font-family:inherit;color:var(--texto);background:var(--tarjeta);cursor:pointer}
+
+  /* Rejilla del calendario */
+  .cal{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(19,41,75,.06)}
+  .dow{display:grid;grid-template-columns:repeat(7,1fr);background:#f4f7fb;border-bottom:1px solid var(--borde)}
+  .dow div{padding:10px;text-align:center;font-size:12px;font-weight:800;color:var(--suave);text-transform:uppercase;letter-spacing:.5px}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr)}
+  .celda{min-height:118px;border-right:1px solid var(--borde);border-bottom:1px solid var(--borde);
+    padding:6px 6px 8px;position:relative;cursor:pointer;transition:.12s;overflow:hidden}
+  .celda:nth-child(7n){border-right:none}
+  .celda:hover{background:#f7faff}
+  .celda.otro{background:#fafbfd;color:#b9c3d4}
+  .celda.otro .dnum{color:#c2cbd9}
+  .celda.hoy{background:#fffef2}
+  .celda.hoy .dnum{background:var(--navy);color:#fff}
+  .dnum{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;
+    border-radius:50%;font-size:12.5px;font-weight:700;margin-bottom:3px}
+  .mas{position:absolute;top:8px;right:8px;font-size:16px;color:var(--suave);opacity:0;font-weight:800}
+  .celda:hover .mas{opacity:1}
+
+  .pub{display:block;width:100%;text-align:left;border:none;border-radius:6px;padding:4px 7px;margin-bottom:4px;
+    font-size:11.5px;font-weight:600;color:#fff;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    border-left:4px solid rgba(0,0,0,.25)}
+  .pub .hora{opacity:.85;font-weight:700;margin-right:4px}
+  .pub.borrador{opacity:.55}
+  .pub.publicado{text-decoration:line-through;opacity:.75}
+  .pub .campana{margin-left:3px}
+  .cuenta-mas{font-size:10.5px;color:var(--suave);font-weight:700;padding-left:4px}
+
+  /* Leyenda */
+  .leyenda{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--suave)}
+  .leyenda span{display:inline-flex;align-items:center;gap:6px}
+  .leyenda i{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+  /* Panel lateral (crear/editar) */
+  .fondo{position:fixed;inset:0;background:rgba(19,41,75,.4);opacity:0;pointer-events:none;transition:.18s;z-index:998}
+  .fondo.on{opacity:1;pointer-events:auto}
+  .lateral{position:fixed;top:0;right:0;height:100%;width:440px;max-width:100vw;background:var(--tarjeta);
+    box-shadow:-8px 0 40px rgba(19,41,75,.22);transform:translateX(100%);transition:.22s;z-index:999;
+    display:flex;flex-direction:column}
+  .lateral.on{transform:translateX(0)}
+  .lat-head{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--borde)}
+  .lat-head h2{font-size:17px;color:var(--navy)}
+  .lat-head .x{cursor:pointer;font-size:20px;color:var(--suave)}
+  .lat-body{padding:18px 20px;overflow-y:auto;flex:1}
+  .lat-foot{padding:14px 20px;border-top:1px solid var(--borde);display:flex;gap:10px}
+  label{display:block;font-size:12px;font-weight:700;color:var(--suave);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.4px}
+  input,select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:10px;
+    font-size:14px;font-family:inherit;color:var(--texto);background:#fbfcfe;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--navy)}
+  textarea{resize:vertical;line-height:1.45}
+  .fila2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .contador{font-size:11px;color:var(--suave);text-align:right;margin-top:3px}
+  /* Checkboxes de canales (selección múltiple) */
+  .chks{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+  .chk{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1.5px solid var(--borde);
+    border-radius:9px;font-size:12.5px;cursor:pointer;user-select:none;background:#fbfcfe;font-weight:600;color:var(--texto)}
+  .chk input{width:auto;margin:0}
+  .chk i{width:11px;height:11px;border-radius:3px;display:inline-block;flex-shrink:0}
+  .chk.sel{border-color:var(--navy);background:#eef3fb}
+  .vacio{color:var(--suave);text-align:center;padding:40px 20px;font-size:14px}
+
+  @media(max-width:720px){
+    .celda{min-height:82px}
+    .pub{font-size:10.5px}
+    .mesActual{min-width:130px;font-size:16px}
+    .dow div{font-size:10px;padding:7px 2px}
+  }
+</style>
+</head>
+<body>
+<div class="contenedor">
+  <header>
+    <div class="titulo">
+      <img class="logo" src="assets/logo-ingesco.png" alt="INGESCO">
+      <div class="sep"></div>
+      <div>
+        <h1>🗓️ Calendario de contenido</h1>
+        <p>Planifica y programa las publicaciones de marketing</p>
+      </div>
+    </div>
+    <a class="btn-inicio" href="index.html">← Inicio</a>
+  </header>
+
+  <div class="barra">
+    <div class="nav">
+      <button id="prev" title="Mes anterior">‹</button>
+      <div class="mesActual" id="mesActual">—</div>
+      <button id="next" title="Mes siguiente">›</button>
+    </div>
+    <button class="btn btn-hoy" id="btnHoy">Hoy</button>
+    <button class="btn btn-pri" id="btnNuevo">+ Nueva publicación</button>
+    <div class="espacio"></div>
+    <div class="filtros">
+      <select id="fltCanal"><option value="">Todos los canales</option></select>
+      <select id="fltEstado">
+        <option value="">Todos los estados</option>
+        <option value="idea">Idea</option>
+        <option value="progreso">En progreso</option>
+        <option value="listo">Listo</option>
+        <option value="publicado">Publicado</option>
+      </select>
+      <button class="btn btn-sec" id="btnExport" title="Descargar copia (JSON)">⬇︎ Exportar</button>
+      <button class="btn btn-sec" id="btnImport" title="Cargar desde archivo">⬆︎ Importar</button>
+      <input type="file" id="fileImport" accept="application/json" style="display:none">
+    </div>
+  </div>
+
+  <div class="cal">
+    <div class="dow"><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="leyenda" id="leyenda"></div>
+  <p class="vacio" id="pista" style="padding:14px;font-size:12px">
+    💾 Los datos se guardan <b>en este navegador</b>. Usa <b>Exportar</b> para tener copia o compartirlos.
+    Los recordatorios son informativos; los avisos automáticos llegarán cuando pasemos el calendario a la nube compartida.
+  </p>
+</div>
+
+<!-- Panel crear/editar -->
+<div class="fondo" id="fondo"></div>
+<aside class="lateral" id="lateral">
+  <div class="lat-head">
+    <h2 id="latTit">Nueva publicación</h2>
+    <span class="x" id="latX">✕</span>
+  </div>
+  <div class="lat-body">
+    <input type="hidden" id="pId">
+    <label>Título *</label>
+    <input type="text" id="pTitulo" placeholder="Ej. Caso de éxito pararrayos PDC">
+
+    <div class="fila2">
+      <div>
+        <label>Fecha *</label>
+        <input type="date" id="pFecha">
+      </div>
+      <div>
+        <label>Hora</label>
+        <input type="time" id="pHora">
+      </div>
+    </div>
+
+    <label>Canales / redes <span style="text-transform:none;font-weight:600;color:var(--suave)">(puedes elegir varias)</span></label>
+    <div class="chks" id="pCanales"></div>
+
+    <label>Estado</label>
+    <select id="pEstado">
+      <option value="idea">💡 Idea</option>
+      <option value="progreso">✏️ En progreso</option>
+      <option value="listo">✅ Listo</option>
+      <option value="publicado">📢 Publicado</option>
+    </select>
+
+    <label>Responsable</label>
+    <input type="text" id="pResp" placeholder="Nombre de quien se encarga">
+
+    <label>Texto del post</label>
+    <textarea id="pTexto" rows="5" maxlength="3000" placeholder="El copy de la publicación..."></textarea>
+    <div class="contador"><span id="cntTexto">0</span>/3000</div>
+
+    <label>Hashtags</label>
+    <input type="text" id="pHash" placeholder="#pararrayos #proteccioncontraelrayo">
+
+    <label>Enlace al material</label>
+    <input type="text" id="pLink" placeholder="https://... (imagen, diseño en Drive, borrador)">
+
+    <label>Recordatorio</label>
+    <select id="pAviso">
+      <option value="">Sin recordatorio</option>
+      <option value="mismo">El mismo día</option>
+      <option value="1">1 día antes</option>
+      <option value="3">3 días antes</option>
+      <option value="7">1 semana antes</option>
+    </select>
+  </div>
+  <div class="lat-foot">
+    <button class="btn btn-pri" id="latGuardar" style="flex:1">Guardar</button>
+    <button class="btn btn-sec" id="latBorrar" style="display:none">Eliminar</button>
+  </div>
+</aside>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var CLAVE = 'ingesco_calendario_v1';
+
+  // Canales disponibles (nombre + color CSS var)
+  var CANALES = [
+    {id:'linkedin',  nom:'LinkedIn',   color:'var(--c-linkedin)'},
+    {id:'instagram', nom:'Instagram',  color:'var(--c-instagram)'},
+    {id:'facebook',  nom:'Facebook',   color:'var(--c-facebook)'},
+    {id:'x',         nom:'X (Twitter)',color:'var(--c-x)'},
+    {id:'blog',      nom:'Blog / Web', color:'var(--c-blog)'},
+    {id:'newsletter',nom:'Newsletter', color:'var(--c-newsletter)'},
+    {id:'youtube',   nom:'YouTube',    color:'var(--c-youtube)'},
+    {id:'otro',      nom:'Otro',       color:'var(--c-otro)'}
+  ];
+  function canal(id){ for(var i=0;i<CANALES.length;i++){ if(CANALES[i].id===id) return CANALES[i]; } return CANALES[CANALES.length-1]; }
+
+  // Fondo de una publicación según sus canales: 1 color, o franjas iguales si son varios
+  function fondoCanales(ids){
+    ids = (ids||[]).filter(Boolean);
+    if(!ids.length) return canal('otro').color;
+    if(ids.length===1) return canal(ids[0]).color;
+    var seg = 100/ids.length;
+    var stops = ids.map(function(id,i){ return canal(id).color+' '+(seg*i).toFixed(2)+'% '+(seg*(i+1)).toFixed(2)+'%'; });
+    return 'linear-gradient(90deg,'+stops.join(',')+')';
+  }
+  // Compatibilidad: normaliza una publicación al nuevo formato (canales = array)
+  function normaliza(p){
+    if(!p.canales){ p.canales = p.canal ? [p.canal] : []; }
+    return p;
+  }
+
+  // ---------- Datos ----------
+  var pubs = [];
+  function cargar(){
+    try{ pubs = JSON.parse(localStorage.getItem(CLAVE)) || []; }catch(e){ pubs = []; }
+    pubs.forEach(normaliza);
+  }
+  // Devuelve true si guardó bien; si el navegador bloquea localStorage, avisa.
+  function guardar(){
+    try{ localStorage.setItem(CLAVE, JSON.stringify(pubs)); return true; }
+    catch(e){
+      alert('No se ha podido guardar en este navegador.\n\n' +
+            'Suele pasar al abrir el archivo en local o en modo incógnito. ' +
+            'En la web publicada (https) funciona sin problema.\n\nDetalle: ' + e.message);
+      return false;
+    }
+  }
+  function nuevoId(){ return 'p' + Date.now() + Math.floor(Math.random()*1000); }
+
+  // ---------- Fechas ----------
+  var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  var hoy = new Date(); hoy.setHours(0,0,0,0);
+  var verMes = hoy.getMonth(), verAnio = hoy.getFullYear();
+  function iso(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+  function isoHoy(){ return iso(hoy); }
+
+  // ---------- Filtro de canal (desplegable simple) ----------
+  $('fltCanal').innerHTML = '<option value="">Todos los canales</option>' +
+    CANALES.map(function(c){ return '<option value="'+c.id+'">'+c.nom+'</option>'; }).join('');
+
+  // ---------- Checkboxes de canales en el panel (selección múltiple) ----------
+  $('pCanales').innerHTML = CANALES.map(function(c){
+    return '<label class="chk" data-id="'+c.id+'"><input type="checkbox" value="'+c.id+'">'+
+           '<i style="background:'+c.color+'"></i>'+c.nom+'</label>';
+  }).join('');
+  Array.prototype.forEach.call($('pCanales').querySelectorAll('input'), function(inp){
+    inp.addEventListener('change', function(){ this.closest('.chk').classList.toggle('sel', this.checked); });
+  });
+  function getCanales(){
+    return Array.prototype.filter.call($('pCanales').querySelectorAll('input'), function(i){ return i.checked; })
+      .map(function(i){ return i.value; });
+  }
+  function setCanales(ids){
+    ids = ids || [];
+    Array.prototype.forEach.call($('pCanales').querySelectorAll('input'), function(inp){
+      var on = ids.indexOf(inp.value) >= 0;
+      inp.checked = on; inp.closest('.chk').classList.toggle('sel', on);
+    });
+  }
+
+  // ---------- Leyenda ----------
+  $('leyenda').innerHTML = CANALES.map(function(c){
+    return '<span><i style="background:'+c.color+'"></i>'+c.nom+'</span>';
+  }).join('') + '<span style="margin-left:8px">· una publicación en <b>varias redes</b> se muestra con esos colores a franjas · tachado = publicado · atenuado = idea/borrador</span>';
+
+  // ---------- Pintar calendario ----------
+  function visibles(){
+    var fc = $('fltCanal').value, fe = $('fltEstado').value;
+    return pubs.filter(function(p){
+      if(fc && (p.canales||[]).indexOf(fc)<0) return false;
+      if(fe && p.estado!==fe) return false;
+      return true;
+    });
+  }
+
+  function pintar(){
+    $('mesActual').textContent = MESES[verMes] + ' ' + verAnio;
+    var primero = new Date(verAnio, verMes, 1);
+    var arranque = (primero.getDay()+6)%7;               // lunes=0
+    var inicio = new Date(verAnio, verMes, 1 - arranque);
+    var lista = visibles();
+
+    var porDia = {};
+    lista.forEach(function(p){ (porDia[p.fecha] = porDia[p.fecha] || []).push(p); });
+
+    var html = '';
+    for(var i=0;i<42;i++){
+      var d = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate()+i);
+      var key = iso(d);
+      var cls = 'celda';
+      if(d.getMonth()!==verMes) cls += ' otro';
+      if(key===isoHoy()) cls += ' hoy';
+      var items = (porDia[key]||[]).sort(function(a,b){ return (a.hora||'99')<(b.hora||'99')?-1:1; });
+
+      var chips = items.slice(0,3).map(function(p){
+        var bg = fondoCanales(p.canales);
+        var estCls = p.estado==='publicado' ? ' publicado' : (p.estado==='idea'||p.estado==='progreso' ? ' borrador' : '');
+        var hora = p.hora ? '<span class="hora">'+p.hora+'</span>' : '';
+        var camp = p.aviso ? '<span class="campana">🔔</span>' : '';
+        var nomCanales = (p.canales||[]).map(function(id){ return canal(id).nom; }).join(', ');
+        return '<button class="pub'+estCls+'" style="background:'+bg+'" data-id="'+p.id+'" title="'+esc(p.titulo)+(nomCanales?' · '+esc(nomCanales):'')+'">'+hora+esc(p.titulo)+camp+'</button>';
+      }).join('');
+      var resto = items.length>3 ? '<div class="cuenta-mas">+'+(items.length-3)+' más</div>' : '';
+
+      html += '<div class="'+cls+'" data-fecha="'+key+'">'
+            + '<span class="mas">+</span>'
+            + '<div class="dnum">'+d.getDate()+'</div>'
+            + chips + resto
+            + '</div>';
+    }
+    $('grid').innerHTML = html;
+  }
+
+  function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // ---------- Panel lateral ----------
+  var editandoId = null;
+  function abrirPanel(){ $('fondo').classList.add('on'); $('lateral').classList.add('on'); }
+  function cerrarPanel(){ $('fondo').classList.remove('on'); $('lateral').classList.remove('on'); }
+
+  function nuevo(fecha){
+    editandoId = null;
+    $('latTit').textContent = 'Nueva publicación';
+    $('pId').value=''; $('pTitulo').value=''; $('pFecha').value = fecha || isoHoy();
+    $('pHora').value=''; setCanales(['linkedin']); $('pEstado').value='idea';
+    $('pResp').value=''; $('pTexto').value=''; $('pHash').value=''; $('pLink').value=''; $('pAviso').value='';
+    $('cntTexto').textContent='0';
+    $('latBorrar').style.display='none';
+    abrirPanel(); $('pTitulo').focus();
+  }
+  function editar(id){
+    var p = pubs.filter(function(x){return x.id===id;})[0]; if(!p) return;
+    editandoId = id;
+    $('latTit').textContent = 'Editar publicación';
+    $('pId').value=p.id; $('pTitulo').value=p.titulo||''; $('pFecha').value=p.fecha||isoHoy();
+    $('pHora').value=p.hora||''; setCanales(p.canales||[]); $('pEstado').value=p.estado||'idea';
+    $('pResp').value=p.resp||''; $('pTexto').value=p.texto||''; $('pHash').value=p.hash||'';
+    $('pLink').value=p.link||''; $('pAviso').value=p.aviso||'';
+    $('cntTexto').textContent=(p.texto||'').length;
+    $('latBorrar').style.display='block';
+    abrirPanel();
+  }
+
+  $('latGuardar').onclick = function(){
+    var titulo = $('pTitulo').value.trim(), fecha = $('pFecha').value;
+    if(!titulo){ alert('Ponle un título a la publicación.'); $('pTitulo').focus(); return; }
+    if(!fecha){ alert('Elige una fecha.'); return; }
+    var canales = getCanales();
+    if(!canales.length){ alert('Elige al menos una red social / canal.'); return; }
+    var datos = {
+      titulo:titulo, fecha:fecha, hora:$('pHora').value, canales:canales, estado:$('pEstado').value,
+      resp:$('pResp').value.trim(), texto:$('pTexto').value, hash:$('pHash').value.trim(),
+      link:$('pLink').value.trim(), aviso:$('pAviso').value
+    };
+    var copia = pubs.slice();   // por si el guardado falla, poder revertir
+    if(editandoId){
+      for(var i=0;i<pubs.length;i++){ if(pubs[i].id===editandoId){ datos.id=editandoId; pubs[i]=datos; break; } }
+    } else {
+      datos.id = nuevoId(); pubs.push(datos);
+    }
+    if(!guardar()){ pubs = copia; return; }   // si el navegador bloquea el guardado, no dejamos estado a medias
+    pintar(); cerrarPanel();
+  };
+  $('latBorrar').onclick = function(){
+    if(!editandoId) return;
+    if(!confirm('¿Eliminar esta publicación?')) return;
+    pubs = pubs.filter(function(x){return x.id!==editandoId;});
+    guardar(); pintar(); cerrarPanel();
+  };
+  $('latX').onclick = cerrarPanel;
+  $('fondo').onclick = cerrarPanel;
+  $('pTexto').addEventListener('input', function(){ $('cntTexto').textContent = this.value.length; });
+
+  // ---------- Clicks en el grid ----------
+  $('grid').addEventListener('click', function(e){
+    var chip = e.target.closest('.pub');
+    if(chip){ e.stopPropagation(); editar(chip.dataset.id); return; }
+    var celda = e.target.closest('.celda');
+    if(celda){ nuevo(celda.dataset.fecha); }
+  });
+
+  // ---------- Navegación ----------
+  $('prev').onclick = function(){ if(--verMes<0){verMes=11;verAnio--;} pintar(); };
+  $('next').onclick = function(){ if(++verMes>11){verMes=0;verAnio++;} pintar(); };
+  $('btnHoy').onclick = function(){ verMes=hoy.getMonth(); verAnio=hoy.getFullYear(); pintar(); };
+  $('btnNuevo').onclick = function(){ nuevo(isoHoy()); };
+  $('fltCanal').onchange = pintar;
+  $('fltEstado').onchange = pintar;
+
+  // ---------- Export / Import ----------
+  $('btnExport').onclick = function(){
+    var blob = new Blob([JSON.stringify(pubs,null,2)], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'calendario-contenido-ingesco.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  };
+  $('btnImport').onclick = function(){ $('fileImport').click(); };
+  $('fileImport').onchange = function(e){
+    var f = e.target.files[0]; if(!f) return;
+    var lector = new FileReader();
+    lector.onload = function(){
+      try{
+        var datos = JSON.parse(lector.result);
+        if(!Array.isArray(datos)) throw new Error('formato');
+        if(!confirm('¿Cómo quieres importar?\n\nAceptar = AÑADIR a lo que ya hay\nCancelar = REEMPLAZAR todo')){
+          pubs = datos;
+        } else {
+          pubs = pubs.concat(datos);
+        }
+        // asegurar ids y formato nuevo
+        pubs.forEach(function(p){ if(!p.id) p.id = nuevoId(); normaliza(p); });
+        guardar(); pintar();
+        alert('Importadas '+datos.length+' publicaciones.');
+      }catch(err){ alert('El archivo no es un calendario válido.'); }
+      $('fileImport').value='';
+    };
+    lector.readAsText(f);
+  };
+
+  // ---------- Arranque ----------
+  cargar(); pintar();
+})();
+</script>
+<script src="assets/widget.js?v=7"></script>
+</body>
+</html>
