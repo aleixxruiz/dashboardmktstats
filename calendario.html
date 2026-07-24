@@ -371,15 +371,19 @@
     try{ pubs = JSON.parse(localStorage.getItem(CLAVE)) || []; }catch(e){ pubs = []; }
     pubs.forEach(normaliza);
   }
-  // Devuelve true si guardó bien; si el navegador bloquea localStorage, avisa.
+  // Aviso único si el navegador bloquea el almacenamiento (local / incógnito)
+  var avisadoStorage = false;
+  function avisoStorage(){
+    if(avisadoStorage) return; avisadoStorage = true;
+    alert('⚠️ Este navegador no permite guardar de forma permanente.\n\n' +
+          'Lo que añadas se verá durante esta sesión, pero se perderá al recargar. ' +
+          'Suele pasar al abrir el archivo en LOCAL o en modo incógnito.\n\n' +
+          'Ábrelo desde la web publicada (https://aleixxruiz.github.io/dashboardmktstats/calendario.html) ' +
+          'para que se guarde de verdad.');
+  }
   function guardar(){
     try{ localStorage.setItem(CLAVE, JSON.stringify(pubs)); return true; }
-    catch(e){
-      alert('No se ha podido guardar en este navegador.\n\n' +
-            'Suele pasar al abrir el archivo en local o en modo incógnito. ' +
-            'En la web publicada (https) funciona sin problema.\n\nDetalle: ' + e.message);
-      return false;
-    }
+    catch(e){ avisoStorage(); return false; }
   }
   function nuevoId(){ return 'p' + Date.now() + Math.floor(Math.random()*1000); }
 
@@ -510,13 +514,12 @@
       resp:$('pResp').value.trim(), texto:$('pTexto').value, hash:$('pHash').value.trim(),
       link:$('pLink').value.trim(), aviso:$('pAviso').value
     };
-    var copia = pubs.slice();   // por si el guardado falla, poder revertir
     if(editandoId){
       for(var i=0;i<pubs.length;i++){ if(pubs[i].id===editandoId){ datos.id=editandoId; pubs[i]=datos; break; } }
     } else {
       datos.id = nuevoId(); pubs.push(datos);
     }
-    if(!guardar()){ pubs = copia; return; }   // si el navegador bloquea el guardado, no dejamos estado a medias
+    guardar();                 // intenta persistir; si no puede, avisa pero igual se muestra
     pintar(); cerrarPanel();
   };
   $('latBorrar').onclick = function(){
@@ -598,7 +601,7 @@
   function cargarIdeas(){ try{ ideas = JSON.parse(localStorage.getItem(CLAVE_IDEAS)) || []; }catch(e){ ideas = []; } }
   function guardarIdeas(){
     try{ localStorage.setItem(CLAVE_IDEAS, JSON.stringify(ideas)); return true; }
-    catch(e){ alert('No se ha podido guardar la idea en este navegador (prueba en la web publicada).'); return false; }
+    catch(e){ avisoStorage(); return false; }
   }
 
   // Rellenar selects/checkboxes del modal
@@ -666,7 +669,6 @@
   $('iGuardar').onclick = function(){
     var titulo = $('iTitulo').value.trim();
     if(!titulo){ alert('Escribe la idea.'); $('iTitulo').focus(); return; }
-    var copia = ideas.slice();
     if(editandoIdea){
       for(var i=0;i<ideas.length;i++){ if(ideas[i].id===editandoIdea){
         ideas[i].titulo=titulo; ideas[i].cat=$('iCat').value; ideas[i].notas=$('iNotas').value.trim();
@@ -676,7 +678,7 @@
       ideas.push({ id:'i'+Date.now()+Math.floor(Math.random()*1000), titulo:titulo, cat:$('iCat').value,
         notas:$('iNotas').value.trim(), prio:$('iPrio').value, canales:iGetCanales(), usada:false, creada:Date.now() });
     }
-    if(!guardarIdeas()){ ideas=copia; return; }
+    guardarIdeas();            // intenta persistir; si no puede, avisa pero la idea igual se muestra
     resetForm(); pintarIdeas();
   };
   $('iCancelar').onclick = resetForm;
