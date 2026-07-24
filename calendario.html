@@ -192,6 +192,7 @@
         <option value="listo">Listo</option>
         <option value="publicado">Publicado</option>
       </select>
+      <button class="btn btn-ideas" id="btnHist" title="Cargar de una vez el histórico 2025-2026">⭳ Cargar histórico</button>
       <button class="btn btn-sec" id="btnExport" title="Descargar copia (JSON)">⬇︎ Exportar</button>
       <button class="btn btn-sec" id="btnImport" title="Cargar desde archivo">⬆︎ Importar</button>
       <input type="file" id="fileImport" accept=".json,application/json" style="display:none">
@@ -266,6 +267,9 @@
     <div class="idea-lista" id="iLista"></div>
   </div>
 </div>
+
+<!-- Histórico 2025-2026 incrustado (para el botón "Cargar histórico") -->
+<script src="datos/calendario-historico.js"></script>
 
 <!-- Panel crear/editar -->
 <div class="fondo" id="fondo"></div>
@@ -555,6 +559,19 @@
     a.href = URL.createObjectURL(blob);
     a.download = 'calendario-contenido-ingesco.json';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  };
+  // Cargar el histórico incrustado (un clic, sin elegir archivo)
+  $('btnHist').onclick = function(){
+    var seed = window.CAL_HISTORICO || [];
+    if(!seed.length){ alert('No encuentro el histórico incrustado. Recarga la página (Ctrl+F5).'); return; }
+    var existentes = {}; pubs.forEach(function(p){ existentes[p.id]=1; });
+    var nuevos = seed.filter(function(p){ return !existentes[p.id]; });
+    if(!nuevos.length){ alert('El histórico ya estaba cargado. ✅'); return; }
+    nuevos.forEach(function(p){ normaliza(p); pubs.push(p); });
+    guardar();
+    verMes = 5; verAnio = 2025;   // saltar a junio 2025 para que lo veas al instante
+    pintar();
+    alert('✅ Cargadas '+nuevos.length+' publicaciones del histórico (2025-2026).\nTe he llevado a junio 2025; navega con ▶ para recorrerlo.');
   };
   $('btnImport').onclick = function(){ $('fileImport').click(); };
   $('fileImport').onchange = function(e){
