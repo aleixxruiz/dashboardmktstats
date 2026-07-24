@@ -40,7 +40,52 @@
   .btn-pri{background:var(--navy);color:#fff}.btn-pri:hover{filter:brightness(1.2)}
   .btn-sec{background:#e6ecf6;color:var(--navy)}.btn-sec:hover{background:#d9e2f1}
   .btn-hoy{background:var(--tarjeta);border:1px solid var(--borde);color:var(--navy)}
+  .btn-ideas{background:var(--lima);color:#5a5c00}.btn-ideas:hover{filter:brightness(.97)}
   .espacio{flex:1}
+
+  /* ---------- Modal Banco de ideas ---------- */
+  .modal-fondo{position:fixed;inset:0;background:rgba(19,41,75,.45);opacity:0;pointer-events:none;transition:.18s;z-index:1000}
+  .modal-fondo.on{opacity:1;pointer-events:auto}
+  .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-48%) scale(.98);opacity:0;pointer-events:none;
+    width:760px;max-width:calc(100vw - 32px);max-height:90vh;background:var(--tarjeta);border-radius:16px;
+    box-shadow:0 24px 70px rgba(19,41,75,.35);z-index:1001;display:flex;flex-direction:column;transition:.18s}
+  .modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--borde)}
+  .modal-head h2{font-size:18px;color:var(--navy)}
+  .modal-head .x{cursor:pointer;font-size:21px;color:var(--suave)}
+  .modal-body{padding:18px 22px;overflow-y:auto}
+
+  /* Alta rápida de idea */
+  .idea-form{background:#f6f9fd;border:1px solid var(--borde);border-radius:12px;padding:14px}
+  .idea-form .r1{display:grid;grid-template-columns:1fr 200px;gap:10px}
+  .idea-form .r2{display:grid;grid-template-columns:1fr 150px auto;gap:10px;margin-top:10px;align-items:end}
+  @media(max-width:640px){.idea-form .r1,.idea-form .r2{grid-template-columns:1fr}}
+  .idea-form label{margin-top:0}
+  .idea-chks{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .idea-chks .chk{padding:5px 8px;font-size:11.5px}
+
+  .idea-filtro{display:flex;align-items:center;gap:10px;margin:18px 0 10px;flex-wrap:wrap}
+  .idea-filtro h3{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--suave)}
+  .idea-filtro select{padding:8px 10px;border:1px solid var(--borde);border-radius:9px;font-size:13px;font-family:inherit;background:var(--tarjeta)}
+  .idea-filtro .cont{margin-left:auto;font-size:12.5px;color:var(--suave);font-weight:700}
+
+  .idea-lista{display:flex;flex-direction:column;gap:10px}
+  .idea{border:1px solid var(--borde);border-left:5px solid var(--suave);border-radius:11px;padding:12px 14px;background:var(--tarjeta)}
+  .idea.usada{opacity:.55}
+  .idea .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .idea .cat{font-size:11.5px;font-weight:800;padding:3px 8px;border-radius:999px;color:#fff}
+  .idea .prio{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.4px}
+  .prio.alta{background:#fde2e6;color:#b02a3a}.prio.media{background:#fdf1d6;color:#8a6415}.prio.baja{background:#e5f3ec;color:#227a4e}
+  .idea .tit{font-size:15px;font-weight:700;color:var(--texto);margin-top:7px}
+  .idea .redes{font-size:11.5px;color:var(--suave);margin-top:3px}
+  .idea .notas{font-size:13px;color:#42506b;margin-top:6px;line-height:1.45;white-space:pre-wrap}
+  .idea .acc{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+  .idea .acc button{border:1px solid var(--borde);background:#f7faff;color:var(--navy);border-radius:8px;
+    padding:6px 11px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+  .idea .acc button:hover{background:#eaf1fb}
+  .idea .acc .prog{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .idea .acc .del{color:var(--rojo)}
+  .idea-vacio{color:var(--suave);text-align:center;padding:28px 10px;font-size:13.5px}
   .filtros{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .filtros select{padding:9px 11px;border:1px solid var(--borde);border-radius:10px;font-size:13px;
     font-family:inherit;color:var(--texto);background:var(--tarjeta);cursor:pointer}
@@ -136,6 +181,7 @@
     </div>
     <button class="btn btn-hoy" id="btnHoy">Hoy</button>
     <button class="btn btn-pri" id="btnNuevo">+ Nueva publicación</button>
+    <button class="btn btn-ideas" id="btnIdeas">💡 Banco de ideas</button>
     <div class="espacio"></div>
     <div class="filtros">
       <select id="fltCanal"><option value="">Todos los canales</option></select>
@@ -162,6 +208,63 @@
     💾 Los datos se guardan <b>en este navegador</b>. Usa <b>Exportar</b> para tener copia o compartirlos.
     Los recordatorios son informativos; los avisos automáticos llegarán cuando pasemos el calendario a la nube compartida.
   </p>
+</div>
+
+<!-- Banco de ideas -->
+<div class="modal-fondo" id="ideasFondo"></div>
+<div class="modal" id="ideasModal">
+  <div class="modal-head">
+    <h2>💡 Banco de ideas de contenido</h2>
+    <span class="x" id="ideasX">✕</span>
+  </div>
+  <div class="modal-body">
+    <div class="idea-form">
+      <input type="hidden" id="iId">
+      <div class="r1">
+        <div>
+          <label>Idea *</label>
+          <input type="text" id="iTitulo" placeholder="Ej. Vídeo: cómo funciona un pararrayos PDC">
+        </div>
+        <div>
+          <label>Categoría</label>
+          <select id="iCat"></select>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <label>Redes tentativas (opcional)</label>
+        <div class="idea-chks" id="iCanales"></div>
+      </div>
+      <div style="margin-top:10px">
+        <label>Notas</label>
+        <textarea id="iNotas" rows="2" placeholder="Enfoque, gancho, materiales que harían falta..."></textarea>
+      </div>
+      <div class="r2">
+        <div>
+          <label>Prioridad</label>
+          <select id="iPrio">
+            <option value="alta">🔴 Alta</option>
+            <option value="media" selected>🟡 Media</option>
+            <option value="baja">🟢 Baja</option>
+          </select>
+        </div>
+        <div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-pri" id="iGuardar">Añadir idea</button>
+          <button class="btn btn-sec" id="iCancelar" style="display:none">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="idea-filtro">
+      <h3>Ideas guardadas</h3>
+      <select id="iFiltro"><option value="">Todas las categorías</option></select>
+      <label style="margin:0;display:inline-flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-weight:600;color:var(--suave)">
+        <input type="checkbox" id="iVerUsadas" style="width:auto"> Ver ya programadas
+      </label>
+      <span class="cont" id="iCont">0 ideas</span>
+    </div>
+    <div class="idea-lista" id="iLista"></div>
+  </div>
 </div>
 
 <!-- Panel crear/editar -->
@@ -372,13 +475,14 @@
   function abrirPanel(){ $('fondo').classList.add('on'); $('lateral').classList.add('on'); }
   function cerrarPanel(){ $('fondo').classList.remove('on'); $('lateral').classList.remove('on'); }
 
-  function nuevo(fecha){
+  function nuevo(fecha, pre){
+    pre = pre || {};
     editandoId = null;
     $('latTit').textContent = 'Nueva publicación';
-    $('pId').value=''; $('pTitulo').value=''; $('pFecha').value = fecha || isoHoy();
-    $('pHora').value=''; setCanales(['linkedin']); $('pEstado').value='idea';
-    $('pResp').value=''; $('pTexto').value=''; $('pHash').value=''; $('pLink').value=''; $('pAviso').value='';
-    $('cntTexto').textContent='0';
+    $('pId').value=''; $('pTitulo').value = pre.titulo || ''; $('pFecha').value = fecha || isoHoy();
+    $('pHora').value=''; setCanales(pre.canales && pre.canales.length ? pre.canales : ['linkedin']); $('pEstado').value='idea';
+    $('pResp').value=''; $('pTexto').value = pre.texto || ''; $('pHash').value=''; $('pLink').value=''; $('pAviso').value='';
+    $('cntTexto').textContent = String(($('pTexto').value||'').length);
     $('latBorrar').style.display='none';
     abrirPanel(); $('pTitulo').focus();
   }
@@ -472,8 +576,147 @@
     lector.readAsText(f);
   };
 
+  // ==========================================================
+  //  BANCO DE IDEAS
+  // ==========================================================
+  var CLAVE_IDEAS = 'ingesco_ideas_v1';
+  var CATEGORIAS = [
+    {id:'educativo',  nom:'Educativo',    emoji:'📚', color:'#2fa36b'},
+    {id:'caso',       nom:'Caso de éxito',emoji:'🏆', color:'#e0a326'},
+    {id:'producto',   nom:'Producto',     emoji:'📦', color:'#0a66c2'},
+    {id:'noticia',    nom:'Novedad',      emoji:'📰', color:'#1f5f9b'},
+    {id:'evento',     nom:'Evento/feria', emoji:'🎪', color:'#d6336c'},
+    {id:'formacion',  nom:'Formación',    emoji:'🎓', color:'#7c53c3'},
+    {id:'tecnico',    nom:'Técnico',      emoji:'⚙️', color:'#475569'},
+    {id:'testimonio', nom:'Testimonio',   emoji:'💬', color:'#0e9aa7'},
+    {id:'corporativo',nom:'Corporativo',  emoji:'🏢', color:'#13294b'},
+    {id:'estacional', nom:'Estacional',   emoji:'📅', color:'#c0562b'}
+  ];
+  function categoria(id){ for(var i=0;i<CATEGORIAS.length;i++){ if(CATEGORIAS[i].id===id) return CATEGORIAS[i]; } return CATEGORIAS[0]; }
+
+  var ideas = [];
+  function cargarIdeas(){ try{ ideas = JSON.parse(localStorage.getItem(CLAVE_IDEAS)) || []; }catch(e){ ideas = []; } }
+  function guardarIdeas(){
+    try{ localStorage.setItem(CLAVE_IDEAS, JSON.stringify(ideas)); return true; }
+    catch(e){ alert('No se ha podido guardar la idea en este navegador (prueba en la web publicada).'); return false; }
+  }
+
+  // Rellenar selects/checkboxes del modal
+  $('iCat').innerHTML = CATEGORIAS.map(function(c){ return '<option value="'+c.id+'">'+c.emoji+' '+c.nom+'</option>'; }).join('');
+  $('iFiltro').innerHTML = '<option value="">Todas las categorías</option>' +
+    CATEGORIAS.map(function(c){ return '<option value="'+c.id+'">'+c.emoji+' '+c.nom+'</option>'; }).join('');
+  $('iCanales').innerHTML = CANALES.map(function(c){
+    return '<label class="chk" data-id="'+c.id+'"><input type="checkbox" value="'+c.id+'"><i style="background:'+c.color+'"></i>'+c.nom+'</label>';
+  }).join('');
+  Array.prototype.forEach.call($('iCanales').querySelectorAll('input'), function(inp){
+    inp.addEventListener('change', function(){ this.closest('.chk').classList.toggle('sel', this.checked); });
+  });
+  function iGetCanales(){ return Array.prototype.filter.call($('iCanales').querySelectorAll('input'), function(i){return i.checked;}).map(function(i){return i.value;}); }
+  function iSetCanales(ids){ ids=ids||[]; Array.prototype.forEach.call($('iCanales').querySelectorAll('input'), function(inp){ var on=ids.indexOf(inp.value)>=0; inp.checked=on; inp.closest('.chk').classList.toggle('sel',on); }); }
+
+  var editandoIdea = null;
+  function resetForm(){
+    editandoIdea = null;
+    $('iId').value=''; $('iTitulo').value=''; $('iCat').value='educativo'; $('iNotas').value='';
+    $('iPrio').value='media'; iSetCanales([]);
+    $('iGuardar').textContent = 'Añadir idea';
+    $('iCancelar').style.display='none';
+  }
+
+  function pintarIdeas(){
+    var f = $('iFiltro').value, verUsadas = $('iVerUsadas').checked;
+    var lista = ideas.filter(function(x){
+      if(f && x.cat!==f) return false;
+      if(!verUsadas && x.usada) return false;
+      return true;
+    });
+    // orden: prioridad alta primero, luego por fecha de creacion desc
+    var peso = {alta:0, media:1, baja:2};
+    lista.sort(function(a,b){
+      var pa=peso[a.prio]==null?1:peso[a.prio], pb=peso[b.prio]==null?1:peso[b.prio];
+      if(pa!==pb) return pa-pb;
+      return (b.creada||0)-(a.creada||0);
+    });
+    $('iCont').textContent = lista.length + (lista.length===1?' idea':' ideas');
+
+    if(!lista.length){ $('iLista').innerHTML = '<div class="idea-vacio">No hay ideas'+(f?' en esta categoría':'')+' todavía. Añade la primera arriba. 👆</div>'; return; }
+
+    $('iLista').innerHTML = lista.map(function(x){
+      var c = categoria(x.cat);
+      var redes = (x.canales||[]).map(function(id){ return canal(id).nom; }).join(', ');
+      return '<div class="idea'+(x.usada?' usada':'')+'" style="border-left-color:'+c.color+'" data-id="'+x.id+'">'
+        + '<div class="top">'
+        +   '<span class="cat" style="background:'+c.color+'">'+c.emoji+' '+esc(c.nom)+'</span>'
+        +   '<span class="prio '+(x.prio||'media')+'">'+(x.prio||'media')+'</span>'
+        +   (x.usada?'<span style="font-size:11.5px;color:var(--suave);font-weight:700">✓ ya programada</span>':'')
+        + '</div>'
+        + '<div class="tit">'+esc(x.titulo)+'</div>'
+        + (redes?'<div class="redes">📱 '+esc(redes)+'</div>':'')
+        + (x.notas?'<div class="notas">'+esc(x.notas)+'</div>':'')
+        + '<div class="acc">'
+        +   '<button class="prog" data-a="prog">📅 Programar</button>'
+        +   '<button data-a="edit">✏️ Editar</button>'
+        +   '<button data-a="usada">'+(x.usada?'↩︎ Reactivar':'✓ Marcar programada')+'</button>'
+        +   '<button class="del" data-a="del">🗑 Eliminar</button>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+  }
+
+  $('iGuardar').onclick = function(){
+    var titulo = $('iTitulo').value.trim();
+    if(!titulo){ alert('Escribe la idea.'); $('iTitulo').focus(); return; }
+    var copia = ideas.slice();
+    if(editandoIdea){
+      for(var i=0;i<ideas.length;i++){ if(ideas[i].id===editandoIdea){
+        ideas[i].titulo=titulo; ideas[i].cat=$('iCat').value; ideas[i].notas=$('iNotas').value.trim();
+        ideas[i].prio=$('iPrio').value; ideas[i].canales=iGetCanales(); break;
+      } }
+    } else {
+      ideas.push({ id:'i'+Date.now()+Math.floor(Math.random()*1000), titulo:titulo, cat:$('iCat').value,
+        notas:$('iNotas').value.trim(), prio:$('iPrio').value, canales:iGetCanales(), usada:false, creada:Date.now() });
+    }
+    if(!guardarIdeas()){ ideas=copia; return; }
+    resetForm(); pintarIdeas();
+  };
+  $('iCancelar').onclick = resetForm;
+
+  $('iLista').addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-a]'); if(!btn) return;
+    var cont = e.target.closest('.idea'); var id = cont.dataset.id;
+    var idea = ideas.filter(function(x){return x.id===id;})[0]; if(!idea) return;
+    var a = btn.dataset.a;
+    if(a==='edit'){
+      editandoIdea = id;
+      $('iId').value=id; $('iTitulo').value=idea.titulo||''; $('iCat').value=idea.cat||'educativo';
+      $('iNotas').value=idea.notas||''; $('iPrio').value=idea.prio||'media'; iSetCanales(idea.canales||[]);
+      $('iGuardar').textContent='Guardar cambios'; $('iCancelar').style.display='inline-block';
+      $('iTitulo').focus();
+    } else if(a==='del'){
+      if(!confirm('¿Eliminar esta idea?')) return;
+      ideas = ideas.filter(function(x){return x.id!==id;}); guardarIdeas(); pintarIdeas();
+    } else if(a==='usada'){
+      idea.usada = !idea.usada; guardarIdeas(); pintarIdeas();
+    } else if(a==='prog'){
+      // Convertir en publicación: cerrar modal y abrir el panel prerelleno
+      idea.usada = true; guardarIdeas(); pintarIdeas();
+      cerrarIdeas();
+      var texto = idea.notas ? idea.notas : '';
+      nuevo(isoHoy(), { titulo: idea.titulo, canales: idea.canales, texto: texto });
+    }
+  });
+
+  function abrirIdeas(){ resetForm(); pintarIdeas(); $('ideasFondo').classList.add('on'); $('ideasModal').classList.add('on'); }
+  function cerrarIdeas(){ $('ideasFondo').classList.remove('on'); $('ideasModal').classList.remove('on'); }
+  $('btnIdeas').onclick = abrirIdeas;
+  $('ideasX').onclick = cerrarIdeas;
+  $('ideasFondo').onclick = cerrarIdeas;
+  $('iFiltro').onchange = pintarIdeas;
+  $('iVerUsadas').onchange = pintarIdeas;
+
   // ---------- Arranque ----------
   cargar(); pintar();
+  cargarIdeas();
 })();
 </script>
 <script src="assets/widget.js?v=7"></script>
