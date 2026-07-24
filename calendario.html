@@ -66,6 +66,7 @@
   .pub{display:block;width:100%;text-align:left;border:none;border-radius:6px;padding:4px 7px;margin-bottom:4px;
     font-size:11.5px;font-weight:600;color:#fff;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     border-left:4px solid rgba(0,0,0,.25)}
+  .pub .estado{font-size:10px;margin-right:3px}
   .pub .hora{opacity:.85;font-weight:700;margin-right:4px}
   .pub.borrador{opacity:.55}
   .pub.publicado{text-decoration:line-through;opacity:.75}
@@ -243,6 +244,9 @@
   ];
   function canal(id){ for(var i=0;i<CANALES.length;i++){ if(CANALES[i].id===id) return CANALES[i]; } return CANALES[CANALES.length-1]; }
 
+  // Emoji por estado (mismo criterio que el desplegable del panel)
+  var EMOJI_ESTADO = { idea:'💡', progreso:'✏️', listo:'✅', publicado:'📢' };
+
   // Fondo de una publicación según sus canales: 1 color, o franjas iguales si son varios
   function fondoCanales(ids){
     ids = (ids||[]).filter(Boolean);
@@ -344,10 +348,11 @@
       var chips = items.slice(0,3).map(function(p){
         var bg = fondoCanales(p.canales);
         var estCls = p.estado==='publicado' ? ' publicado' : (p.estado==='idea'||p.estado==='progreso' ? ' borrador' : '');
+        var est = '<span class="estado">'+(EMOJI_ESTADO[p.estado]||'')+'</span>';
         var hora = p.hora ? '<span class="hora">'+p.hora+'</span>' : '';
         var camp = p.aviso ? '<span class="campana">🔔</span>' : '';
         var nomCanales = (p.canales||[]).map(function(id){ return canal(id).nom; }).join(', ');
-        return '<button class="pub'+estCls+'" style="background:'+bg+'" data-id="'+p.id+'" title="'+esc(p.titulo)+(nomCanales?' · '+esc(nomCanales):'')+'">'+hora+esc(p.titulo)+camp+'</button>';
+        return '<button class="pub'+estCls+'" style="background:'+bg+'" data-id="'+p.id+'" title="'+esc(p.titulo)+(nomCanales?' · '+esc(nomCanales):'')+'">'+est+hora+esc(p.titulo)+camp+'</button>';
       }).join('');
       var resto = items.length>3 ? '<div class="cuenta-mas">+'+(items.length-3)+' más</div>' : '';
 
