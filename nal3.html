@@ -98,7 +98,11 @@
   .gtxt .gsub{display:block;font-weight:600;color:#7c8aa0;font-size:9.5px;margin-top:2px;text-transform:none}
   .gtrack{align-items:center}
   .gbar{align-self:center;margin:4px 3px;border-radius:6px;font-size:10px;font-weight:700;line-height:1.15;padding:5px 5px;text-align:center;
-    display:flex;align-items:center;justify-content:center;min-height:36px;box-shadow:0 1px 2px rgba(0,0,0,.18);overflow:hidden}
+    display:flex;align-items:center;justify-content:center;min-height:36px;box-shadow:0 1px 2px rgba(0,0,0,.18);overflow:hidden;cursor:pointer;white-space:nowrap}
+  .gbar:hover{filter:brightness(1.08)}
+  .gtip{position:fixed;z-index:3000;max-width:280px;background:#17365d;color:#fff;font-size:12.5px;line-height:1.4;
+    padding:8px 11px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.3);display:none;pointer-events:none}
+  .gtip.on{display:block}
   .gcheck{font-size:16px}
   .gleg{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px;font-size:12.5px;color:var(--texto)}
   .gleg span{display:inline-flex;align-items:center;gap:7px}
@@ -349,28 +353,29 @@
   // ---- Vista mapa (Gantt) — réplica del PDF de NAL3 ----
   var G_GREEN='#34a04d', G_NAVY='#17365d', G_YELLOW='#f2b100';
   // Columnas = semanas (24). Cada caja: c1..c2 = columnas que ocupa, t = color, txt = texto.
+  // abbr = texto corto que se muestra si no cabe; txt = texto completo (tooltip / clic)
   var GBOX = {
     f0:  [ {c1:1,c2:1, t:'navy', check:true} ],
     f1:  [ {c1:1,c2:2, t:'green',  txt:'21 – 27 jul'},
-           {c1:3,c2:3, t:'navy',   txt:'Lliurament a Ingesco 7 d’agost'} ],
+           {c1:3,c2:3, t:'navy',   txt:'Lliurament a Ingesco 7 d’agost', abbr:'📦 7 ago'} ],
     f2:  [ {c1:2,c2:5, t:'green',  txt:'28 jul – 17 ago'} ],
     f3:  [ {c1:6,c2:8, t:'green',  txt:'18 ago – 9 set'},
-           {c1:9,c2:9, t:'navy',   txt:'Validació Ingesco 10 – 17 set'},
-           {c1:10,c2:10,t:'navy',  txt:'Lliurament a Ingesco 10 de setembre'} ],
+           {c1:9,c2:9, t:'navy',   txt:'Validació Ingesco 10 – 17 set', abbr:'✔ 10–17 set'},
+           {c1:10,c2:10,t:'navy',  txt:'Lliurament a Ingesco 10 de setembre', abbr:'📦 10 set'} ],
     f4:  [ {c1:10,c2:11,t:'yellow',txt:'18 set – 1 oct'},
-           {c1:12,c2:12,t:'navy',  txt:'Lliurament a Ingesco 2 d’octubre'},
-           {c1:13,c2:13,t:'navy',  txt:'Validació Ingesco 2 – 9 oct'} ],
+           {c1:12,c2:12,t:'navy',  txt:'Lliurament a Ingesco 2 d’octubre', abbr:'📦 2 oct'},
+           {c1:13,c2:13,t:'navy',  txt:'Validació Ingesco 2 – 9 oct', abbr:'✔ 2–9 oct'} ],
     f5:  [ {c1:10,c2:11,t:'yellow',txt:'18 set – 8 oct'},
-           {c1:12,c2:12,t:'navy',  txt:'Lliurament a Ingesco 9 d’octubre'},
-           {c1:13,c2:13,t:'navy',  txt:'Validació Ingesco 9 – 16 oct'} ],
+           {c1:12,c2:12,t:'navy',  txt:'Lliurament a Ingesco 9 d’octubre', abbr:'📦 9 oct'},
+           {c1:13,c2:13,t:'navy',  txt:'Validació Ingesco 9 – 16 oct', abbr:'✔ 9–16 oct'} ],
     f6:  [ {c1:12,c2:18,t:'green', txt:'9 oct – 19 nov'},
-           {c1:19,c2:19,t:'navy',  txt:'Lliurament a Ingesco 20 de novembre'},
-           {c1:20,c2:20,t:'navy',  txt:'Validació Ingesco 20 nov – 4 des'} ],
-    f6b: [ {c1:20,c2:21,t:'navy',  txt:'Finalització validació Ingesco 4 de desembre'} ],
+           {c1:19,c2:19,t:'navy',  txt:'Lliurament a Ingesco 20 de novembre', abbr:'📦 20 nov'},
+           {c1:20,c2:20,t:'navy',  txt:'Validació Ingesco 20 nov – 4 des', abbr:'✔ 20 nov'} ],
+    f6b: [ {c1:20,c2:21,t:'navy',  txt:'Finalització validació Ingesco 4 de desembre', abbr:'✔ 4 des'} ],
     f7:  [ {c1:21,c2:22,t:'green', txt:'5 – 18 des'},
-           {c1:23,c2:23,t:'navy',  txt:'Lliurament a Ingesco 18 de desembre'} ],
+           {c1:23,c2:23,t:'navy',  txt:'Lliurament a Ingesco 18 de desembre', abbr:'📦 18 des'} ],
     f8:  [ {c1:21,c2:22,t:'green', txt:'5 – 18 des'},
-           {c1:23,c2:23,t:'navy',  txt:'Lliurament a Ingesco 18 de desembre'} ]
+           {c1:23,c2:23,t:'navy',  txt:'Lliurament a Ingesco 18 de desembre', abbr:'📦 18 des'} ]
   };
   // Etiquetas de la izquierda (en catalán, como el PDF)
   var GLBL = {
@@ -402,8 +407,9 @@
       var boxes = (GBOX[f.id]||[]).map(function(b){
         var bg = b.t==='green' ? G_GREEN : (b.t==='yellow' ? G_YELLOW : G_NAVY);
         var fg = b.t==='yellow' ? '#3a2e00' : '#fff';
-        var cont = b.check ? '<span class="gcheck">✓</span>' : esc(b.txt);
-        return '<div class="gbar" style="grid-column:'+b.c1+'/'+(b.c2+1)+';background:'+bg+';color:'+fg+'">'+cont+'</div>';
+        var full = b.check ? 'Fase completada i validada' : (b.txt || '');
+        var cont = b.check ? '<span class="gcheck">✓</span>' : esc(b.abbr || full);
+        return '<div class="gbar" style="grid-column:'+b.c1+'/'+(b.c2+1)+';background:'+bg+';color:'+fg+'" title="'+esc(full)+'" data-full="'+esc(full)+'">'+cont+'</div>';
       }).join('');
       return '<div class="grow gfase">'
         + '<div class="gc-fase">'
@@ -420,6 +426,25 @@
       +   '<span><i style="background:'+G_YELLOW+'"></i>Fases en paral·lel</span>'
       + '</div>';
   }
+
+  // Bocadillo al clicar una barra (el atributo title ya muestra el texto al pasar por encima)
+  var gtip = document.createElement('div'); gtip.className = 'gtip'; document.body.appendChild(gtip);
+  function ocultarTip(){ gtip.classList.remove('on'); }
+  $('gantt').addEventListener('click', function(e){
+    var bar = e.target.closest('.gbar');
+    if(!bar){ ocultarTip(); return; }
+    var full = bar.getAttribute('data-full') || '';
+    if(!full){ ocultarTip(); return; }
+    gtip.textContent = full; gtip.classList.add('on');
+    var r = bar.getBoundingClientRect();
+    var top = r.top - gtip.offsetHeight - 8; if(top < 4) top = r.bottom + 8;
+    var left = r.left + r.width/2 - gtip.offsetWidth/2;
+    left = Math.max(8, Math.min(left, document.documentElement.clientWidth - gtip.offsetWidth - 8));
+    gtip.style.top = top+'px'; gtip.style.left = left+'px';
+    e.stopPropagation();
+  });
+  document.addEventListener('click', function(e){ if(!e.target.closest('.gbar')) ocultarTip(); });
+  window.addEventListener('scroll', ocultarTip, true);
 
   var vista = 'lista';
   try{ vista = localStorage.getItem('nal3_vista') || 'lista'; }catch(e){}
