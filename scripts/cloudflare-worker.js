@@ -125,6 +125,27 @@ export default {
         return new Response(JSON.stringify({ ok: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
       }
 
+      // ===== PROYECTO NAL3 (Cloudflare KV, misma base que el calendario, clave 'nal3') =====
+      if (body && (body.accion === 'nal3_load' || body.accion === 'nal3_save')) {
+        if (!env.CALENDARIO) {
+          return new Response(JSON.stringify({ sinKV: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+        }
+        const KEY = 'nal3';
+        if (body.accion === 'nal3_load') {
+          const raw = await env.CALENDARIO.get(KEY);
+          return new Response(JSON.stringify({ ok: true, data: raw ? JSON.parse(raw) : null }),
+            { headers: { ...cors, 'Content-Type': 'application/json' } });
+        }
+        const guardado = {
+          faseActual: body.faseActual || '',
+          estados:    (body.estados && typeof body.estados === 'object') ? body.estados : {},
+          docs:       Array.isArray(body.docs) ? body.docs : [],
+          updated:    Date.now()
+        };
+        await env.CALENDARIO.put(KEY, JSON.stringify(guardado));
+        return new Response(JSON.stringify({ ok: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+      }
+
       // ===== ESTRATEGIA DE CONTENIDO -> Claude Opus 4.8 (Gemini de reserva) =====
       if (body && body.accion === 'estrategia') {
         const datosE     = body.datos || {};
