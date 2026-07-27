@@ -72,6 +72,27 @@
   .doc .d-del{background:none;border:none;color:var(--rojo);cursor:pointer;font-size:14px;flex-shrink:0}
   .doc-vacio{font-size:12.5px;color:var(--suave);font-style:italic;padding:2px 0 4px}
 
+  /* Conmutador de vistas */
+  .vistas{display:flex;gap:8px;margin-bottom:14px}
+  .vbtn{padding:8px 14px;border:1px solid var(--borde);background:var(--tarjeta);border-radius:9px;cursor:pointer;font-weight:700;font-size:13px;color:var(--suave);font-family:inherit}
+  .vbtn.on{background:var(--navy);border-color:var(--navy);color:#fff}
+
+  /* Vista mapa (Gantt) */
+  .gantt{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:16px 16px 10px;overflow-x:auto}
+  .g-inner{min-width:880px}
+  .g-axis{position:relative;height:20px;margin-left:180px;margin-bottom:4px;border-bottom:2px solid var(--borde)}
+  .g-mes{position:absolute;top:0;font-size:11.5px;font-weight:800;color:var(--suave)}
+  .g-body{position:relative}
+  .g-gridlines{position:absolute;left:180px;right:0;top:0;bottom:0;pointer-events:none}
+  .g-grid{position:absolute;top:0;bottom:0;width:1px;background:#eef1f6}
+  .g-hoy{position:absolute;top:0;bottom:0;width:2px;background:var(--rojo)}
+  .g-fila{position:relative;display:flex;align-items:center;height:40px;border-bottom:1px solid #f2f5f9}
+  .g-fila.actual{background:rgba(19,41,75,.05)}
+  .g-lbl{width:180px;flex-shrink:0;font-size:12px;font-weight:700;color:var(--navy);padding-right:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .g-track{position:relative;flex:1;height:100%}
+  .g-bar{position:absolute;top:10px;height:20px;border-radius:5px;font-size:10.5px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.18);cursor:default}
+  .g-hito{position:absolute;top:8px;font-size:12px;color:var(--navy);transform:translateX(-50%);cursor:default}
+
   /* Modal documento */
   .modal-fondo{position:fixed;inset:0;background:rgba(19,41,75,.45);opacity:0;pointer-events:none;transition:.18s;z-index:1000}
   .modal-fondo.on{opacity:1;pointer-events:auto}
@@ -120,7 +141,13 @@
     </div>
   </div>
 
+  <div class="vistas">
+    <button class="vbtn on" id="vLista">☰ Vista lista</button>
+    <button class="vbtn" id="vMapa">🗺️ Vista mapa</button>
+  </div>
+
   <div id="roadmap"></div>
+  <div id="gantt" style="display:none"></div>
 
   <p class="nota">💾 Los datos (estado de fases y documentos) se guardan <b>compartidos para todo el equipo</b>. Cada documento se registra con un enlace (a Drive, correo, etc.), no se sube el archivo en sí.</p>
 </div>
@@ -305,7 +332,71 @@
         + '</div>'
         + '</div>';
     }).join('');
+    renderGantt();
   }
+
+  // ---- Vista mapa (Gantt) ----
+  // Fechas de cada fase para posicionar las barras (ini/fin trabajo, vIni/vFin validación, entrega = hito).
+  var GD = {
+    f0: { ini:'2026-07-14', fin:'2026-07-14', entrega:'2026-07-14' },
+    f1: { ini:'2026-07-21', fin:'2026-07-27', entrega:'2026-08-07' },
+    f2: { ini:'2026-07-28', fin:'2026-08-17' },
+    f3: { ini:'2026-08-18', fin:'2026-09-09', vIni:'2026-09-10', vFin:'2026-09-17', entrega:'2026-09-10' },
+    f4: { ini:'2026-09-18', fin:'2026-10-01', vIni:'2026-10-02', vFin:'2026-10-09', entrega:'2026-10-02' },
+    f5: { ini:'2026-09-18', fin:'2026-10-08', vIni:'2026-10-09', vFin:'2026-10-16', entrega:'2026-10-09' },
+    f6: { ini:'2026-10-09', fin:'2026-11-19', vIni:'2026-11-20', vFin:'2026-12-04', entrega:'2026-11-20' },
+    f6b:{ ini:'2026-11-20', fin:'2026-12-04' },
+    f7: { ini:'2026-12-05', fin:'2026-12-18', entrega:'2026-12-18' },
+    f8: { ini:'2026-12-05', fin:'2026-12-18', entrega:'2026-12-18' }
+  };
+  var R0 = new Date('2026-07-13'), R1 = new Date('2026-12-28'), RTOT = R1 - R0;
+  function pos(iso){ var p=(new Date(iso) - R0)/RTOT*100; return Math.max(0, Math.min(100, p)); }
+  function isoHoy(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+  var OPACIDAD = { validado:1, entregado:.85, encurso:.7, pendiente:.5 };
+
+  function renderGantt(){
+    var meses = [['Jul','2026-07-13'],['Ago','2026-08-01'],['Sep','2026-09-01'],['Oct','2026-10-01'],['Nov','2026-11-01'],['Dic','2026-12-01']];
+    var axis = meses.map(function(m){ return '<div class="g-mes" style="left:'+pos(m[1])+'%">'+m[0]+'</div>'; }).join('');
+    var grid = meses.map(function(m){ return '<div class="g-grid" style="left:'+pos(m[1])+'%"></div>'; }).join('');
+    var hp = pos(isoHoy()); var hoy = (hp>0 && hp<100) ? '<div class="g-hoy" style="left:'+hp+'%" title="Hoy"></div>' : '';
+    var filas = FASES.map(function(f){
+      var g = GD[f.id] || {}; var col = TIPOS[f.tipo].color;
+      var op = OPACIDAD[estadoDe(f.id)] || .7;
+      var actual = (state.faseActual === f.id);
+      var bar = '';
+      if(g.ini){
+        var L = pos(g.ini), W = Math.max(1.6, pos(g.fin)-pos(g.ini));
+        var txt = (f.id==='f0') ? '✓' : (W>7 ? ('F'+f.n) : '');
+        bar += '<div class="g-bar" style="left:'+L+'%;width:'+W+'%;background:'+col+';opacity:'+op+'" title="'+esc(f.nombre)+' — '+esc(f.trabajo)+'">'+txt+'</div>';
+      }
+      if(g.vIni){
+        var VL = pos(g.vIni), VW = Math.max(1.6, pos(g.vFin)-pos(g.vIni));
+        bar += '<div class="g-bar" style="left:'+VL+'%;width:'+VW+'%;background:var(--validacion);opacity:.92" title="Validación INGESCO"></div>';
+      }
+      if(g.entrega){ bar += '<div class="g-hito" style="left:'+pos(g.entrega)+'%" title="Entrega a INGESCO: '+esc(f.entrega)+'">◆</div>'; }
+      return '<div class="g-fila'+(actual?' actual':'')+'"><div class="g-lbl" title="'+esc(f.nombre)+'">'+f.n+'. '+esc(f.nombre)+'</div><div class="g-track">'+bar+'</div></div>';
+    }).join('');
+    $('gantt').innerHTML = '<div class="g-inner"><div class="g-axis">'+axis+'</div>'
+      + '<div class="g-body"><div class="g-gridlines">'+grid+hoy+'</div>'+filas+'</div></div>'
+      + '<div class="leyenda" style="margin-top:12px">'
+      +   '<span><i style="background:var(--agencia)"></i>Trabajo agencia</span>'
+      +   '<span><i style="background:var(--validacion)"></i>Validación INGESCO</span>'
+      +   '<span><i style="background:var(--paralelo)"></i>En paralelo</span>'
+      +   '<span>◆ Entrega a INGESCO</span>'
+      + '</div>';
+  }
+
+  var vista = 'lista';
+  try{ vista = localStorage.getItem('nal3_vista') || 'lista'; }catch(e){}
+  function setVista(v){
+    vista = v; try{ localStorage.setItem('nal3_vista', v); }catch(e){}
+    $('vLista').classList.toggle('on', v==='lista');
+    $('vMapa').classList.toggle('on', v==='mapa');
+    $('roadmap').style.display = (v==='lista') ? '' : 'none';
+    $('gantt').style.display = (v==='mapa') ? '' : 'none';
+  }
+  $('vLista').onclick = function(){ setVista('lista'); };
+  $('vMapa').onclick = function(){ setVista('mapa'); };
 
   // ---- Interacción del roadmap ----
   $('roadmap').addEventListener('change', function(e){
@@ -372,7 +463,7 @@
   });
 
   // ---- Arranque ----
-  cargarLocal(); render();
+  cargarLocal(); render(); setVista(vista);
   cargarNube();
 })();
 </script>
