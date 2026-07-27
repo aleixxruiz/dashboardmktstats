@@ -24,10 +24,11 @@
   h1{font-size:24px;font-weight:800;letter-spacing:-.5px;margin-top:10px;text-align:center;color:#ffffff}
   .sub{color:#ffffff;font-size:13.5px;text-align:center;margin-top:4px}
 
-  .tarjetas{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
-    margin-top:20px;max-width:1080px;width:100%}
-  @media(max-width:820px){.tarjetas{grid-template-columns:repeat(2,1fr)}}
-  @media(max-width:540px){.tarjetas{grid-template-columns:1fr}}
+  .tarjetas{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+    margin-top:20px;max-width:1200px;width:100%}
+  @media(max-width:1040px){.tarjetas{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:760px){.tarjetas{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.tarjetas{grid-template-columns:1fr}}
 
   .card{position:relative;display:block;text-decoration:none;color:inherit;
     background:var(--ingazul);border:2px solid var(--lima);
@@ -49,7 +50,7 @@
 
   /* Accesos secundarios (FAQ / Peticiones) */
   .extra{display:flex;gap:16px;justify-content:center;align-items:stretch;flex-wrap:wrap;
-    margin-top:16px;max-width:1080px;width:100%}
+    margin-top:16px;max-width:1200px;width:100%}
   .btn-extra{flex:1 1 0;min-width:240px;max-width:380px;display:inline-flex;align-items:center;
     justify-content:center;gap:11px;text-decoration:none;color:#fff;font-size:14.5px;font-weight:800;
     background:var(--ingazul);border:2px solid var(--lima);border-radius:14px;padding:13px 24px;
