@@ -1,9 +1,10 @@
 /* ============================================================
    Cloudflare Worker · Asistente IA + Peticiones · dashboard INGESCO
    ------------------------------------------------------------
-   Dos funciones segun el cuerpo del POST:
-   - { accion:'peticion', nombre, tipo, detalle }  -> publica la peticion en TEAMS
-   - { pregunta, pagina, datos }                   -> pregunta a Google Gemini (IA)
+   Funciones segun el cuerpo del POST:
+   - { accion:'peticion', ... }    -> publica la peticion en TEAMS
+   - { accion:'estrategia', ... }  -> plan de contenido (Claude Opus 4.8, Gemini de reserva)
+   - { pregunta, pagina, datos }   -> chatbot XIELA (Claude Sonnet 5, Gemini de reserva)
 
    SECRETOS (Worker -> Settings -> Variables and Secrets):
    - ANTHROPIC_API_KEY = clave Claude (sk-ant-...) [IA primaria]
@@ -15,6 +16,39 @@
    "Publicar en un canal cuando se reciba una solicitud de webhook".
    Copia la URL HTTPS que genera y guardala como secreto TEAMS_WEBHOOK_URL.
    ============================================================ */
+
+// Llama a Claude (Anthropic). Devuelve el texto de la respuesta; lanza error si la API falla.
+async function claudeChat(apiKey, model, system, prompt, maxTokens, sinThinking) {
+  if (!apiKey) return '';   // sin clave -> el llamador usara Gemini de reserva
+  const cuerpo = { model: model, max_tokens: maxTokens, system: system, messages: [{ role: 'user', content: prompt }] };
+  if (sinThinking) cuerpo.thinking = { type: 'disabled' };   // desactiva razonamiento -> respuestas mas rapidas
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify(cuerpo)
+  });
+  const j = await resp.json();
+  if (!resp.ok) throw new Error((j.error && j.error.message) || ('HTTP ' + resp.status));
+  return (j.content || []).filter(function(b){ return b.type === 'text'; }).map(function(b){ return b.text; }).join('\n').trim();
+}
+
+// Llama a Gemini (Google) como reserva: un solo modelo, sin thinking. Devuelve texto o ''.
+async function geminiChat(apiKey, system, prompt, maxTokens) {
+  if (!apiKey) return '';
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey;
+  const resp = await fetch(url, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: system }] },
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.4, maxOutputTokens: maxTokens, thinkingConfig: { thinkingBudget: 0 } }
+    })
+  });
+  const j = await resp.json();
+  const txt = j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts && j.candidates[0].content.parts[0].text;
+  return txt || '';
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
@@ -64,6 +98,52 @@ export default {
         return new Response(JSON.stringify({ error: 'Teams devolvio ' + tr.status }), { status: 502, headers: { ...cors, 'Content-Type': 'application/json' } });
       }
 
+      // ===== ESTRATEGIA DE CONTENIDO -> Claude Opus 4.8 (Gemini de reserva) =====
+      if (body && body.accion === 'estrategia') {
+        const datosE     = body.datos || {};
+        const existentes = body.existentes || [];   // [{titulo, fecha, canales}]
+        const cantidad   = Math.min(parseInt(body.cantidad, 10) || 8, 20);
+        const periodo    = (body.periodo || 'el proximo mes').toString().slice(0, 120);
+        const enfoque    = (body.enfoque || '').toString().slice(0, 500);
+
+        const sysE =
+          "Eres XIELA, estratega de contenidos de INGESCO (proteccion contra el rayo: pararrayos PDC, detectores de tormenta PREVISTORM, puesta a tierra). " +
+          "Disenas planes de contenido para redes y web basandote en DATOS REALES de rendimiento del panel. " +
+          "Propon publicaciones concretas, variadas y accionables, alineadas con lo que funciona segun los datos, y SIN repetir lo ya publicado o planificado. " +
+          "REGLA: no inventes cifras; si te apoyas en un dato, que salga del panel. " +
+          "Devuelve UNICAMENTE un array JSON valido, sin texto antes ni despues y SIN vallas de codigo (nada de triple backtick). " +
+          "Cada elemento debe tener exactamente estas claves: " +
+          "\"titulo\" (string), " +
+          "\"canales\" (array con uno o varios de: linkedin, instagram, facebook, x, blog, newsletter, youtube, otro), " +
+          "\"categoria\" (uno de: educativo, caso, producto, noticia, evento, formacion, tecnico, testimonio, corporativo, estacional), " +
+          "\"prioridad\" (alta, media o baja), " +
+          "\"fecha\" (YYYY-MM-DD sugerida dentro del periodo), " +
+          "\"notas\" (gancho o enfoque, 1-2 frases).";
+
+        const resumenExist = existentes.slice(0, 150).map(function(p){
+          return '- ' + (p.fecha || '') + ' [' + ((p.canales || []).join('/')) + '] ' + (p.titulo || '');
+        }).join('\n');
+
+        const promptE =
+          "Genera un plan de " + cantidad + " publicaciones para " + periodo + ".\n" +
+          (enfoque ? ("Enfoque o prioridad del usuario: " + enfoque + "\n") : "") +
+          "\nContenido YA planificado o publicado (NO lo repitas; complementalo y evita solapamientos):\n" +
+          (resumenExist || "(ninguno)") +
+          "\n\nDatos del panel (rendimiento real; usalos para elegir temas y canales):\n" +
+          JSON.stringify(datosE).slice(0, 40000) +
+          "\n\nRecuerda: responde SOLO con el array JSON, nada mas.";
+
+        let plan = '';
+        try { plan = await claudeChat(env.ANTHROPIC_API_KEY, 'claude-opus-4-8', sysE, promptE, 8000, true); }
+        catch (err) { console.log('Estrategia Claude fallo, uso Gemini: ' + err.message); }
+        if (!plan) { try { plan = await geminiChat(env.GEMINI_API_KEY, sysE, promptE, 8000); } catch (err) {} }
+        if (!plan) {
+          return new Response(JSON.stringify({ error: 'No se pudo generar la estrategia ahora mismo. Reintentalo en unos segundos.' }),
+            { status: 502, headers: { ...cors, 'Content-Type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({ estrategia: plan }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+      }
+
       // ===== PREGUNTA -> IA (Claude primario, Gemini de reserva) =====
       const { pregunta, pagina, datos } = body;
       const sistema =
@@ -82,33 +162,10 @@ export default {
       const prompt = "Pregunta del usuario: " + pregunta + "\n\nPagina actual del panel: " + pagina +
         "\n\nDatos del panel (JSON con todas las fuentes disponibles):\n" + JSON.stringify(datos).slice(0, 40000);
 
-      // --- IA PRIMARIA: Claude (Anthropic) ---
-      // Opus 4.8: sin 'thinking' (respuesta directa y rapida) y sin 'temperature'
-      // (los modelos Opus 4.7+ rechazan ese parametro). max_tokens 4096 para
-      // respuestas analiticas sin que se corten.
+      // --- IA PRIMARIA del chatbot: Claude Sonnet 5 (rapido) ---
+      // Sonnet 5 con thinking desactivado -> respuestas de ~3-5 s. max_tokens 4096.
       async function llamarClaude() {
-        if (!env.ANTHROPIC_API_KEY) return '';   // sin clave -> pasa a Gemini
-        const resp = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-            'x-api-key': env.ANTHROPIC_API_KEY,
-            'anthropic-version': '2023-06-01'
-          },
-          body: JSON.stringify({
-            model: 'claude-opus-4-8',
-            max_tokens: 4096,
-            system: sistema,
-            messages: [{ role: 'user', content: prompt }]
-          })
-        });
-        const j = await resp.json();
-        if (!resp.ok) throw new Error((j.error && j.error.message) || ('HTTP ' + resp.status));
-        // La respuesta es una lista de bloques; nos quedamos con el texto.
-        return (j.content || [])
-          .filter(function(b){ return b.type === 'text'; })
-          .map(function(b){ return b.text; })
-          .join('\n').trim();
+        return await claudeChat(env.ANTHROPIC_API_KEY, 'claude-sonnet-5', sistema, prompt, 4096, true);
       }
 
       // --- IA DE RESERVA: Gemini (Google), si Claude falla o no hay saldo ---
