@@ -67,7 +67,7 @@
    + '<div class="asis-body" id="asisMenu">'
    +   '<p style="font-size:14.5px;color:#1e2b50;font-weight:700;margin-bottom:14px">'+CONFIG.titulo+'</p>'
    +   '<button class="asis-op" id="asisIA"><span class="ic">🤖</span><span><b>Preguntar a XIELA IA</b><span>Resuelve dudas sobre los datos del panel</span></span></button>'
-   +   '<button class="asis-op" id="asisTeams"><span class="ic">💬</span><span><b>Escribir a Aleix por Teams</b><span>Manda un mensaje directo por Teams</span></span></button>'
+   +   '<button class="asis-op" id="asisTeams"><span class="ic">💬</span><span><b>Escribir al equipo de marketing</b><span>Manda un mensaje al equipo por Teams</span></span></button>'
    + '</div>'
    + '<div class="asis-chat" id="asisChat">'
    +   '<div class="asis-back" id="asisBack">← Volver</div>'
