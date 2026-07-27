@@ -58,6 +58,7 @@ $todos = @(
     @{ local = "assets\logo-hubspot.png";    remoto = "assets/logo-hubspot.png" },
     @{ local = "assets\logo-sage.png";       remoto = "assets/logo-sage.png" },
     @{ local = "assets\direct-industry.png"; remoto = "assets/direct-industry.png" },
+    @{ local = "assets\nal3.png";            remoto = "assets/nal3.png" },
     @{ local = "assets\PDC 6.4.png";         remoto = "assets/PDC 6.4.png" },
     @{ local = "assets\previstorm.png";       remoto = "assets/previstorm.png" },
     @{ local = "assets\PararrayosE.png";      remoto = "assets/PararrayosE.png" },
