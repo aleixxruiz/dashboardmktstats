@@ -390,6 +390,9 @@
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var CLAVE = 'ingesco_calendario_v1';
+  var CAL_URL = 'https://asistente-ingesco.aleixcr9.workers.dev/';  // Worker compartido (mismo que XIELA)
+  var nube = true;        // ¿hay almacén compartido (KV)? se desactiva solo si no está configurado
+  var syncTimer = null;
 
   // Canales disponibles (nombre + color CSS var)
   var CANALES = [
@@ -441,10 +444,46 @@
           'para que se guarde de verdad.');
   }
   function guardar(){
-    try{ localStorage.setItem(CLAVE, JSON.stringify(pubs)); return true; }
-    catch(e){ avisoStorage(); return false; }
+    try{ localStorage.setItem(CLAVE, JSON.stringify(pubs)); }catch(e){ avisoStorage(); }
+    sincronizarNube();   // además, guarda en la nube compartida (todo el equipo ve lo mismo)
+    return true;
   }
   function nuevoId(){ return 'p' + Date.now() + Math.floor(Math.random()*1000); }
+
+  // ---------- Nube compartida (Cloudflare KV a través del Worker) ----------
+  // Envía el estado completo {pubs, ideas}; agrupa cambios rápidos con un pequeño retardo.
+  function sincronizarNube(inmediato){
+    if(!nube) return;
+    if(syncTimer){ clearTimeout(syncTimer); syncTimer=null; }
+    var enviar = function(){
+      fetch(CAL_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ accion:'cal_save', pubs:pubs, ideas:ideas }) })
+        .then(function(r){ return r.json(); })
+        .then(function(j){ if(j && j.sinKV){ nube=false; } })
+        .catch(function(){});
+    };
+    if(inmediato){ enviar(); } else { syncTimer = setTimeout(enviar, 800); }
+  }
+  // Al abrir: trae el calendario compartido y refresca la vista.
+  function cargarNube(){
+    fetch(CAL_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ accion:'cal_load' }) })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if(!j || j.sinKV){ nube=false; return; }                 // el Worker no tiene KV -> modo local
+        if(j.data === null){                                     // nube vacía (primera vez)
+          if((pubs && pubs.length) || (ideas && ideas.length)) sincronizarNube(true);  // sembramos con lo local
+          return;
+        }
+        pubs  = Array.isArray(j.data.pubs)  ? j.data.pubs  : [];
+        ideas = Array.isArray(j.data.ideas) ? j.data.ideas : [];
+        pubs.forEach(normaliza);
+        try{ localStorage.setItem(CLAVE, JSON.stringify(pubs)); localStorage.setItem(CLAVE_IDEAS, JSON.stringify(ideas)); }catch(e){}
+        pintar();
+        if($('ideasModal') && $('ideasModal').classList.contains('on')) pintarIdeas();
+      })
+      .catch(function(){ nube=false; });                         // sin conexión -> modo local
+  }
 
   // ---------- Fechas ----------
   var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -672,8 +711,9 @@
   var ideas = [];
   function cargarIdeas(){ try{ ideas = JSON.parse(localStorage.getItem(CLAVE_IDEAS)) || []; }catch(e){ ideas = []; } }
   function guardarIdeas(){
-    try{ localStorage.setItem(CLAVE_IDEAS, JSON.stringify(ideas)); return true; }
-    catch(e){ avisoStorage(); return false; }
+    try{ localStorage.setItem(CLAVE_IDEAS, JSON.stringify(ideas)); }catch(e){ avisoStorage(); }
+    sincronizarNube();   // guarda también en la nube compartida
+    return true;
   }
 
   // Rellenar selects/checkboxes del modal
@@ -900,8 +940,8 @@
   }
 
   // ---------- Arranque ----------
-  cargar(); pintar();
-  cargarIdeas();
+  cargar(); cargarIdeas(); pintar();   // 1º caché local -> vista instantánea
+  cargarNube();                        // 2º calendario compartido de la nube (si está configurada)
 })();
 </script>
 <script src="assets/widget.js?v=8"></script>
