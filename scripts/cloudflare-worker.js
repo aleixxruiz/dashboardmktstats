@@ -11,6 +11,11 @@
    - GEMINI_API_KEY    = clave Gemini (AIza...)    [IA de reserva]
    - TEAMS_WEBHOOK_URL = URL del flujo de Teams    [para las peticiones]
 
+   BINDING KV (Worker -> Settings -> Bindings -> KV namespace):
+   - Variable: CALENDARIO  ->  namespace propio  [calendario compartido del equipo]
+     (crea el namespace en Workers & Pages -> KV; si falta, el calendario funciona
+      en modo local por navegador, sin compartir)
+
    Webhook de Teams (Power Automate / Workflows):
    En el canal de Teams -> ... -> Workflows -> plantilla
    "Publicar en un canal cuando se reciba una solicitud de webhook".
@@ -96,6 +101,28 @@ export default {
         });
         if (tr.ok) return new Response(JSON.stringify({ ok: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
         return new Response(JSON.stringify({ error: 'Teams devolvio ' + tr.status }), { status: 502, headers: { ...cors, 'Content-Type': 'application/json' } });
+      }
+
+      // ===== CALENDARIO COMPARTIDO (Cloudflare KV) =====
+      if (body && (body.accion === 'cal_load' || body.accion === 'cal_save')) {
+        if (!env.CALENDARIO) {
+          // Sin almacen KV -> el frontend seguira funcionando en modo local por navegador.
+          return new Response(JSON.stringify({ sinKV: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+        }
+        const KEY = 'calendario';
+        if (body.accion === 'cal_load') {
+          const raw = await env.CALENDARIO.get(KEY);
+          return new Response(JSON.stringify({ ok: true, data: raw ? JSON.parse(raw) : null }),
+            { headers: { ...cors, 'Content-Type': 'application/json' } });
+        }
+        // cal_save: guarda el estado completo del calendario
+        const guardado = {
+          pubs:  Array.isArray(body.pubs)  ? body.pubs  : [],
+          ideas: Array.isArray(body.ideas) ? body.ideas : [],
+          updated: Date.now()
+        };
+        await env.CALENDARIO.put(KEY, JSON.stringify(guardado));
+        return new Response(JSON.stringify({ ok: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
       }
 
       // ===== ESTRATEGIA DE CONTENIDO -> Claude Opus 4.8 (Gemini de reserva) =====
