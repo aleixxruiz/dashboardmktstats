@@ -77,21 +77,32 @@
   .vbtn{padding:8px 14px;border:1px solid var(--borde);background:var(--tarjeta);border-radius:9px;cursor:pointer;font-weight:700;font-size:13px;color:var(--suave);font-family:inherit}
   .vbtn.on{background:var(--navy);border-color:var(--navy);color:#fff}
 
-  /* Vista mapa (Gantt) */
-  .gantt{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:16px 16px 10px;overflow-x:auto}
-  .g-inner{min-width:880px}
-  .g-axis{position:relative;height:20px;margin-left:180px;margin-bottom:4px;border-bottom:2px solid var(--borde)}
-  .g-mes{position:absolute;top:0;font-size:11.5px;font-weight:800;color:var(--suave)}
-  .g-body{position:relative}
-  .g-gridlines{position:absolute;left:180px;right:0;top:0;bottom:0;pointer-events:none}
-  .g-grid{position:absolute;top:0;bottom:0;width:1px;background:#eef1f6}
-  .g-hoy{position:absolute;top:0;bottom:0;width:2px;background:var(--rojo)}
-  .g-fila{position:relative;display:flex;align-items:center;height:40px;border-bottom:1px solid #f2f5f9}
-  .g-fila.actual{background:rgba(19,41,75,.05)}
-  .g-lbl{width:180px;flex-shrink:0;font-size:12px;font-weight:700;color:var(--navy);padding-right:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .g-track{position:relative;flex:1;height:100%}
-  .g-bar{position:absolute;top:10px;height:20px;border-radius:5px;font-size:10.5px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.18);cursor:default}
-  .g-hito{position:absolute;top:8px;font-size:12px;color:var(--navy);transform:translateX(-50%);cursor:default}
+  /* Vista mapa (Gantt) — réplica del PDF de NAL3 */
+  .gantt{overflow-x:auto}
+  .gmap{min-width:940px;border:1px solid #cfd8e6;border-radius:12px;overflow:hidden;background:#fff}
+  .grow{display:flex;align-items:stretch;border-bottom:1px solid #e6ebf2}
+  .grow:last-child{border-bottom:none}
+  .gc-fase{width:215px;flex-shrink:0;padding:8px 10px;display:flex;align-items:center;gap:9px}
+  .gc-time{flex:1;display:grid;grid-template-columns:repeat(24,1fr)}
+  .ghead{background:#17365d;color:#fff}
+  .gh-fase{font-weight:800;font-size:15px;color:#fff;letter-spacing:.5px}
+  .gh-time{grid-template-rows:auto auto}
+  .gh-mes{grid-row:1;text-align:center;font-size:11px;font-weight:800;letter-spacing:.6px;padding:7px 2px 4px;border-left:1px solid rgba(255,255,255,.16)}
+  .gh-sem{grid-row:2;text-align:center;line-height:1.05;padding:2px 0 6px;border-left:1px solid rgba(255,255,255,.1);color:#c9d4e6}
+  .gh-sem b{font-size:11px;display:block;color:#fff;font-weight:800}
+  .gh-sem span{font-size:9px}
+  .gfase{min-height:58px}
+  .gfase .gc-time{background:repeating-linear-gradient(to right,transparent 0,transparent calc(100%/24 - 1px),#edf1f6 calc(100%/24 - 1px),#edf1f6 calc(100%/24))}
+  .gnum{width:27px;height:27px;border-radius:50%;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .gtxt{font-size:11px;line-height:1.22;font-weight:800;text-transform:uppercase}
+  .gtxt .gsub{display:block;font-weight:600;color:#7c8aa0;font-size:9.5px;margin-top:2px;text-transform:none}
+  .gtrack{align-items:center}
+  .gbar{align-self:center;margin:4px 3px;border-radius:6px;font-size:10px;font-weight:700;line-height:1.15;padding:5px 5px;text-align:center;
+    display:flex;align-items:center;justify-content:center;min-height:36px;box-shadow:0 1px 2px rgba(0,0,0,.18);overflow:hidden}
+  .gcheck{font-size:16px}
+  .gleg{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px;font-size:12.5px;color:var(--texto)}
+  .gleg span{display:inline-flex;align-items:center;gap:7px}
+  .gleg i{width:15px;height:15px;border-radius:3px;display:inline-block}
 
   /* Modal documento */
   .modal-fondo{position:fixed;inset:0;background:rgba(19,41,75,.45);opacity:0;pointer-events:none;transition:.18s;z-index:1000}
@@ -335,54 +346,78 @@
     renderGantt();
   }
 
-  // ---- Vista mapa (Gantt) ----
-  // Fechas de cada fase para posicionar las barras (ini/fin trabajo, vIni/vFin validación, entrega = hito).
-  var GD = {
-    f0: { ini:'2026-07-14', fin:'2026-07-14', entrega:'2026-07-14' },
-    f1: { ini:'2026-07-21', fin:'2026-07-27', entrega:'2026-08-07' },
-    f2: { ini:'2026-07-28', fin:'2026-08-17' },
-    f3: { ini:'2026-08-18', fin:'2026-09-09', vIni:'2026-09-10', vFin:'2026-09-17', entrega:'2026-09-10' },
-    f4: { ini:'2026-09-18', fin:'2026-10-01', vIni:'2026-10-02', vFin:'2026-10-09', entrega:'2026-10-02' },
-    f5: { ini:'2026-09-18', fin:'2026-10-08', vIni:'2026-10-09', vFin:'2026-10-16', entrega:'2026-10-09' },
-    f6: { ini:'2026-10-09', fin:'2026-11-19', vIni:'2026-11-20', vFin:'2026-12-04', entrega:'2026-11-20' },
-    f6b:{ ini:'2026-11-20', fin:'2026-12-04' },
-    f7: { ini:'2026-12-05', fin:'2026-12-18', entrega:'2026-12-18' },
-    f8: { ini:'2026-12-05', fin:'2026-12-18', entrega:'2026-12-18' }
+  // ---- Vista mapa (Gantt) — réplica del PDF de NAL3 ----
+  var G_GREEN='#34a04d', G_NAVY='#17365d', G_YELLOW='#f2b100';
+  // Columnas = semanas (24). Cada caja: c1..c2 = columnas que ocupa, t = color, txt = texto.
+  var GBOX = {
+    f0:  [ {c1:1,c2:1, t:'navy', check:true} ],
+    f1:  [ {c1:1,c2:2, t:'green',  txt:'21 – 27 jul'},
+           {c1:3,c2:3, t:'navy',   txt:'Lliurament a Ingesco 7 d’agost'} ],
+    f2:  [ {c1:2,c2:5, t:'green',  txt:'28 jul – 17 ago'} ],
+    f3:  [ {c1:6,c2:8, t:'green',  txt:'18 ago – 9 set'},
+           {c1:9,c2:9, t:'navy',   txt:'Validació Ingesco 10 – 17 set'},
+           {c1:10,c2:10,t:'navy',  txt:'Lliurament a Ingesco 10 de setembre'} ],
+    f4:  [ {c1:10,c2:11,t:'yellow',txt:'18 set – 1 oct'},
+           {c1:12,c2:12,t:'navy',  txt:'Lliurament a Ingesco 2 d’octubre'},
+           {c1:13,c2:13,t:'navy',  txt:'Validació Ingesco 2 – 9 oct'} ],
+    f5:  [ {c1:10,c2:11,t:'yellow',txt:'18 set – 8 oct'},
+           {c1:12,c2:12,t:'navy',  txt:'Lliurament a Ingesco 9 d’octubre'},
+           {c1:13,c2:13,t:'navy',  txt:'Validació Ingesco 9 – 16 oct'} ],
+    f6:  [ {c1:12,c2:18,t:'green', txt:'9 oct – 19 nov'},
+           {c1:19,c2:19,t:'navy',  txt:'Lliurament a Ingesco 20 de novembre'},
+           {c1:20,c2:20,t:'navy',  txt:'Validació Ingesco 20 nov – 4 des'} ],
+    f6b: [ {c1:20,c2:21,t:'navy',  txt:'Finalització validació Ingesco 4 de desembre'} ],
+    f7:  [ {c1:21,c2:22,t:'green', txt:'5 – 18 des'},
+           {c1:23,c2:23,t:'navy',  txt:'Lliurament a Ingesco 18 de desembre'} ],
+    f8:  [ {c1:21,c2:22,t:'green', txt:'5 – 18 des'},
+           {c1:23,c2:23,t:'navy',  txt:'Lliurament a Ingesco 18 de desembre'} ]
   };
-  var R0 = new Date('2026-07-13'), R1 = new Date('2026-12-28'), RTOT = R1 - R0;
-  function pos(iso){ var p=(new Date(iso) - R0)/RTOT*100; return Math.max(0, Math.min(100, p)); }
-  function isoHoy(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
-  var OPACIDAD = { validado:1, entregado:.85, encurso:.7, pendiente:.5 };
+  // Etiquetas de la izquierda (en catalán, como el PDF)
+  var GLBL = {
+    f0: { t:'FASE 0. ONBOARDING', s:'Fase realitzada el 14 de juliol de 2026.', navy:true },
+    f1: { t:'FASE 1. DEFINICIÓ DE BUYER PERSONA', s:'(Durada: 1 setmana)' },
+    f2: { t:'FASE 2. AUDITORIA I ESTRATÈGIA "ZERO"', s:'(Durada: 3 setmanes)' },
+    f3: { t:'FASE 3. INTEGRACIÓ DE LA CONSULTORIA I ELABORACIÓ DEL PLA DE MÀRQUETING', s:'' },
+    f4: { t:'FASE 4. COPYWRITING SEO', s:'(Durada: 2 setmanes)' },
+    f5: { t:'FASE 5. DISSENY UI', s:'(Durada: 3 setmanes) · En paral·lel amb el copywriting SEO' },
+    f6: { t:'FASE 6. DESENVOLUPAMENT WORDPRESS', s:'(Durada: 5 setmanes)' },
+    f6b:{ t:'FASE 6. VALIDACIÓ DEL DESENVOLUPAMENT', s:'' },
+    f7: { t:'FASE 7. INTEGRACIONS, TESTING I DESPLEGAMENT EN PRODUCCIÓ', s:'(Durada: 2 setmanes)' },
+    f8: { t:'FASE 8. MIGRACIÓ SEO', s:'(Durada: 2 setmanes)' }
+  };
+  var MESES = [ {n:'JULIOL',a:1,b:3}, {n:'AGOST',a:3,b:8}, {n:'SETEMBRE',a:8,b:12},
+                {n:'OCTUBRE',a:12,b:16}, {n:'NOVEMBRE',a:16,b:21}, {n:'DESEMBRE',a:21,b:25} ];
+  var SEMANAS = [['20','jul'],['27','jul'],['3','ago'],['10','ago'],['17','ago'],['24','ago'],['31','ago'],
+                 ['7','set'],['14','set'],['21','set'],['28','set'],['5','oct'],['12','oct'],['19','oct'],['26','oct'],
+                 ['2','nov'],['9','nov'],['16','nov'],['23','nov'],['30','nov'],['7','des'],['14','des'],['21','des'],['28','des']];
 
   function renderGantt(){
-    var meses = [['Jul','2026-07-13'],['Ago','2026-08-01'],['Sep','2026-09-01'],['Oct','2026-10-01'],['Nov','2026-11-01'],['Dic','2026-12-01']];
-    var axis = meses.map(function(m){ return '<div class="g-mes" style="left:'+pos(m[1])+'%">'+m[0]+'</div>'; }).join('');
-    var grid = meses.map(function(m){ return '<div class="g-grid" style="left:'+pos(m[1])+'%"></div>'; }).join('');
-    var hp = pos(isoHoy()); var hoy = (hp>0 && hp<100) ? '<div class="g-hoy" style="left:'+hp+'%" title="Hoy"></div>' : '';
+    var mesesH = MESES.map(function(m){ return '<div class="gh-mes" style="grid-column:'+m.a+'/'+m.b+'">'+m.n+'</div>'; }).join('');
+    var semH = SEMANAS.map(function(s){ return '<div class="gh-sem"><b>'+s[0]+'</b><span>'+s[1]+'</span></div>'; }).join('');
+    var head = '<div class="grow ghead"><div class="gc-fase gh-fase">FASE</div>'
+             + '<div class="gc-time gh-time">'+mesesH+semH+'</div></div>';
     var filas = FASES.map(function(f){
-      var g = GD[f.id] || {}; var col = TIPOS[f.tipo].color;
-      var op = OPACIDAD[estadoDe(f.id)] || .7;
-      var actual = (state.faseActual === f.id);
-      var bar = '';
-      if(g.ini){
-        var L = pos(g.ini), W = Math.max(1.6, pos(g.fin)-pos(g.ini));
-        var txt = (f.id==='f0') ? '✓' : (W>7 ? ('F'+f.n) : '');
-        bar += '<div class="g-bar" style="left:'+L+'%;width:'+W+'%;background:'+col+';opacity:'+op+'" title="'+esc(f.nombre)+' — '+esc(f.trabajo)+'">'+txt+'</div>';
-      }
-      if(g.vIni){
-        var VL = pos(g.vIni), VW = Math.max(1.6, pos(g.vFin)-pos(g.vIni));
-        bar += '<div class="g-bar" style="left:'+VL+'%;width:'+VW+'%;background:var(--validacion);opacity:.92" title="Validación INGESCO"></div>';
-      }
-      if(g.entrega){ bar += '<div class="g-hito" style="left:'+pos(g.entrega)+'%" title="Entrega a INGESCO: '+esc(f.entrega)+'">◆</div>'; }
-      return '<div class="g-fila'+(actual?' actual':'')+'"><div class="g-lbl" title="'+esc(f.nombre)+'">'+f.n+'. '+esc(f.nombre)+'</div><div class="g-track">'+bar+'</div></div>';
+      var l = GLBL[f.id] || { t:f.nombre, s:'' };
+      var circ = l.navy ? G_NAVY : G_GREEN;
+      var boxes = (GBOX[f.id]||[]).map(function(b){
+        var bg = b.t==='green' ? G_GREEN : (b.t==='yellow' ? G_YELLOW : G_NAVY);
+        var fg = b.t==='yellow' ? '#3a2e00' : '#fff';
+        var cont = b.check ? '<span class="gcheck">✓</span>' : esc(b.txt);
+        return '<div class="gbar" style="grid-column:'+b.c1+'/'+(b.c2+1)+';background:'+bg+';color:'+fg+'">'+cont+'</div>';
+      }).join('');
+      return '<div class="grow gfase">'
+        + '<div class="gc-fase">'
+        +   '<span class="gnum" style="background:'+circ+'">'+f.n+'</span>'
+        +   '<span class="gtxt" style="color:'+circ+'">'+esc(l.t)+(l.s?'<span class="gsub">'+esc(l.s)+'</span>':'')+'</span>'
+        + '</div>'
+        + '<div class="gc-time gtrack">'+boxes+'</div>'
+        + '</div>';
     }).join('');
-    $('gantt').innerHTML = '<div class="g-inner"><div class="g-axis">'+axis+'</div>'
-      + '<div class="g-body"><div class="g-gridlines">'+grid+hoy+'</div>'+filas+'</div></div>'
-      + '<div class="leyenda" style="margin-top:12px">'
-      +   '<span><i style="background:var(--agencia)"></i>Trabajo agencia</span>'
-      +   '<span><i style="background:var(--validacion)"></i>Validación INGESCO</span>'
-      +   '<span><i style="background:var(--paralelo)"></i>En paralelo</span>'
-      +   '<span>◆ Entrega a INGESCO</span>'
+    $('gantt').innerHTML = '<div class="gantt-scroll gmap">'+head+filas+'</div>'
+      + '<div class="gleg">'
+      +   '<span><i style="background:'+G_GREEN+'"></i>Fases de l’agència (treball)</span>'
+      +   '<span><i style="background:'+G_NAVY+'"></i>Temps de validació Ingesco</span>'
+      +   '<span><i style="background:'+G_YELLOW+'"></i>Fases en paral·lel</span>'
       + '</div>';
   }
 
