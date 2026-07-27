@@ -6,8 +6,9 @@
    - { pregunta, pagina, datos }                   -> pregunta a Google Gemini (IA)
 
    SECRETOS (Worker -> Settings -> Variables and Secrets):
-   - GEMINI_API_KEY    = clave Gemini (AIza...)   [para la IA]
-   - TEAMS_WEBHOOK_URL = URL del flujo de Teams   [para las peticiones]
+   - ANTHROPIC_API_KEY = clave Claude (sk-ant-...) [IA primaria]
+   - GEMINI_API_KEY    = clave Gemini (AIza...)    [IA de reserva]
+   - TEAMS_WEBHOOK_URL = URL del flujo de Teams    [para las peticiones]
 
    Webhook de Teams (Power Automate / Workflows):
    En el canal de Teams -> ... -> Workflows -> plantilla
@@ -63,7 +64,7 @@ export default {
         return new Response(JSON.stringify({ error: 'Teams devolvio ' + tr.status }), { status: 502, headers: { ...cors, 'Content-Type': 'application/json' } });
       }
 
-      // ===== PREGUNTA -> IA (Gemini) =====
+      // ===== PREGUNTA -> IA (Claude primario, Gemini de reserva) =====
       const { pregunta, pagina, datos } = body;
       const sistema =
         "Eres XIELA, analista de marketing senior de INGESCO (proteccion contra el rayo: pararrayos PDC, detectores de tormenta PREVISTORM, puesta a tierra). " +
@@ -81,38 +82,74 @@ export default {
       const prompt = "Pregunta del usuario: " + pregunta + "\n\nPagina actual del panel: " + pagina +
         "\n\nDatos del panel (JSON con todas las fuentes disponibles):\n" + JSON.stringify(datos).slice(0, 40000);
 
-      // Modelos en cadena: si el primero esta saturado, pasa al siguiente (con un reintento breve).
-      const MODELOS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite'];
-      // Cuerpo por modelo: subimos el limite de salida a 4096 para que las respuestas
-      // analiticas no se corten a medias, y en los modelos "2.5" (con razonamiento)
-      // desactivamos el thinking para que NO consuma el presupuesto de la respuesta.
-      function cuerpoPara(modelo) {
-        const gen = { temperature: 0.4, maxOutputTokens: 4096 };
-        if (modelo.indexOf('2.5') >= 0) gen.thinkingConfig = { thinkingBudget: 0 };
-        return JSON.stringify({
-          systemInstruction: { parts: [{ text: sistema }] },
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: gen
+      // --- IA PRIMARIA: Claude (Anthropic) ---
+      // Opus 4.8: sin 'thinking' (respuesta directa y rapida) y sin 'temperature'
+      // (los modelos Opus 4.7+ rechazan ese parametro). max_tokens 4096 para
+      // respuestas analiticas sin que se corten.
+      async function llamarClaude() {
+        if (!env.ANTHROPIC_API_KEY) return '';   // sin clave -> pasa a Gemini
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'x-api-key': env.ANTHROPIC_API_KEY,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: 'claude-opus-4-8',
+            max_tokens: 4096,
+            system: sistema,
+            messages: [{ role: 'user', content: prompt }]
+          })
         });
+        const j = await resp.json();
+        if (!resp.ok) throw new Error((j.error && j.error.message) || ('HTTP ' + resp.status));
+        // La respuesta es una lista de bloques; nos quedamos con el texto.
+        return (j.content || [])
+          .filter(function(b){ return b.type === 'text'; })
+          .map(function(b){ return b.text; })
+          .join('\n').trim();
       }
-      let respuesta = '', ultimoError = '';
-      for (const modelo of MODELOS) {
-        let hecho = false;
-        for (let intento = 0; intento < 2 && !hecho; intento++) {
-          try {
-            const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + modelo + ':generateContent?key=' + env.GEMINI_API_KEY;
-            const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: cuerpoPara(modelo) });
-            const j = await resp.json();
-            const txt = j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts && j.candidates[0].content.parts[0].text;
-            if (txt) { respuesta = txt; hecho = true; break; }
-            ultimoError = (j.error && j.error.message) || ('HTTP ' + resp.status);
-            // Saturacion / limite -> espera breve y reintenta; cualquier otro error -> probar siguiente modelo
-            if (resp.status === 503 || resp.status === 429 || /overload|high demand|UNAVAILABLE|RESOURCE_EXHAUSTED/i.test(ultimoError)) {
-              await new Promise(function(r){ setTimeout(r, 700); });
-            } else { break; }
-          } catch (err) { ultimoError = err.message; await new Promise(function(r){ setTimeout(r, 400); }); }
+
+      // --- IA DE RESERVA: Gemini (Google), si Claude falla o no hay saldo ---
+      async function llamarGemini() {
+        const MODELOS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite'];
+        function cuerpoPara(modelo) {
+          const gen = { temperature: 0.4, maxOutputTokens: 4096 };
+          if (modelo.indexOf('2.5') >= 0) gen.thinkingConfig = { thinkingBudget: 0 };
+          return JSON.stringify({
+            systemInstruction: { parts: [{ text: sistema }] },
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: gen
+          });
         }
-        if (respuesta) break;
+        let out = '', ultimoError = '';
+        for (const modelo of MODELOS) {
+          let hecho = false;
+          for (let intento = 0; intento < 2 && !hecho; intento++) {
+            try {
+              const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + modelo + ':generateContent?key=' + env.GEMINI_API_KEY;
+              const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: cuerpoPara(modelo) });
+              const j = await resp.json();
+              const txt = j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts && j.candidates[0].content.parts[0].text;
+              if (txt) { out = txt; hecho = true; break; }
+              ultimoError = (j.error && j.error.message) || ('HTTP ' + resp.status);
+              if (resp.status === 503 || resp.status === 429 || /overload|high demand|UNAVAILABLE|RESOURCE_EXHAUSTED/i.test(ultimoError)) {
+                await new Promise(function(r){ setTimeout(r, 700); });
+              } else { break; }
+            } catch (err) { ultimoError = err.message; await new Promise(function(r){ setTimeout(r, 400); }); }
+          }
+          if (out) break;
+        }
+        return out;
+      }
+
+      // Claude primero; si falla (error, sin saldo o sin clave), Gemini de reserva.
+      let respuesta = '';
+      try { respuesta = await llamarClaude(); }
+      catch (err) { console.log('Claude fallo, uso Gemini de reserva: ' + err.message); }
+      if (!respuesta) {
+        try { respuesta = await llamarGemini(); } catch (err) { console.log('Gemini fallo: ' + err.message); }
       }
       if (!respuesta) respuesta = 'El servicio de IA esta muy solicitado ahora mismo. Vuelve a intentarlo en unos segundos.';
       return new Response(JSON.stringify({ respuesta }), { headers: { ...cors, 'Content-Type': 'application/json' } });
