@@ -41,7 +41,27 @@
   .btn-sec{background:#e6ecf6;color:var(--navy)}.btn-sec:hover{background:#d9e2f1}
   .btn-hoy{background:var(--tarjeta);border:1px solid var(--borde);color:var(--navy)}
   .btn-ideas{background:var(--lima);color:#5a5c00}.btn-ideas:hover{filter:brightness(.97)}
+  .btn-est{background:linear-gradient(135deg,#7c53c3,#a06fe0);color:#fff}.btn-est:hover{filter:brightness(1.07)}
   .espacio{flex:1}
+
+  /* Generador de estrategia con IA */
+  .est-form{background:#f6f9fd;border:1px solid var(--borde);border-radius:12px;padding:14px}
+  .est-form .r{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:end}
+  @media(max-width:640px){.est-form .r{grid-template-columns:1fr}}
+  .est-info{font-size:12.5px;color:var(--suave);margin:10px 0 4px;line-height:1.5}
+  .est-cargando{text-align:center;color:#7c53c3;font-weight:700;padding:22px;font-size:14px}
+  .est-lista{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .prop{border:1px solid var(--borde);border-left:5px solid #7c53c3;border-radius:11px;padding:12px 14px;background:#fff;display:flex;gap:12px;align-items:flex-start}
+  .prop input[type=checkbox]{width:auto;margin-top:3px;transform:scale(1.2);cursor:pointer;flex-shrink:0}
+  .prop .cuerpo{flex:1;min-width:0}
+  .prop .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+  .prop .cat{font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px;color:#fff}
+  .prop .fch{font-size:11.5px;color:var(--suave);font-weight:700}
+  .prop .tit{font-size:14.5px;font-weight:700;color:var(--texto)}
+  .prop .redes{font-size:11.5px;color:var(--suave);margin-top:3px}
+  .prop .notas{font-size:13px;color:#42506b;margin-top:5px;line-height:1.45}
+  .est-acc{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .est-acc .cont{margin-left:auto;font-size:12.5px;color:var(--suave);font-weight:700}
 
   /* ---------- Modal Banco de ideas ---------- */
   .modal-fondo{position:fixed;inset:0;background:rgba(19,41,75,.45);opacity:0;pointer-events:none;transition:.18s;z-index:1000}
@@ -182,6 +202,7 @@
     <button class="btn btn-hoy" id="btnHoy">Hoy</button>
     <button class="btn btn-pri" id="btnNuevo">+ Nueva publicación</button>
     <button class="btn btn-ideas" id="btnIdeas">💡 Banco de ideas</button>
+    <button class="btn btn-est" id="btnEstrategia">✨ Estrategia con IA</button>
     <div class="espacio"></div>
     <div class="filtros">
       <select id="fltCanal"><option value="">Todos los canales</option></select>
@@ -265,6 +286,38 @@
       <span class="cont" id="iCont">0 ideas</span>
     </div>
     <div class="idea-lista" id="iLista"></div>
+  </div>
+</div>
+
+<!-- Estrategia de contenido con IA -->
+<div class="modal-fondo" id="estFondo"></div>
+<div class="modal" id="estModal">
+  <div class="modal-head">
+    <h2>✨ Estrategia de contenido con IA</h2>
+    <span class="x" id="estX">✕</span>
+  </div>
+  <div class="modal-body">
+    <div class="est-form">
+      <div class="r">
+        <div>
+          <label>Nº de publicaciones</label>
+          <input type="number" id="estCantidad" min="3" max="20" value="8">
+        </div>
+        <div>
+          <label>Periodo</label>
+          <input type="text" id="estPeriodo" placeholder="el próximo mes">
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <label>Enfoque (opcional)</label>
+        <input type="text" id="estEnfoque" placeholder="Ej. reforzar LinkedIn, temporada de tormentas, casos de éxito…">
+      </div>
+      <div class="est-info">
+        La IA analiza <b>los datos de tu panel</b> y <b>lo que ya tienes en el calendario y el banco de ideas</b> para proponer publicaciones nuevas, sin repetir. Motor: <b>Claude Opus 4.8</b>.
+      </div>
+      <button class="btn btn-est" id="estGenerar" style="width:100%">✨ Generar propuestas</button>
+    </div>
+    <div id="estResultado"></div>
   </div>
 </div>
 
@@ -734,6 +787,117 @@
   $('ideasFondo').onclick = cerrarIdeas;
   $('iFiltro').onchange = pintarIdeas;
   $('iVerUsadas').onchange = pintarIdeas;
+
+  // ==========================================================
+  //  ESTRATEGIA DE CONTENIDO CON IA (Claude Opus 4.8 vía Worker)
+  // ==========================================================
+  var AI_URL = 'https://asistente-ingesco.aleixcr9.workers.dev/';
+  var propuestas = [];
+
+  // Reúne los datos del panel (los window.* que carga widget.js en esta página)
+  function datosPanel(){
+    var d = {};
+    function corta(a,n){ return Array.isArray(a) ? a.slice(0, n||15) : a; }
+    try{ if(window.GA) d.analytics = window.GA; }catch(e){}
+    try{ if(window.GSC) d.searchConsole = {totales:window.GSC.totales, queries:corta(window.GSC.queries,12), paginas:corta(window.GSC.paginas,12)}; }catch(e){}
+    try{ if(window.LEADS) d.leads = {total:window.LEADS.total, nuevos30:window.LEADS.nuevos30, prev30:window.LEADS.prev30, porFuente:window.LEADS.porFuente, porMes:window.LEADS.porMes}; }catch(e){}
+    try{ if(window.SAGE) d.oportunidades = {total:window.SAGE.total, ganadas:window.SAGE.ganadas, porSector:window.SAGE.porSector, porOrigen:window.SAGE.porOrigen}; }catch(e){}
+    try{ if(window.DIRECTINDUSTRY){ var di=window.DIRECTINDUSTRY; d.directIndustry={panel:di.panel, kpis:di.kpis, porPais:corta(di.porPais,12), porSector:corta(di.porSector,12), topProductos:corta(di.topProductos,12)}; } }catch(e){}
+    try{ if(window.CLARITY_IA) d.traficoIA = window.CLARITY_IA; }catch(e){}
+    try{ if(window.CITAS) d.citasIA = window.CITAS; }catch(e){}
+    return d;
+  }
+
+  function abrirEst(){ $('estResultado').innerHTML=''; propuestas=[]; $('estFondo').classList.add('on'); $('estModal').classList.add('on'); }
+  function cerrarEst(){ $('estFondo').classList.remove('on'); $('estModal').classList.remove('on'); }
+  $('btnEstrategia').onclick = abrirEst;
+  $('estX').onclick = cerrarEst;
+  $('estFondo').onclick = cerrarEst;
+
+  // Extrae el array JSON aunque venga con texto o vallas de código alrededor
+  function extraerArray(txt){
+    if(!txt) return null;
+    var s = String(txt).trim().replace(/^```(json)?/i,'').replace(/```$/,'').trim();
+    var a = s.indexOf('['), b = s.lastIndexOf(']');
+    if(a>=0 && b>a) s = s.slice(a, b+1);
+    try{ var arr = JSON.parse(s); return Array.isArray(arr) ? arr : null; }catch(e){ return null; }
+  }
+
+  $('estGenerar').onclick = function(){
+    var cantidad = parseInt($('estCantidad').value,10) || 8;
+    var periodo = $('estPeriodo').value.trim() || 'el próximo mes';
+    var enfoque = $('estEnfoque').value.trim();
+    var existentes = pubs.map(function(p){ return {titulo:p.titulo, fecha:p.fecha, canales:p.canales}; })
+      .concat(ideas.map(function(i){ return {titulo:i.titulo, fecha:'', canales:i.canales}; }));
+
+    $('estResultado').innerHTML = '<div class="est-cargando">✨ Generando estrategia con IA… (puede tardar 15-30 s)</div>';
+    $('estGenerar').disabled = true;
+
+    fetch(AI_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ accion:'estrategia', cantidad:cantidad, periodo:periodo, enfoque:enfoque, existentes:existentes, datos:datosPanel() }) })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        $('estGenerar').disabled = false;
+        if(j.error){ $('estResultado').innerHTML = '<div class="est-cargando" style="color:var(--rojo)">'+esc(j.error)+'</div>'; return; }
+        var arr = extraerArray(j.estrategia);
+        if(!arr || !arr.length){ $('estResultado').innerHTML = '<div class="est-cargando" style="color:var(--rojo)">La IA no devolvió propuestas válidas. Reinténtalo.</div>'; return; }
+        propuestas = arr;
+        pintarPropuestas();
+      })
+      .catch(function(){ $('estGenerar').disabled=false; $('estResultado').innerHTML='<div class="est-cargando" style="color:var(--rojo)">No se pudo conectar con la IA. Inténtalo más tarde.</div>'; });
+  };
+
+  function pintarPropuestas(){
+    var html = propuestas.map(function(p,idx){
+      var cat = categoria(p.categoria||'educativo');
+      var redes = (Array.isArray(p.canales)?p.canales:[]).map(function(id){ return canal(id).nom; }).join(', ');
+      return '<div class="prop">'
+        + '<input type="checkbox" data-i="'+idx+'" checked>'
+        + '<div class="cuerpo">'
+        +   '<div class="top">'
+        +     '<span class="cat" style="background:'+cat.color+'">'+cat.emoji+' '+esc(cat.nom)+'</span>'
+        +     '<span class="prio '+(p.prioridad||'media')+'">'+esc(p.prioridad||'media')+'</span>'
+        +     (p.fecha?'<span class="fch">📅 '+esc(p.fecha)+'</span>':'')
+        +   '</div>'
+        +   '<div class="tit">'+esc(p.titulo||'(sin título)')+'</div>'
+        +   (redes?'<div class="redes">📱 '+esc(redes)+'</div>':'')
+        +   (p.notas?'<div class="notas">'+esc(p.notas)+'</div>':'')
+        + '</div></div>';
+    }).join('');
+    html += '<div class="est-acc">'
+      + '<button class="btn btn-pri" id="estAnadir">➕ Añadir seleccionadas al Banco de ideas</button>'
+      + '<button class="btn btn-sec" id="estRegenerar">↻ Regenerar</button>'
+      + '<span class="cont">'+propuestas.length+' propuestas</span>'
+      + '</div>';
+    $('estResultado').innerHTML = '<div class="est-lista">'+html+'</div>';
+    $('estAnadir').onclick = anadirSeleccionadas;
+    $('estRegenerar').onclick = function(){ $('estGenerar').click(); };
+  }
+
+  function anadirSeleccionadas(){
+    var checks = $('estResultado').querySelectorAll('input[type=checkbox]');
+    var n = 0;
+    Array.prototype.forEach.call(checks, function(chk){
+      if(!chk.checked) return;
+      var p = propuestas[parseInt(chk.dataset.i,10)]; if(!p) return;
+      var notas = p.notas || '';
+      if(p.fecha) notas = (notas ? notas + ' ' : '') + '(fecha sugerida: ' + p.fecha + ')';
+      var prio = (['alta','media','baja'].indexOf(p.prioridad) >= 0) ? p.prioridad : 'media';
+      ideas.push({
+        id:'i'+Date.now()+Math.floor(Math.random()*1000),
+        titulo: (p.titulo || '(sin título)'),
+        cat: categoria(p.categoria||'educativo').id,
+        notas: notas, prio: prio,
+        canales: (Array.isArray(p.canales)?p.canales:[]).filter(Boolean),
+        usada: false, creada: Date.now()
+      });
+      n++;
+    });
+    if(!n){ alert('No has seleccionado ninguna propuesta.'); return; }
+    guardarIdeas(); pintarIdeas();
+    cerrarEst(); abrirIdeas();
+    alert('✅ Añadidas '+n+' ideas al Banco de ideas.');
+  }
 
   // ---------- Arranque ----------
   cargar(); pintar();
