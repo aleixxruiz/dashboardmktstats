@@ -3,30 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Estrategia de marketing · Nal3 · INGESCO</title>
+<title>Proyecto Nal3 · Estrategia de marketing · INGESCO</title>
 <link rel="icon" type="image/png" href="assets/favicon.ico.png">
 <script src="assets/gate.js"></script>
 <style>
   :root{--navy:#13294b;--azul:#1f5f9b;--fondo:#eef2f8;--tarjeta:#fff;
-        --texto:#16233f;--suave:#6a7894;--borde:#d6deea;--lima:#DEDC00}
+        --texto:#16233f;--suave:#6a7894;--borde:#d6deea;--lima:#DEDC00;
+        --agencia:#2fa36b;--validacion:#1d3a5f;--paralelo:#e0a326;
+        --rojo:#d1495b}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:28px 22px 60px}
-  .contenedor{max-width:1040px;margin:0 auto}
-  a{text-decoration:none}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:26px 20px 60px}
+  .contenedor{max-width:1100px;margin:0 auto}
+  a{text-decoration:none;color:inherit}
   header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
-    margin-bottom:26px;border-bottom:3px solid var(--navy);padding-bottom:16px}
+    margin-bottom:22px;border-bottom:3px solid var(--navy);padding-bottom:14px}
   .titulo{display:flex;align-items:center;gap:16px}
-  .titulo .logo{height:46px}
+  .titulo .logo{height:44px}
   .titulo .sep{width:1px;height:40px;background:var(--borde)}
-  .titulo h1{font-size:21px;font-weight:800;color:var(--navy)}
+  .titulo h1{font-size:20px;font-weight:800;color:var(--navy)}
   .titulo p{color:var(--suave);font-size:13px;margin-top:3px}
   .btn-inicio{background:var(--navy);color:#fff;padding:9px 15px;border-radius:10px;font-weight:700;font-size:13px}
   .btn-inicio:hover{filter:brightness(1.2)}
-  .placeholder{background:var(--tarjeta);border:1px solid var(--borde);border-radius:16px;padding:48px 32px;text-align:center;
-    box-shadow:0 2px 12px rgba(19,41,75,.06);margin-top:20px}
-  .placeholder .ic{font-size:56px}
-  .placeholder h2{font-size:22px;color:var(--navy);margin:16px 0 8px}
-  .placeholder p{color:var(--suave);font-size:14.5px;line-height:1.6;max-width:620px;margin:0 auto}
+
+  .cab{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+  .inicio-proy{font-size:14px;color:var(--texto)}
+  .inicio-proy b{color:var(--navy)}
+  .faseact{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--suave)}
+  .faseact select{padding:8px 10px;border:1px solid var(--borde);border-radius:9px;font-size:13px;font-family:inherit;background:var(--tarjeta);font-weight:700;color:var(--navy)}
+  .leyenda{display:flex;gap:16px;flex-wrap:wrap;margin-left:auto;font-size:12px;color:var(--suave)}
+  .leyenda span{display:inline-flex;align-items:center;gap:6px}
+  .leyenda i{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+  /* Roadmap */
+  .fase{background:var(--tarjeta);border:1px solid var(--borde);border-left:6px solid var(--suave);
+    border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 1px 4px rgba(19,41,75,.05);transition:.15s}
+  .fase.actual{box-shadow:0 0 0 2px var(--navy),0 6px 18px rgba(19,41,75,.15)}
+  .fase .top{display:flex;align-items:flex-start;gap:14px}
+  .fase .num{width:34px;height:34px;border-radius:50%;flex-shrink:0;color:#fff;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:15px}
+  .fase .info{flex:1;min-width:0}
+  .fase .nom{font-size:16px;font-weight:800;color:var(--navy)}
+  .fase .badge-act{display:inline-block;margin-left:8px;font-size:10.5px;font-weight:800;background:var(--navy);color:#fff;padding:2px 8px;border-radius:999px;vertical-align:middle}
+  .fase .meta{font-size:12.5px;color:var(--suave);margin-top:3px;line-height:1.5}
+  .fase .meta b{color:var(--texto)}
+  .fase .entrega{font-size:12.5px;margin-top:5px;color:#42506b}
+  .fase .entrega .fch{font-weight:800;color:var(--navy)}
+  .fase .ctrl{display:flex;align-items:center;gap:8px;flex-shrink:0}
+  .fase .ctrl select{padding:7px 9px;border:1px solid var(--borde);border-radius:9px;font-size:12px;font-family:inherit;font-weight:700}
+  .est{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+  .est.pendiente{background:#eef1f5;color:#6a7894}
+  .est.encurso{background:#fdf1d6;color:#8a6415}
+  .est.entregado{background:#e3edfb;color:#1f5f9b}
+  .est.validado{background:#e5f3ec;color:#227a4e}
+
+  /* Documentos de la fase */
+  .docs{margin-top:12px;border-top:1px dashed var(--borde);padding-top:10px}
+  .docs .cabd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .docs .cabd h4{font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--suave)}
+  .btn-doc{background:var(--navy);color:#fff;border:none;border-radius:8px;padding:6px 11px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+  .btn-doc:hover{filter:brightness(1.2)}
+  .doc{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border:1px solid var(--borde);border-radius:9px;margin-bottom:6px;background:#fbfcfe}
+  .doc .tipo{font-size:16px;flex-shrink:0;line-height:1.4}
+  .doc .d-cuerpo{flex:1;min-width:0}
+  .doc .d-nom{font-size:13.5px;font-weight:700;color:var(--texto)}
+  .doc .d-nom a{color:var(--azul);text-decoration:underline}
+  .doc .d-meta{font-size:11.5px;color:var(--suave);margin-top:2px}
+  .doc .d-notas{font-size:12px;color:#42506b;margin-top:2px}
+  .doc .d-del{background:none;border:none;color:var(--rojo);cursor:pointer;font-size:14px;flex-shrink:0}
+  .doc-vacio{font-size:12.5px;color:var(--suave);font-style:italic;padding:2px 0 4px}
+
+  /* Modal documento */
+  .modal-fondo{position:fixed;inset:0;background:rgba(19,41,75,.45);opacity:0;pointer-events:none;transition:.18s;z-index:1000}
+  .modal-fondo.on{opacity:1;pointer-events:auto}
+  .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-48%) scale(.98);opacity:0;pointer-events:none;
+    width:480px;max-width:calc(100vw - 32px);max-height:90vh;background:var(--tarjeta);border-radius:16px;
+    box-shadow:0 24px 70px rgba(19,41,75,.35);z-index:1001;display:flex;flex-direction:column;transition:.18s}
+  .modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--borde)}
+  .modal-head h2{font-size:17px;color:var(--navy)}
+  .modal-head .x{cursor:pointer;font-size:20px;color:var(--suave)}
+  .modal-body{padding:16px 20px;overflow-y:auto}
+  .modal-foot{padding:12px 20px;border-top:1px solid var(--borde);display:flex;gap:10px}
+  label{display:block;font-size:12px;font-weight:700;color:var(--suave);margin:10px 0 5px;text-transform:uppercase;letter-spacing:.4px}
+  input,select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:10px;font-size:14px;font-family:inherit;color:var(--texto);background:#fbfcfe;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--navy)}
+  textarea{resize:vertical;line-height:1.45}
+  .fila2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .btn{padding:11px;border:none;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit}
+  .btn-pri{background:var(--navy);color:#fff;flex:1}.btn-pri:hover{filter:brightness(1.2)}
+  .btn-sec{background:#e8edf6;color:var(--navy)}.btn-sec:hover{background:#dbe3f1}
+  .nota{font-size:11.5px;color:var(--suave);margin-top:14px;line-height:1.5}
+  @media(max-width:640px){.fase .top{flex-wrap:wrap}.fase .ctrl{width:100%}}
 </style>
 </head>
 <body>
@@ -36,19 +103,279 @@
       <img class="logo" src="assets/logo-ingesco.png" alt="INGESCO">
       <div class="sep"></div>
       <div>
-        <h1>📈 Estrategia de marketing · Nal3</h1>
-        <p>Trabajo de la agencia Nal3 en la estrategia de marketing de INGESCO</p>
+        <h1>📈 Proyecto Nal3 · Estrategia de marketing</h1>
+        <p>Seguimiento del proyecto con la agencia NAL3 (nueva web de INGESCO)</p>
       </div>
     </div>
     <a class="btn-inicio" href="index.html">← Inicio</a>
   </header>
 
-  <div class="placeholder">
-    <div class="ic">🚧</div>
-    <h2>Página en construcción</h2>
-    <p>Aquí montaremos el espacio de seguimiento del trabajo con <b>Nal3</b>. Cuéntame qué quieres mostrar (plan de acción, hitos, informes, KPIs de la agencia…) y lo construimos.</p>
+  <div class="cab">
+    <div class="inicio-proy">🚀 Inicio del proyecto: <b>27 de julio de 2026</b></div>
+    <div class="faseact">Fase actual: <select id="faseActualSel"></select></div>
+    <div class="leyenda">
+      <span><i style="background:var(--agencia)"></i>Trabajo agencia</span>
+      <span><i style="background:var(--validacion)"></i>Validación INGESCO</span>
+      <span><i style="background:var(--paralelo)"></i>En paralelo</span>
+    </div>
+  </div>
+
+  <div id="roadmap"></div>
+
+  <p class="nota">💾 Los datos (estado de fases y documentos) se guardan <b>compartidos para todo el equipo</b>. Cada documento se registra con un enlace (a Drive, correo, etc.), no se sube el archivo en sí.</p>
+</div>
+
+<!-- Modal añadir/editar documento -->
+<div class="modal-fondo" id="docFondo"></div>
+<div class="modal" id="docModal">
+  <div class="modal-head">
+    <h2 id="docTit">Añadir documento</h2>
+    <span class="x" id="docX">✕</span>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="dId">
+    <label>Nombre del documento *</label>
+    <input type="text" id="dNombre" placeholder="Ej. Documento definitivo de buyer persona">
+    <div class="fila2">
+      <div>
+        <label>Tipo</label>
+        <select id="dTipo">
+          <option value="recibido">📥 Recibido (de Nal3)</option>
+          <option value="enviado">📤 Enviado (a Nal3)</option>
+        </select>
+      </div>
+      <div>
+        <label>Fecha</label>
+        <input type="date" id="dFecha">
+      </div>
+    </div>
+    <label>Fase del proyecto</label>
+    <select id="dFase"></select>
+    <label>Enlace (Drive, correo, web…)</label>
+    <input type="text" id="dEnlace" placeholder="https://…">
+    <label>Notas (opcional)</label>
+    <textarea id="dNotas" rows="2" placeholder="Comentario, versión, quién lo envió…"></textarea>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-pri" id="dGuardar">Guardar</button>
+    <button class="btn btn-sec" id="dBorrar" style="display:none">Eliminar</button>
   </div>
 </div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var NAL3_URL = 'https://asistente-ingesco.aleixcr9.workers.dev/';
+  var CLAVE = 'ingesco_nal3_v1';
+  var nube = true, syncTimer = null;
+
+  // ---- Fases del proyecto (datos del calendario de NAL3) ----
+  var TIPOS = {
+    agencia:    { color:'var(--agencia)',    nom:'Trabajo agencia' },
+    validacion: { color:'var(--validacion)', nom:'Validación INGESCO' },
+    paralelo:   { color:'var(--paralelo)',   nom:'En paralelo' }
+  };
+  var FASES = [
+    { id:'f0',  n:'0', tipo:'agencia',    nombre:'Onboarding',
+      trabajo:'Fase realizada el 14 de julio de 2026',
+      entregable:'Fase completada y validada', entrega:'14 de julio' },
+    { id:'f1',  n:'1', tipo:'agencia',    nombre:'Definición de buyer persona',
+      trabajo:'Trabajo 21–27 jul · Duración 1 semana',
+      entregable:'Documento definitivo de buyer persona', entrega:'7 de agosto' },
+    { id:'f2',  n:'2', tipo:'agencia',    nombre:'Auditoría y estrategia "zero"',
+      trabajo:'28 jul – 17 ago · Duración 3 semanas',
+      entregable:'Sin entrega independiente; se integra en el plan de márketing', entrega:'—' },
+    { id:'f3',  n:'3', tipo:'agencia',    nombre:'Integración de la consultoría y elaboración del plan de márketing',
+      trabajo:'18 ago – 9 set · Validación INGESCO 10–17 set',
+      entregable:'Documento definitivo de consultoría y plan de márketing', entrega:'10 de septiembre' },
+    { id:'f4',  n:'4', tipo:'paralelo',   nombre:'Copywriting SEO',
+      trabajo:'18 set – 1 oct · Duración 2 semanas · Validación 2–9 oct',
+      entregable:'Copywriting completo de la nueva web', entrega:'2 de octubre' },
+    { id:'f5',  n:'5', tipo:'paralelo',   nombre:'Diseño UI',
+      trabajo:'18 set – 8 oct · Duración 3 semanas (en paralelo con copywriting) · Validación 9–16 oct',
+      entregable:'Diseño completo de las pantallas', entrega:'9 de octubre' },
+    { id:'f6',  n:'6', tipo:'agencia',    nombre:'Desarrollo WordPress',
+      trabajo:'9 oct – 19 nov · Duración 5 semanas',
+      entregable:'Web completa en entorno de preproducción', entrega:'20 de noviembre' },
+    { id:'f6b', n:'6', tipo:'validacion', nombre:'Validación del desarrollo',
+      trabajo:'Validación INGESCO 20 nov – 4 des',
+      entregable:'Finalización de la validación del cliente', entrega:'4 de diciembre' },
+    { id:'f7',  n:'7', tipo:'agencia',    nombre:'Integraciones, testing y despliegue en producción',
+      trabajo:'5 – 18 des · Duración 2 semanas',
+      entregable:'Web publicada en producción', entrega:'18 de diciembre' },
+    { id:'f8',  n:'8', tipo:'agencia',    nombre:'Migración SEO',
+      trabajo:'5 – 18 des · Duración 2 semanas',
+      entregable:'Migración SEO implementada', entrega:'18 de diciembre' }
+  ];
+  function fase(id){ for(var i=0;i<FASES.length;i++){ if(FASES[i].id===id) return FASES[i]; } return null; }
+
+  var ESTADOS = [
+    { id:'pendiente', nom:'Pendiente', cls:'pendiente' },
+    { id:'encurso',   nom:'En curso',  cls:'encurso' },
+    { id:'entregado', nom:'Entregado', cls:'entregado' },
+    { id:'validado',  nom:'Validado',  cls:'validado' }
+  ];
+  function estadoInfo(id){ for(var i=0;i<ESTADOS.length;i++){ if(ESTADOS[i].id===id) return ESTADOS[i]; } return ESTADOS[0]; }
+
+  // ---- Estado persistente ----
+  var state = { faseActual:'', estados:{ f0:'validado' }, docs:[] };
+
+  function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function estadoDe(id){ return state.estados[id] || (id==='f0' ? 'validado' : 'pendiente'); }
+
+  // ---- Persistencia (local + nube compartida) ----
+  function cargarLocal(){ try{ var s=JSON.parse(localStorage.getItem(CLAVE)); if(s){ state=s; if(!state.estados) state.estados={}; if(!state.docs) state.docs=[]; } }catch(e){} }
+  function guardar(){ try{ localStorage.setItem(CLAVE, JSON.stringify(state)); }catch(e){} sincronizarNube(); }
+  function sincronizarNube(inmediato){
+    if(!nube) return;
+    if(syncTimer){ clearTimeout(syncTimer); syncTimer=null; }
+    var enviar = function(){
+      fetch(NAL3_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ accion:'nal3_save', faseActual:state.faseActual, estados:state.estados, docs:state.docs }) })
+        .then(function(r){ return r.json(); }).then(function(j){ if(j&&j.sinKV){ nube=false; } }).catch(function(){});
+    };
+    if(inmediato){ enviar(); } else { syncTimer=setTimeout(enviar, 800); }
+  }
+  function cargarNube(){
+    fetch(NAL3_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ accion:'nal3_load' }) })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if(!j || j.sinKV){ nube=false; return; }
+        if(j.data === null){
+          if(state.docs.length || Object.keys(state.estados).length>1 || state.faseActual) sincronizarNube(true);
+          return;
+        }
+        state.faseActual = j.data.faseActual || '';
+        state.estados = (j.data.estados && typeof j.data.estados==='object') ? j.data.estados : {};
+        if(!state.estados.f0) state.estados.f0='validado';
+        state.docs = Array.isArray(j.data.docs) ? j.data.docs : [];
+        try{ localStorage.setItem(CLAVE, JSON.stringify(state)); }catch(e){}
+        render();
+      })
+      .catch(function(){ nube=false; });
+  }
+
+  // ---- Selector de fase actual ----
+  $('faseActualSel').innerHTML = '<option value="">— sin marcar —</option>' +
+    FASES.map(function(f){ return '<option value="'+f.id+'">Fase '+f.n+' · '+esc(f.nombre)+'</option>'; }).join('');
+  $('faseActualSel').onchange = function(){ state.faseActual = this.value; guardar(); render(); };
+
+  // ---- Render del roadmap ----
+  function render(){
+    $('faseActualSel').value = state.faseActual || '';
+    $('roadmap').innerHTML = FASES.map(function(f){
+      var col = TIPOS[f.tipo].color;
+      var est = estadoDe(f.id);
+      var ei = estadoInfo(est);
+      var actual = (state.faseActual === f.id);
+      var docs = state.docs.filter(function(d){ return d.fase===f.id; });
+
+      var opts = ESTADOS.map(function(e){ return '<option value="'+e.id+'"'+(e.id===est?' selected':'')+'>'+e.nom+'</option>'; }).join('');
+
+      var docsHtml = docs.length ? docs.map(function(d){
+        var icon = d.tipo==='enviado' ? '📤' : '📥';
+        var nom = d.enlace ? '<a href="'+esc(d.enlace)+'" target="_blank" rel="noopener">'+esc(d.nombre)+' ↗</a>' : esc(d.nombre);
+        return '<div class="doc">'
+          + '<span class="tipo" title="'+(d.tipo==='enviado'?'Enviado a Nal3':'Recibido de Nal3')+'">'+icon+'</span>'
+          + '<div class="d-cuerpo">'
+          +   '<div class="d-nom">'+nom+'</div>'
+          +   '<div class="d-meta">'+(d.tipo==='enviado'?'Enviado':'Recibido')+(d.fecha?(' · '+esc(d.fecha)):'')+'</div>'
+          +   (d.notas?'<div class="d-notas">'+esc(d.notas)+'</div>':'')
+          + '</div>'
+          + '<button class="d-del" data-del="'+d.id+'" title="Eliminar">🗑</button>'
+          + '</div>';
+      }).join('') : '<div class="doc-vacio">Aún no hay documentos en esta fase.</div>';
+
+      return '<div class="fase'+(actual?' actual':'')+'" style="border-left-color:'+col+'">'
+        + '<div class="top">'
+        +   '<div class="num" style="background:'+col+'">'+f.n+'</div>'
+        +   '<div class="info">'
+        +     '<div class="nom">'+esc(f.nombre)+(actual?'<span class="badge-act">● Fase actual</span>':'')+'</div>'
+        +     '<div class="meta">'+esc(f.trabajo)+'</div>'
+        +     '<div class="entrega">📦 <b>Entregable:</b> '+esc(f.entregable)+(f.entrega && f.entrega!=='—'?' · <span class="fch">'+esc(f.entrega)+'</span>':'')+'</div>'
+        +   '</div>'
+        +   '<div class="ctrl">'
+        +     '<span class="est '+ei.cls+'">'+ei.nom+'</span>'
+        +     '<select data-est="'+f.id+'" title="Estado de la fase">'+opts+'</select>'
+        +   '</div>'
+        + '</div>'
+        + '<div class="docs">'
+        +   '<div class="cabd"><h4>Documentos ('+docs.length+')</h4><button class="btn-doc" data-add="'+f.id+'">➕ Añadir documento</button></div>'
+        +   docsHtml
+        + '</div>'
+        + '</div>';
+    }).join('');
+  }
+
+  // ---- Interacción del roadmap ----
+  $('roadmap').addEventListener('change', function(e){
+    var sel = e.target.closest('select[data-est]');
+    if(sel){ state.estados[sel.dataset.est] = sel.value; guardar(); render(); }
+  });
+  $('roadmap').addEventListener('click', function(e){
+    var add = e.target.closest('button[data-add]');
+    if(add){ abrirDoc(null, add.dataset.add); return; }
+    var del = e.target.closest('button[data-del]');
+    if(del){
+      if(!confirm('¿Eliminar este documento?')) return;
+      state.docs = state.docs.filter(function(d){ return d.id!==del.dataset.del; });
+      guardar(); render();
+    }
+  });
+
+  // ---- Modal documento ----
+  $('dFase').innerHTML = FASES.map(function(f){ return '<option value="'+f.id+'">Fase '+f.n+' · '+esc(f.nombre)+'</option>'; }).join('');
+  var editandoDoc = null;
+  function abrirDoc(id, faseId){
+    editandoDoc = id;
+    if(id){
+      var d = state.docs.filter(function(x){return x.id===id;})[0]; if(!d) return;
+      $('docTit').textContent='Editar documento';
+      $('dId').value=d.id; $('dNombre').value=d.nombre||''; $('dTipo').value=d.tipo||'recibido';
+      $('dFecha').value=d.fecha||''; $('dFase').value=d.fase||FASES[0].id; $('dEnlace').value=d.enlace||''; $('dNotas').value=d.notas||'';
+      $('dBorrar').style.display='block';
+    } else {
+      $('docTit').textContent='Añadir documento';
+      $('dId').value=''; $('dNombre').value=''; $('dTipo').value='recibido';
+      $('dFecha').value=''; $('dFase').value=faseId||FASES[0].id; $('dEnlace').value=''; $('dNotas').value='';
+      $('dBorrar').style.display='none';
+    }
+    $('docFondo').classList.add('on'); $('docModal').classList.add('on'); $('dNombre').focus();
+  }
+  function cerrarDoc(){ $('docFondo').classList.remove('on'); $('docModal').classList.remove('on'); }
+  $('docX').onclick = cerrarDoc; $('docFondo').onclick = cerrarDoc;
+
+  $('dGuardar').onclick = function(){
+    var nombre = $('dNombre').value.trim();
+    if(!nombre){ alert('Ponle un nombre al documento.'); $('dNombre').focus(); return; }
+    var enlace = $('dEnlace').value.trim();
+    if(enlace && !/^https?:\/\//i.test(enlace)) enlace = 'https://' + enlace;
+    var datos = { nombre:nombre, tipo:$('dTipo').value, fecha:$('dFecha').value, fase:$('dFase').value, enlace:enlace, notas:$('dNotas').value.trim() };
+    if(editandoDoc){
+      for(var i=0;i<state.docs.length;i++){ if(state.docs[i].id===editandoDoc){ datos.id=editandoDoc; state.docs[i]=datos; break; } }
+    } else {
+      datos.id = 'd'+Date.now()+Math.floor(Math.random()*1000); state.docs.push(datos);
+    }
+    guardar(); render(); cerrarDoc();
+  };
+  $('dBorrar').onclick = function(){
+    if(!editandoDoc) return;
+    if(!confirm('¿Eliminar este documento?')) return;
+    state.docs = state.docs.filter(function(d){ return d.id!==editandoDoc; });
+    guardar(); render(); cerrarDoc();
+  };
+  // Editar documento al hacer clic en su nombre (excepto el enlace)
+  $('roadmap').addEventListener('click', function(e){
+    if(e.target.closest('a')) return;                 // dejar pasar los enlaces
+    var nom = e.target.closest('.d-nom');
+    if(nom){ var doc = nom.closest('.doc'); var del = doc.querySelector('[data-del]'); if(del) abrirDoc(del.dataset.del); }
+  });
+
+  // ---- Arranque ----
+  cargarLocal(); render();
+  cargarNube();
+})();
+</script>
 <script src="assets/widget.js?v=8"></script>
 </body>
 </html>
