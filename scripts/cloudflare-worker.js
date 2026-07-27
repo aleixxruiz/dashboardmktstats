@@ -136,7 +136,11 @@ export default {
         const sysE =
           "Eres XIELA, estratega de contenidos de INGESCO (proteccion contra el rayo: pararrayos PDC, detectores de tormenta PREVISTORM, puesta a tierra). " +
           "Disenas planes de contenido para redes y web basandote en DATOS REALES de rendimiento del panel. " +
-          "Propon publicaciones concretas, variadas y accionables, alineadas con lo que funciona segun los datos, y SIN repetir lo ya publicado o planificado. " +
+          "Propon publicaciones NUEVAS, concretas, variadas y accionables, alineadas con lo que funciona segun los datos. " +
+          "**EVITAR DUPLICADOS (prioridad maxima):** se te dara la lista del contenido que el equipo YA ha publicado o planificado. " +
+          "NO propongas ninguna publicacion cuyo TEMA, angulo o mensaje ya aparezca en esa lista, aunque el titulo sea distinto o este redactado de otra forma. " +
+          "Antes de incluir cada propuesta, compara su tema con TODA la lista; si se solapa o es muy parecida a algo ya existente, descartala y propon un tema diferente. " +
+          "El objetivo es COMPLEMENTAR lo que ya hay, cubriendo huecos y angulos nuevos, no repetirlo. " +
           "REGLA: no inventes cifras; si te apoyas en un dato, que salga del panel. " +
           "Devuelve UNICAMENTE un array JSON valido, sin texto antes ni despues y SIN vallas de codigo (nada de triple backtick). " +
           "Cada elemento debe tener exactamente estas claves: " +
@@ -147,18 +151,21 @@ export default {
           "\"fecha\" (YYYY-MM-DD sugerida dentro del periodo), " +
           "\"notas\" (gancho o enfoque, 1-2 frases).";
 
-        const resumenExist = existentes.slice(0, 150).map(function(p){
+        const resumenExist = existentes.slice(0, 400).map(function(p){
           return '- ' + (p.fecha || '') + ' [' + ((p.canales || []).join('/')) + '] ' + (p.titulo || '');
         }).join('\n');
 
         const promptE =
-          "Genera un plan de " + cantidad + " publicaciones para " + periodo + ".\n" +
+          "Genera un plan de " + cantidad + " publicaciones NUEVAS para " + periodo + ".\n" +
           (enfoque ? ("Enfoque o prioridad del usuario: " + enfoque + "\n") : "") +
-          "\nContenido YA planificado o publicado (NO lo repitas; complementalo y evita solapamientos):\n" +
+          "\n===== CONTENIDO YA PUBLICADO O PLANIFICADO (" + existentes.length + " entradas) =====\n" +
+          "REVISA esta lista con atencion. NO propongas ningun tema que ya aparezca aqui (aunque el titulo sea distinto):\n" +
           (resumenExist || "(ninguno)") +
-          "\n\nDatos del panel (rendimiento real; usalos para elegir temas y canales):\n" +
+          "\n===== FIN DE LA LISTA =====\n" +
+          "\nDatos del panel (rendimiento real; usalos para elegir temas y canales que funcionen):\n" +
           JSON.stringify(datosE).slice(0, 40000) +
-          "\n\nRecuerda: responde SOLO con el array JSON, nada mas.";
+          "\n\nAntes de responder, verifica que CADA propuesta trata un tema que NO esta en la lista de arriba. " +
+          "Responde SOLO con el array JSON, nada mas.";
 
         let plan = '';
         try { plan = await claudeChat(env.ANTHROPIC_API_KEY, 'claude-opus-4-8', sysE, promptE, 8000, true); }
