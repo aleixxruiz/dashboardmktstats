@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablero de tareas · Marketing INGESCO</title>
+<link rel="icon" type="image/png" href="assets/favicon.ico.png">
+<script src="assets/gate.js"></script>
+<style>
+  :root{
+    --navy:#13294b;--azul:#1f5f9b;--cielo:#34a0d9;
+    --fondo:#eef2f8;--tarjeta:#fff;--texto:#16233f;--suave:#6a7894;--borde:#d6deea;
+    --verde:#2fa36b;--ambar:#e0a326;--rojo:#d1495b;--lima:#DEDC00;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--fondo);color:var(--texto);padding:24px 20px 60px}
+  .contenedor{max-width:1560px;margin:0 auto}
+  a{text-decoration:none}
+  header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+    margin-bottom:20px;border-bottom:3px solid var(--navy);padding-bottom:14px}
+  .titulo{display:flex;align-items:center;gap:16px}
+  .titulo .logo{height:44px}
+  .titulo .sep{width:1px;height:40px;background:var(--borde)}
+  .titulo h1{font-size:20px;font-weight:800;color:var(--navy)}
+  .titulo p{color:var(--suave);font-size:13px;margin-top:3px}
+  .btn-inicio{background:var(--navy);color:#fff;padding:9px 15px;border-radius:10px;font-weight:700;font-size:13px}
+  .btn-inicio:hover{filter:brightness(1.2)}
+
+  /* Barra de control */
+  .barra{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .btn{padding:10px 15px;border:none;border-radius:10px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit}
+  .btn-pri{background:var(--navy);color:#fff}.btn-pri:hover{filter:brightness(1.2)}
+  .btn-sec{background:#e6ecf6;color:var(--navy)}.btn-sec:hover{background:#d9e2f1}
+  .espacio{flex:1}
+  .filtros{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .filtros select,.filtros input{padding:9px 11px;border:1px solid var(--borde);border-radius:10px;font-size:13px;
+    font-family:inherit;color:var(--texto);background:var(--tarjeta);cursor:pointer}
+  .filtros input{cursor:text;min-width:180px}
+  /* Conmutador de vista */
+  .switch{display:inline-flex;border:1px solid var(--borde);border-radius:10px;overflow:hidden;background:var(--tarjeta)}
+  .switch button{border:none;background:transparent;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;
+    color:var(--suave);font-family:inherit}
+  .switch button.on{background:var(--navy);color:#fff}
+
+  /* Resumen por persona */
+  .equipo{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .equipo .p{display:inline-flex;align-items:center;gap:9px;background:var(--tarjeta);border:1px solid var(--borde);
+    border-radius:12px;padding:8px 13px 8px 9px;font-size:13px;cursor:pointer;transition:.12s}
+  .equipo .p:hover{border-color:var(--navy)}
+  .equipo .p.sel{border-color:var(--navy);box-shadow:0 0 0 2px rgba(19,41,75,.12)}
+  .avatar{width:30px;height:30px;border-radius:50%;color:#fff;font-weight:800;font-size:12px;
+    display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+  .equipo .p b{font-weight:700}
+  .equipo .p .num{background:#eef2f8;color:var(--suave);border-radius:999px;padding:1px 8px;font-size:12px;font-weight:800}
+
+  /* ---------- KANBAN ---------- */
+  .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:start}
+  @media(max-width:1100px){.kanban{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:620px){.kanban{grid-template-columns:1fr}}
+  .col{background:#e9eef6;border:1px solid var(--borde);border-radius:14px;padding:10px;min-height:120px;transition:.12s}
+  .col.drag{background:#dde7f6;outline:2px dashed var(--azul);outline-offset:-4px}
+  .col-head{display:flex;align-items:center;gap:8px;padding:4px 6px 10px}
+  .col-head .punto{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+  .col-head h3{font-size:13.5px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.4px}
+  .col-head .c{margin-left:auto;background:#fff;color:var(--suave);border-radius:999px;padding:1px 9px;font-size:12px;font-weight:800;border:1px solid var(--borde)}
+  .col-add{width:100%;border:1px dashed var(--borde);background:transparent;color:var(--suave);border-radius:9px;
+    padding:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:2px}
+  .col-add:hover{background:#fff;color:var(--navy);border-color:var(--azul)}
+
+  .tarjeta-t{background:var(--tarjeta);border:1px solid var(--borde);border-left:5px solid var(--suave);
+    border-radius:11px;padding:11px 12px;margin-bottom:9px;cursor:grab;box-shadow:0 1px 4px rgba(19,41,75,.06);transition:.12s}
+  .tarjeta-t:hover{box-shadow:0 6px 18px rgba(19,41,75,.13);transform:translateY(-1px)}
+  .tarjeta-t.arrastrando{opacity:.4}
+  .tarjeta-t .top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+  .chip-area{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:999px;color:#fff}
+  .chip-prio{font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.4px}
+  .prio.alta{background:#fde2e6;color:#b02a3a}.prio.media{background:#fdf1d6;color:#8a6415}.prio.baja{background:#e5f3ec;color:#227a4e}
+  .tarjeta-t .tit{font-size:14px;font-weight:700;color:var(--texto);line-height:1.3;margin-bottom:6px}
+  .tarjeta-t .desc{font-size:12.5px;color:#5a6b86;line-height:1.4;margin-bottom:8px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .tarjeta-t .pie{display:flex;align-items:center;gap:8px}
+  .avatar-sm{width:26px;height:26px;border-radius:50%;color:#fff;font-weight:800;font-size:11px;
+    display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+  .fecha{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--suave);display:inline-flex;align-items:center;gap:4px}
+  .fecha.vence{color:var(--rojo)}
+  .fecha.pronto{color:var(--ambar)}
+
+  /* ---------- LISTA ---------- */
+  .lista-t{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(19,41,75,.06)}
+  table{width:100%;border-collapse:collapse}
+  thead th{background:#f4f7fb;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;
+    color:var(--suave);padding:12px 14px;border-bottom:1px solid var(--borde);font-weight:800}
+  tbody td{padding:11px 14px;border-bottom:1px solid #eef2f8;font-size:13.5px;vertical-align:middle}
+  tbody tr{cursor:pointer}
+  tbody tr:hover{background:#f7faff}
+  .est-badge{font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;white-space:nowrap}
+  .celda-tit{font-weight:700;color:var(--texto)}
+  .mini-resp{display:inline-flex;align-items:center;gap:7px}
+
+  .vacio{color:var(--suave);text-align:center;padding:40px 20px;font-size:14px}
+
+  /* Panel lateral (crear/editar) */
+  .fondo{position:fixed;inset:0;background:rgba(19,41,75,.4);opacity:0;pointer-events:none;transition:.18s;z-index:998}
+  .fondo.on{opacity:1;pointer-events:auto}
+  .lateral{position:fixed;top:0;right:0;height:100%;width:460px;max-width:100vw;background:var(--tarjeta);
+    box-shadow:-8px 0 40px rgba(19,41,75,.22);transform:translateX(100%);transition:.22s;z-index:999;
+    display:flex;flex-direction:column}
+  .lateral.on{transform:translateX(0)}
+  .lat-head{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--borde)}
+  .lat-head h2{font-size:17px;color:var(--navy)}
+  .lat-head .x{cursor:pointer;font-size:20px;color:var(--suave)}
+  .lat-body{padding:18px 20px;overflow-y:auto;flex:1}
+  .lat-foot{padding:14px 20px;border-top:1px solid var(--borde);display:flex;gap:10px}
+  label{display:block;font-size:12px;font-weight:700;color:var(--suave);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.4px}
+  input,select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:10px;
+    font-size:14px;font-family:inherit;color:var(--texto);background:#fbfcfe;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--navy)}
+  textarea{resize:vertical;line-height:1.45}
+  .fila2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .contador{font-size:11px;color:var(--suave);text-align:right;margin-top:3px}
+
+  @media(max-width:720px){
+    .filtros input{min-width:120px}
+    thead th:nth-child(2),tbody td:nth-child(2){display:none}
+  }
+</style>
+</head>
+<body>
+<div class="contenedor">
+  <header>
+    <div class="titulo">
+      <img class="logo" src="assets/logo-ingesco.png" alt="INGESCO">
+      <div class="sep"></div>
+      <div>
+        <h1>📋 Tablero de tareas · Marketing</h1>
+        <p>Qué tenemos entre manos el equipo de marketing</p>
+      </div>
+    </div>
+    <a class="btn-inicio" href="index.html">← Inicio</a>
+  </header>
+
+  <div class="barra">
+    <button class="btn btn-pri" id="btnNueva">+ Nueva tarea</button>
+    <div class="switch">
+      <button id="vKanban" class="on">🗂️ Tablero</button>
+      <button id="vLista">☰ Lista</button>
+    </div>
+    <div class="espacio"></div>
+    <div class="filtros">
+      <input type="text" id="fBuscar" placeholder="🔎 Buscar…">
+      <select id="fArea"><option value="">Todas las áreas</option></select>
+      <select id="fPrio">
+        <option value="">Toda prioridad</option>
+        <option value="alta">🔴 Alta</option>
+        <option value="media">🟡 Media</option>
+        <option value="baja">🟢 Baja</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Resumen por persona (también sirve de filtro) -->
+  <div class="equipo" id="equipo"></div>
+
+  <!-- Vista Kanban -->
+  <div class="kanban" id="kanban"></div>
+
+  <!-- Vista Lista -->
+  <div class="lista-t" id="listaWrap" style="display:none">
+    <table>
+      <thead><tr>
+        <th>Tarea</th><th>Área</th><th>Responsable</th><th>Prioridad</th><th>Estado</th><th>Fecha límite</th>
+      </tr></thead>
+      <tbody id="listaBody"></tbody>
+    </table>
+  </div>
+
+  <p class="vacio" id="pista" style="padding:14px;font-size:12px;color:var(--suave)">
+    🔄 El tablero es <b>compartido</b>: lo que cambie Lis, Patricia o Aleix se ve al instante para todo el equipo.
+    Arrastra las tarjetas entre columnas para cambiar su estado.
+  </p>
+</div>
+
+<!-- Panel crear/editar -->
+<div class="fondo" id="fondo"></div>
+<aside class="lateral" id="lateral">
+  <div class="lat-head">
+    <h2 id="latTit">Nueva tarea</h2>
+    <span class="x" id="latX">✕</span>
+  </div>
+  <div class="lat-body">
+    <input type="hidden" id="tId">
+    <label>Tarea *</label>
+    <input type="text" id="tTitulo" placeholder="Ej. Preparar post feria Matelec">
+
+    <label>Descripción / detalles</label>
+    <textarea id="tDesc" rows="4" maxlength="2000" placeholder="Qué hay que hacer, enlaces, materiales…"></textarea>
+    <div class="contador"><span id="cntDesc">0</span>/2000</div>
+
+    <div class="fila2">
+      <div>
+        <label>Responsable</label>
+        <select id="tResp"></select>
+      </div>
+      <div>
+        <label>Área</label>
+        <select id="tArea"></select>
+      </div>
+    </div>
+
+    <div class="fila2">
+      <div>
+        <label>Prioridad</label>
+        <select id="tPrio">
+          <option value="alta">🔴 Alta</option>
+          <option value="media" selected>🟡 Media</option>
+          <option value="baja">🟢 Baja</option>
+        </select>
+      </div>
+      <div>
+        <label>Estado</label>
+        <select id="tEstado"></select>
+      </div>
+    </div>
+
+    <label>Fecha límite</label>
+    <input type="date" id="tFecha">
+
+    <label>Enlace (opcional)</label>
+    <input type="text" id="tLink" placeholder="https://… Drive, borrador, referencia">
+  </div>
+  <div class="lat-foot">
+    <button class="btn btn-pri" id="latGuardar" style="flex:1">Guardar</button>
+    <button class="btn btn-sec" id="latBorrar" style="display:none">Eliminar</button>
+  </div>
+</aside>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var CLAVE = 'ingesco_tareas_v1';
+  var API_URL = 'https://asistente-ingesco.aleixcr9.workers.dev/';   // mismo Worker que XIELA / calendario
+  var nube = true, syncTimer = null;
+
+  // ---------- Equipo ----------
+  var PERSONAS = [
+    {id:'lis',      nom:'Lis Gil',           ini:'LG', color:'#d6336c'},
+    {id:'patricia', nom:'Patricia Martínez', ini:'PM', color:'#0a66c2'},
+    {id:'aleix',    nom:'Aleix Ruiz',        ini:'AR', color:'#2fa36b'},
+    {id:'equipo',   nom:'Equipo / sin asignar', ini:'··', color:'#6a7894'}
+  ];
+  function persona(id){ for(var i=0;i<PERSONAS.length;i++){ if(PERSONAS[i].id===id) return PERSONAS[i]; } return PERSONAS[PERSONAS.length-1]; }
+
+  // ---------- Áreas ----------
+  var AREAS = [
+    {id:'redes',    nom:'Redes sociales',    color:'#0a66c2'},
+    {id:'web',      nom:'Web / Blog',        color:'#2fa36b'},
+    {id:'diseno',   nom:'Diseño',            color:'#d6336c'},
+    {id:'email',    nom:'Email / Newsletter',color:'#7c53c3'},
+    {id:'seo',      nom:'SEO / SEM',         color:'#e0a326'},
+    {id:'eventos',  nom:'Eventos / Ferias',  color:'#c0562b'},
+    {id:'crm',      nom:'Comercial / CRM',   color:'#0e9aa7'},
+    {id:'contenido',nom:'Contenido / IA',    color:'#475569'},
+    {id:'otro',     nom:'Otro',              color:'#6a7894'}
+  ];
+  function area(id){ for(var i=0;i<AREAS.length;i++){ if(AREAS[i].id===id) return AREAS[i]; } return AREAS[AREAS.length-1]; }
+
+  // ---------- Estados / columnas ----------
+  var ESTADOS = [
+    {id:'pendiente', nom:'Por hacer',    color:'#6a7894', badge:'#eef2f8|#516079'},
+    {id:'curso',     nom:'En curso',     color:'#1f5f9b', badge:'#e2edf8|#1f5f9b'},
+    {id:'revision',  nom:'En revisión',  color:'#e0a326', badge:'#fdf1d6|#8a6415'},
+    {id:'hecho',     nom:'Hecho',        color:'#2fa36b', badge:'#e5f3ec|#227a4e'}
+  ];
+  function estado(id){ for(var i=0;i<ESTADOS.length;i++){ if(ESTADOS[i].id===id) return ESTADOS[i]; } return ESTADOS[0]; }
+
+  // ---------- Datos ----------
+  var tareas = [];
+  function cargar(){ try{ tareas = JSON.parse(localStorage.getItem(CLAVE)) || []; }catch(e){ tareas = []; } }
+  var avisado = false;
+  function avisoStorage(){
+    if(avisado) return; avisado = true;
+    alert('⚠️ Este navegador no permite guardar de forma permanente.\n\nÁbrelo desde la web publicada para que se guarde y se comparta con el equipo.');
+  }
+  function guardar(){
+    try{ localStorage.setItem(CLAVE, JSON.stringify(tareas)); }catch(e){ avisoStorage(); }
+    sincronizarNube();
+  }
+  function nuevoId(){ return 't' + Date.now() + Math.floor(Math.random()*1000); }
+
+  // ---------- Nube compartida (Cloudflare KV) ----------
+  function sincronizarNube(inmediato){
+    if(!nube) return;
+    if(syncTimer){ clearTimeout(syncTimer); syncTimer=null; }
+    var enviar = function(){
+      fetch(API_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ accion:'tareas_save', tareas:tareas }) })
+        .then(function(r){ return r.json(); })
+        .then(function(j){ if(j && j.sinKV){ nube=false; } })
+        .catch(function(){});
+    };
+    if(inmediato){ enviar(); } else { syncTimer = setTimeout(enviar, 800); }
+  }
+  function cargarNube(){
+    fetch(API_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ accion:'tareas_load' }) })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if(!j || j.sinKV){ nube=false; return; }
+        if(j.data === null){ if(tareas && tareas.length) sincronizarNube(true); return; }
+        tareas = Array.isArray(j.data.tareas) ? j.data.tareas : [];
+        try{ localStorage.setItem(CLAVE, JSON.stringify(tareas)); }catch(e){}
+        pintar();
+      })
+      .catch(function(){ nube=false; });
+  }
+
+  // ---------- Fechas ----------
+  function hoyISO(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+  function fmtFecha(iso){
+    if(!iso) return '';
+    var p = iso.split('-'); if(p.length!==3) return iso;
+    return p[2]+'/'+p[1]+'/'+p[0].slice(2);
+  }
+  function estadoFecha(iso, est){
+    if(!iso || est==='hecho') return '';
+    var hoy = hoyISO();
+    if(iso < hoy) return 'vence';
+    // dentro de 3 días
+    var d1 = new Date(iso), d0 = new Date(hoy);
+    var dif = (d1 - d0) / 86400000;
+    if(dif <= 3) return 'pronto';
+    return '';
+  }
+
+  function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // ---------- Rellenar selects ----------
+  $('tResp').innerHTML  = PERSONAS.map(function(p){ return '<option value="'+p.id+'">'+esc(p.nom)+'</option>'; }).join('');
+  $('tArea').innerHTML  = AREAS.map(function(a){ return '<option value="'+a.id+'">'+esc(a.nom)+'</option>'; }).join('');
+  $('tEstado').innerHTML= ESTADOS.map(function(e){ return '<option value="'+e.id+'">'+esc(e.nom)+'</option>'; }).join('');
+  $('fArea').innerHTML  = '<option value="">Todas las áreas</option>' +
+    AREAS.map(function(a){ return '<option value="'+a.id+'">'+esc(a.nom)+'</option>'; }).join('');
+
+  // ---------- Filtros ----------
+  var fPersona = '';   // filtro por persona (chips de equipo)
+  function pasaFiltro(t){
+    if(fPersona && (t.resp||'equipo')!==fPersona) return false;
+    var fa = $('fArea').value, fp = $('fPrio').value, fb = $('fBuscar').value.trim().toLowerCase();
+    if(fa && (t.area||'otro')!==fa) return false;
+    if(fp && (t.prio||'media')!==fp) return false;
+    if(fb){
+      var txt = ((t.titulo||'')+' '+(t.desc||'')).toLowerCase();
+      if(txt.indexOf(fb)<0) return false;
+    }
+    return true;
+  }
+
+  // ---------- Resumen equipo ----------
+  function pintarEquipo(){
+    var cuenta = {};
+    tareas.forEach(function(t){
+      if(t.estado==='hecho') return;                 // pendientes reales
+      var r = t.resp||'equipo'; cuenta[r]=(cuenta[r]||0)+1;
+    });
+    $('equipo').innerHTML = PERSONAS.map(function(p){
+      var sel = fPersona===p.id ? ' sel' : '';
+      return '<div class="p'+sel+'" data-id="'+p.id+'">'
+        + '<span class="avatar" style="background:'+p.color+'">'+p.ini+'</span>'
+        + '<b>'+esc(p.nom)+'</b>'
+        + '<span class="num">'+(cuenta[p.id]||0)+'</span></div>';
+    }).join('');
+  }
+  $('equipo').addEventListener('click', function(e){
+    var chip = e.target.closest('.p'); if(!chip) return;
+    var id = chip.dataset.id;
+    fPersona = (fPersona===id) ? '' : id;   // clic de nuevo = quitar filtro
+    pintar();
+  });
+
+  // ---------- Pintar ----------
+  var vista = 'kanban';
+  try{ vista = localStorage.getItem('tareas_vista') || 'kanban'; }catch(e){}
+
+  function tarjetaHTML(t){
+    var a = area(t.area), p = persona(t.resp||'equipo');
+    var ef = estadoFecha(t.fecha, t.estado);
+    return '<div class="tarjeta-t" draggable="true" data-id="'+t.id+'" style="border-left-color:'+a.color+'">'
+      + '<div class="top">'
+      +   '<span class="chip-area" style="background:'+a.color+'">'+esc(a.nom)+'</span>'
+      +   '<span class="chip-prio prio '+(t.prio||'media')+'">'+(t.prio||'media')+'</span>'
+      + '</div>'
+      + '<div class="tit">'+esc(t.titulo)+'</div>'
+      + (t.desc?'<div class="desc">'+esc(t.desc)+'</div>':'')
+      + '<div class="pie">'
+      +   '<span class="avatar-sm" style="background:'+p.color+'" title="'+esc(p.nom)+'">'+p.ini+'</span>'
+      +   (t.fecha?'<span class="fecha '+ef+'">📅 '+fmtFecha(t.fecha)+'</span>':'')
+      + '</div></div>';
+  }
+
+  function pintarKanban(){
+    var lista = tareas.filter(pasaFiltro);
+    $('kanban').innerHTML = ESTADOS.map(function(e){
+      var items = lista.filter(function(t){ return (t.estado||'pendiente')===e.id; })
+        .sort(function(a,b){ var w={alta:0,media:1,baja:2}; var d=(w[a.prio]==null?1:w[a.prio])-(w[b.prio]==null?1:w[b.prio]); if(d) return d; return (b.creada||0)-(a.creada||0); });
+      return '<div class="col" data-estado="'+e.id+'">'
+        + '<div class="col-head"><span class="punto" style="background:'+e.color+'"></span>'
+        +   '<h3>'+esc(e.nom)+'</h3><span class="c">'+items.length+'</span></div>'
+        + items.map(tarjetaHTML).join('')
+        + '<button class="col-add" data-estado="'+e.id+'">+ Añadir</button>'
+        + '</div>';
+    }).join('');
+  }
+
+  function pintarLista(){
+    var lista = tareas.filter(pasaFiltro).slice().sort(function(a,b){
+      var oe = {pendiente:0,curso:1,revision:2,hecho:3};
+      var d = (oe[a.estado]==null?0:oe[a.estado]) - (oe[b.estado]==null?0:oe[b.estado]);
+      if(d) return d;
+      var w={alta:0,media:1,baja:2}; return (w[a.prio]==null?1:w[a.prio])-(w[b.prio]==null?1:w[b.prio]);
+    });
+    if(!lista.length){ $('listaBody').innerHTML = '<tr><td colspan="6" class="vacio">No hay tareas con estos filtros.</td></tr>'; return; }
+    $('listaBody').innerHTML = lista.map(function(t){
+      var a=area(t.area), p=persona(t.resp||'equipo'), e=estado(t.estado);
+      var bg=e.badge.split('|');
+      var ef=estadoFecha(t.fecha,t.estado);
+      return '<tr data-id="'+t.id+'">'
+        + '<td class="celda-tit">'+esc(t.titulo)+'</td>'
+        + '<td><span class="chip-area" style="background:'+a.color+'">'+esc(a.nom)+'</span></td>'
+        + '<td><span class="mini-resp"><span class="avatar-sm" style="background:'+p.color+'">'+p.ini+'</span>'+esc(p.nom)+'</span></td>'
+        + '<td><span class="chip-prio prio '+(t.prio||'media')+'">'+(t.prio||'media')+'</span></td>'
+        + '<td><span class="est-badge" style="background:'+bg[0]+';color:'+bg[1]+'">'+esc(e.nom)+'</span></td>'
+        + '<td>'+(t.fecha?'<span class="fecha '+ef+'" style="font-size:13px">'+fmtFecha(t.fecha)+'</span>':'—')+'</td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  function pintar(){
+    pintarEquipo();
+    if(vista==='kanban'){ $('kanban').style.display='grid'; $('listaWrap').style.display='none'; pintarKanban(); }
+    else { $('kanban').style.display='none'; $('listaWrap').style.display='block'; pintarLista(); }
+  }
+
+  // ---------- Vista ----------
+  function setVista(v){
+    vista = v;
+    try{ localStorage.setItem('tareas_vista', v); }catch(e){}
+    $('vKanban').classList.toggle('on', v==='kanban');
+    $('vLista').classList.toggle('on', v==='lista');
+    pintar();
+  }
+  $('vKanban').onclick = function(){ setVista('kanban'); };
+  $('vLista').onclick  = function(){ setVista('lista'); };
+
+  // ---------- Arrastrar y soltar ----------
+  var arrastrandoId = null;
+  $('kanban').addEventListener('dragstart', function(e){
+    var card = e.target.closest('.tarjeta-t'); if(!card) return;
+    arrastrandoId = card.dataset.id; card.classList.add('arrastrando');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  $('kanban').addEventListener('dragend', function(e){
+    var card = e.target.closest('.tarjeta-t'); if(card) card.classList.remove('arrastrando');
+    Array.prototype.forEach.call($('kanban').querySelectorAll('.col'), function(c){ c.classList.remove('drag'); });
+  });
+  $('kanban').addEventListener('dragover', function(e){
+    var col = e.target.closest('.col'); if(!col) return;
+    e.preventDefault(); e.dataTransfer.dropEffect='move';
+    Array.prototype.forEach.call($('kanban').querySelectorAll('.col'), function(c){ c.classList.toggle('drag', c===col); });
+  });
+  $('kanban').addEventListener('drop', function(e){
+    var col = e.target.closest('.col'); if(!col || !arrastrandoId) return;
+    e.preventDefault();
+    var nuevoEstado = col.dataset.estado;
+    for(var i=0;i<tareas.length;i++){ if(tareas[i].id===arrastrandoId){
+      if(tareas[i].estado!==nuevoEstado){ tareas[i].estado=nuevoEstado; guardar(); }
+      break;
+    } }
+    arrastrandoId = null; pintar();
+  });
+
+  // ---------- Panel crear/editar ----------
+  var editandoId = null;
+  function abrir(){ $('fondo').classList.add('on'); $('lateral').classList.add('on'); }
+  function cerrar(){ $('fondo').classList.remove('on'); $('lateral').classList.remove('on'); }
+
+  function nueva(estadoPre){
+    editandoId = null;
+    $('latTit').textContent = 'Nueva tarea';
+    $('tId').value=''; $('tTitulo').value=''; $('tDesc').value=''; $('tResp').value='equipo';
+    $('tArea').value='redes'; $('tPrio').value='media'; $('tEstado').value=estadoPre||'pendiente';
+    $('tFecha').value=''; $('tLink').value=''; $('cntDesc').textContent='0';
+    $('latBorrar').style.display='none';
+    abrir(); $('tTitulo').focus();
+  }
+  function editar(id){
+    var t = tareas.filter(function(x){return x.id===id;})[0]; if(!t) return;
+    editandoId = id;
+    $('latTit').textContent = 'Editar tarea';
+    $('tId').value=t.id; $('tTitulo').value=t.titulo||''; $('tDesc').value=t.desc||'';
+    $('tResp').value=t.resp||'equipo'; $('tArea').value=t.area||'otro'; $('tPrio').value=t.prio||'media';
+    $('tEstado').value=t.estado||'pendiente'; $('tFecha').value=t.fecha||''; $('tLink').value=t.link||'';
+    $('cntDesc').textContent=(t.desc||'').length;
+    $('latBorrar').style.display='block';
+    abrir();
+  }
+
+  $('latGuardar').onclick = function(){
+    var titulo = $('tTitulo').value.trim();
+    if(!titulo){ alert('Ponle un nombre a la tarea.'); $('tTitulo').focus(); return; }
+    var datos = {
+      titulo:titulo, desc:$('tDesc').value.trim(), resp:$('tResp').value, area:$('tArea').value,
+      prio:$('tPrio').value, estado:$('tEstado').value, fecha:$('tFecha').value, link:$('tLink').value.trim()
+    };
+    if(editandoId){
+      for(var i=0;i<tareas.length;i++){ if(tareas[i].id===editandoId){ datos.id=editandoId; datos.creada=tareas[i].creada||Date.now(); tareas[i]=datos; break; } }
+    } else {
+      datos.id=nuevoId(); datos.creada=Date.now(); tareas.push(datos);
+    }
+    guardar(); pintar(); cerrar();
+  };
+  $('latBorrar').onclick = function(){
+    if(!editandoId) return;
+    if(!confirm('¿Eliminar esta tarea?')) return;
+    tareas = tareas.filter(function(x){return x.id!==editandoId;});
+    guardar(); pintar(); cerrar();
+  };
+  $('latX').onclick = cerrar;
+  $('fondo').onclick = cerrar;
+  $('tDesc').addEventListener('input', function(){ $('cntDesc').textContent=this.value.length; });
+
+  // ---------- Clics (abrir tarjeta / añadir en columna / fila lista) ----------
+  $('kanban').addEventListener('click', function(e){
+    var add = e.target.closest('.col-add');
+    if(add){ nueva(add.dataset.estado); return; }
+    var card = e.target.closest('.tarjeta-t');
+    if(card){ editar(card.dataset.id); }
+  });
+  $('listaBody').addEventListener('click', function(e){
+    var tr = e.target.closest('tr[data-id]'); if(tr) editar(tr.dataset.id);
+  });
+
+  // ---------- Botones / filtros ----------
+  $('btnNueva').onclick = function(){ nueva('pendiente'); };
+  $('fArea').onchange = pintar;
+  $('fPrio').onchange = pintar;
+  $('fBuscar').addEventListener('input', pintar);
+
+  // ---------- Arranque ----------
+  cargar(); setVista(vista);   // caché local -> vista instantánea
+  cargarNube();                // tablero compartido de la nube
+})();
+</script>
+<script src="assets/widget.js?v=8"></script>
+</body>
+</html>
