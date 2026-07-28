@@ -79,6 +79,7 @@ $todos = @(
     @{ local = "datos\sage.js";              remoto = "datos/sage.js" },
     @{ local = "datos\directindustry.js";    remoto = "datos/directindustry.js" },
     @{ local = "datos\calendario-historico.js"; remoto = "datos/calendario-historico.js" },
+    @{ local = "datos\tareas-iniciales.js";  remoto = "datos/tareas-iniciales.js" },
     @{ local = "scripts\actualizar.ps1";         remoto = "scripts/actualizar.ps1" },
     @{ local = "scripts\subir-github.ps1";       remoto = "scripts/subir-github.ps1" },
     @{ local = "scripts\lib-google.ps1";         remoto = "scripts/lib-google.ps1" },
