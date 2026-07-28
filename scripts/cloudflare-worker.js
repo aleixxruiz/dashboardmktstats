@@ -146,6 +146,25 @@ export default {
         return new Response(JSON.stringify({ ok: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
       }
 
+      // ===== TABLERO DE TAREAS DE MARKETING (Cloudflare KV, clave 'tareas') =====
+      if (body && (body.accion === 'tareas_load' || body.accion === 'tareas_save')) {
+        if (!env.CALENDARIO) {
+          return new Response(JSON.stringify({ sinKV: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+        }
+        const KEY = 'tareas';
+        if (body.accion === 'tareas_load') {
+          const raw = await env.CALENDARIO.get(KEY);
+          return new Response(JSON.stringify({ ok: true, data: raw ? JSON.parse(raw) : null }),
+            { headers: { ...cors, 'Content-Type': 'application/json' } });
+        }
+        const guardado = {
+          tareas:  Array.isArray(body.tareas) ? body.tareas : [],
+          updated: Date.now()
+        };
+        await env.CALENDARIO.put(KEY, JSON.stringify(guardado));
+        return new Response(JSON.stringify({ ok: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+      }
+
       // ===== ESTRATEGIA DE CONTENIDO -> Claude Opus 4.8 (Gemini de reserva) =====
       if (body && body.accion === 'estrategia') {
         const datosE     = body.datos || {};
