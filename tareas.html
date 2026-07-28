@@ -141,6 +141,7 @@
 
   <div class="barra">
     <button class="btn btn-pri" id="btnNueva">+ Nueva tarea</button>
+    <button class="btn btn-sec" id="btnSeed" title="Cargar las tareas activas del tablero de Teams">⭳ Cargar tareas (Teams)</button>
     <div class="switch">
       <button id="vKanban" class="on">🗂️ Tablero</button>
       <button id="vLista">☰ Lista</button>
@@ -539,6 +540,20 @@
     var tr = e.target.closest('tr[data-id]'); if(tr) editar(tr.dataset.id);
   });
 
+  // ---------- Cargar tareas iniciales (del tablero de Teams) ----------
+  $('btnSeed').onclick = function(){
+    var seed = window.TAREAS_INICIALES || [];
+    if(!seed.length){ alert('No encuentro las tareas iniciales. Recarga la página (Ctrl+F5).'); return; }
+    var existentes = {}; tareas.forEach(function(t){ existentes[t.id]=1; });
+    var nuevas = seed.filter(function(t){ return !existentes[t.id]; });
+    if(!nuevas.length){ alert('Las tareas de Teams ya estaban cargadas. ✅'); return; }
+    if(!confirm('Se añadirán '+nuevas.length+' tareas activas del tablero de Teams.\n(No se duplican las que ya estén.)\n\n¿Continuar?')) return;
+    var t0 = Date.now();
+    nuevas.forEach(function(t,i){ var c={}; for(var k in t) c[k]=t[k]; c.creada = t0 - i; tareas.push(c); });
+    guardar(); pintar();
+    alert('✅ Añadidas '+nuevas.length+' tareas del tablero de Teams.');
+  };
+
   // ---------- Botones / filtros ----------
   $('btnNueva').onclick = function(){ nueva('pendiente'); };
   $('fArea').onchange = pintar;
@@ -550,6 +565,7 @@
   cargarNube();                // tablero compartido de la nube
 })();
 </script>
+<script src="datos/tareas-iniciales.js"></script>
 <script src="assets/widget.js?v=8"></script>
 </body>
 </html>
