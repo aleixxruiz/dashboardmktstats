@@ -51,6 +51,7 @@ $todos = @(
     @{ local = "assets\cert-plantilla.png";  remoto = "assets/cert-plantilla.png" },
     @{ local = "calendario.html";            remoto = "calendario.html" },
     @{ local = "nal3.html";                  remoto = "nal3.html" },
+    @{ local = "tareas.html";                remoto = "tareas.html" },
     @{ local = "assets\logo-ingesco.png";    remoto = "assets/logo-ingesco.png" },
     @{ local = "assets\logo-clarity.png";    remoto = "assets/logo-clarity.png" },
     @{ local = "assets\logo-analytics.png";  remoto = "assets/logo-analytics.png" },
