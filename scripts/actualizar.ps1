@@ -238,7 +238,7 @@ if ((Test-Path $scriptSubir) -and $ghCfg -and $ghCfg.token -and $ghCfg.token -ne
 # --- Subir los datos nuevos al dominio propio por FTP (estudios.ingesco.com), si esta configurado ---
 $scriptFtp = Join-Path $PSScriptRoot "subir-ftp.ps1"
 $ftpCfg = $config.ftp
-if ((Test-Path $scriptFtp) -and $ftpCfg -and $ftpCfg.host -and $ftpCfg.host -notlike "PEGA_*") {
+if ((Test-Path $scriptFtp) -and $ftpCfg -and $ftpCfg.host -and $ftpCfg.host -notlike "PEGA_*" -and $ftpCfg.password -and $ftpCfg.password -notlike "PEGA_*") {
     Write-Host "Subiendo datos al servidor FTP..." -ForegroundColor Gray
     try { & $scriptFtp -SoloDatos -Silencioso } catch { Write-Host ("(aviso) FTP fallo: "+$_.Exception.Message) -ForegroundColor DarkYellow; Escribir-Log ("AVISO FTP fallo: "+$_.Exception.Message) }
 }
