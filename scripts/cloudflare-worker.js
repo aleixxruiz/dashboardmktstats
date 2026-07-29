@@ -57,7 +57,10 @@ async function geminiChat(apiKey, system, prompt, maxTokens) {
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
-    const permitido = origin.indexOf('aleixxruiz.github.io') >= 0 ? origin : 'https://aleixxruiz.github.io';
+    // Dominios permitidos (CORS). Anade aqui cualquier dominio nuevo donde se aloje el portal.
+    const DOMINIOS_OK = ['aleixxruiz.github.io', 'estudios.ingesco.com'];
+    const origenPermitido = DOMINIOS_OK.some(function(d){ return origin.indexOf(d) >= 0; });
+    const permitido = origenPermitido ? origin : 'https://aleixxruiz.github.io';
     const cors = {
       'Access-Control-Allow-Origin': permitido,
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
