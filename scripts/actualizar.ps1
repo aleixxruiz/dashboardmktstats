@@ -235,6 +235,14 @@ if ((Test-Path $scriptSubir) -and $ghCfg -and $ghCfg.token -and $ghCfg.token -ne
     & $scriptSubir -SoloDatos -Silencioso
 }
 
+# --- Subir los datos nuevos al dominio propio por FTP (estudios.ingesco.com), si esta configurado ---
+$scriptFtp = Join-Path $PSScriptRoot "subir-ftp.ps1"
+$ftpCfg = $config.ftp
+if ((Test-Path $scriptFtp) -and $ftpCfg -and $ftpCfg.host -and $ftpCfg.host -notlike "PEGA_*") {
+    Write-Host "Subiendo datos al servidor FTP..." -ForegroundColor Gray
+    try { & $scriptFtp -SoloDatos -Silencioso } catch { Write-Host ("(aviso) FTP fallo: "+$_.Exception.Message) -ForegroundColor DarkYellow; Escribir-Log ("AVISO FTP fallo: "+$_.Exception.Message) }
+}
+
 Write-Host ""
 Write-Host "DATOS ACTUALIZADOS CORRECTAMENTE" -ForegroundColor Green
 Write-Host ("Sesiones reales (3 dias): {0}  |  Usuarios: {1}  |  Bots filtrados: {2}" -f $sesiones, $usuarios, $bots)
