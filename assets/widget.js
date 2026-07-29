@@ -14,9 +14,9 @@
 
   // Cargar TODOS los datos del panel (en cualquier página) para que el asistente
   // tenga la foto completa de todas las fuentes, no solo de la página actual.
-  ['datos/datos.js','datos/datos-ia.js','datos/ga.js','datos/gsc.js','datos/leads.js',
-   'datos/sage.js','datos/directindustry.js','datos/citas-ia.js','datos/indexacion.js',
-   'datos/historico.js','datos/historico-ia.js'].forEach(function(src){
+  ['https://aleixxruiz.github.io/dashboardmktstats/datos/datos.js','https://aleixxruiz.github.io/dashboardmktstats/datos/datos-ia.js','https://aleixxruiz.github.io/dashboardmktstats/datos/ga.js','https://aleixxruiz.github.io/dashboardmktstats/datos/gsc.js','https://aleixxruiz.github.io/dashboardmktstats/datos/leads.js',
+   'https://aleixxruiz.github.io/dashboardmktstats/datos/sage.js','https://aleixxruiz.github.io/dashboardmktstats/datos/directindustry.js','https://aleixxruiz.github.io/dashboardmktstats/datos/citas-ia.js','https://aleixxruiz.github.io/dashboardmktstats/datos/indexacion.js',
+   'https://aleixxruiz.github.io/dashboardmktstats/datos/historico.js','https://aleixxruiz.github.io/dashboardmktstats/datos/historico-ia.js'].forEach(function(src){
     if([].some.call(document.scripts, function(s){ return s.src && s.src.indexOf(src) >= 0; })) return;
     var sc = document.createElement('script'); sc.src = src; sc.async = true; sc.onerror = function(){};
     document.head.appendChild(sc);
