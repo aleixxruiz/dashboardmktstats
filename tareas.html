@@ -59,10 +59,14 @@
   @media(max-width:620px){.kanban{grid-template-columns:1fr}}
   .col{background:#e9eef6;border:1px solid var(--borde);border-radius:14px;padding:10px;min-height:120px;transition:.12s}
   .col.drag{background:#dde7f6;outline:2px dashed var(--azul);outline-offset:-4px}
-  .col-head{display:flex;align-items:center;gap:8px;padding:4px 6px 10px}
+  .col-head{display:flex;align-items:center;gap:8px;padding:4px 6px 10px;cursor:pointer;user-select:none;border-radius:8px}
+  .col-head:hover{background:rgba(19,41,75,.05)}
   .col-head .punto{width:11px;height:11px;border-radius:50%;flex-shrink:0}
   .col-head h3{font-size:13.5px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.4px}
   .col-head .c{margin-left:auto;background:#fff;color:var(--suave);border-radius:999px;padding:1px 9px;font-size:12px;font-weight:800;border:1px solid var(--borde)}
+  .col-head .chev{font-size:12px;color:var(--suave);transition:transform .15s;width:14px;text-align:center}
+  .col.plegada .col-head .chev{transform:rotate(-90deg)}
+  .col.plegada .tarjeta-t,.col.plegada .col-add{display:none}
   .col-add{width:100%;border:1px dashed var(--borde);background:transparent;color:var(--suave);border-radius:9px;
     padding:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:2px}
   .col-add:hover{background:#fff;color:var(--navy);border-color:var(--azul)}
@@ -146,6 +150,7 @@
       <button id="vKanban" class="on">🗂️ Tablero</button>
       <button id="vLista">☰ Lista</button>
     </div>
+    <button class="btn btn-sec" id="btnPlegar" title="Plegar o desplegar todas las columnas">⇕ Plegar todo</button>
     <div class="espacio"></div>
     <div class="filtros">
       <input type="text" id="fBuscar" placeholder="🔎 Buscar…">
@@ -382,6 +387,11 @@
   var vista = 'kanban';
   try{ vista = localStorage.getItem('tareas_vista') || 'kanban'; }catch(e){}
 
+  // Columnas plegadas (por estado), recordado en este navegador
+  var colapsadas = {};
+  try{ colapsadas = JSON.parse(localStorage.getItem('tareas_colapsadas')) || {}; }catch(e){ colapsadas = {}; }
+  function guardarColapsadas(){ try{ localStorage.setItem('tareas_colapsadas', JSON.stringify(colapsadas)); }catch(e){} }
+
   function tarjetaHTML(t){
     var a = area(t.area), p = persona(t.resp||'equipo');
     var ef = estadoFecha(t.fecha, t.estado);
@@ -403,9 +413,11 @@
     $('kanban').innerHTML = ESTADOS.map(function(e){
       var items = lista.filter(function(t){ return (t.estado||'pendiente')===e.id; })
         .sort(function(a,b){ var w={alta:0,media:1,baja:2}; var d=(w[a.prio]==null?1:w[a.prio])-(w[b.prio]==null?1:w[b.prio]); if(d) return d; return (b.creada||0)-(a.creada||0); });
-      return '<div class="col" data-estado="'+e.id+'">'
+      var pleg = colapsadas[e.id] ? ' plegada' : '';
+      return '<div class="col'+pleg+'" data-estado="'+e.id+'">'
         + '<div class="col-head"><span class="punto" style="background:'+e.color+'"></span>'
-        +   '<h3>'+esc(e.nom)+'</h3><span class="c">'+items.length+'</span></div>'
+        +   '<h3>'+esc(e.nom)+'</h3><span class="c">'+items.length+'</span>'
+        +   '<span class="chev">▾</span></div>'
         + items.map(tarjetaHTML).join('')
         + '<button class="col-add" data-estado="'+e.id+'">+ Añadir</button>'
         + '</div>';
@@ -451,6 +463,15 @@
   }
   $('vKanban').onclick = function(){ setVista('kanban'); };
   $('vLista').onclick  = function(){ setVista('lista'); };
+
+  // Plegar / desplegar todas las columnas
+  $('btnPlegar').onclick = function(){
+    var algunaAbierta = ESTADOS.some(function(e){ return !colapsadas[e.id]; });
+    ESTADOS.forEach(function(e){ colapsadas[e.id] = algunaAbierta; });   // si hay alguna abierta -> plegar todas; si no -> abrir todas
+    guardarColapsadas();
+    $('btnPlegar').textContent = algunaAbierta ? '⇕ Desplegar todo' : '⇕ Plegar todo';
+    if(vista==='kanban') pintarKanban();
+  };
 
   // ---------- Arrastrar y soltar ----------
   var arrastrandoId = null;
@@ -531,6 +552,13 @@
 
   // ---------- Clics (abrir tarjeta / añadir en columna / fila lista) ----------
   $('kanban').addEventListener('click', function(e){
+    var head = e.target.closest('.col-head');
+    if(head){
+      var col = head.closest('.col'); var est = col.dataset.estado;
+      colapsadas[est] = !colapsadas[est]; guardarColapsadas();
+      col.classList.toggle('plegada', !!colapsadas[est]);
+      return;
+    }
     var add = e.target.closest('.col-add');
     if(add){ nueva(add.dataset.estado); return; }
     var card = e.target.closest('.tarjeta-t');
