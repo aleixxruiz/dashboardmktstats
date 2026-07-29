@@ -31,8 +31,8 @@ function Log($t){ Add-Content -Path $RutaLog -Value ((Get-Date).ToString("dd/MM/
 if (-not (Test-Path $RutaConfig)) { Write-Host "No encuentro config.json" -ForegroundColor Red; return }
 $cfg = Get-Content $RutaConfig -Raw | ConvertFrom-Json
 $ftp = $cfg.ftp
-if (-not $ftp -or [string]::IsNullOrWhiteSpace($ftp.host) -or $ftp.host -like "PEGA_*") {
-    Write-Host "FTP no configurado todavia (bloque 'ftp' en config.json). Omito la subida FTP." -ForegroundColor DarkYellow
+if (-not $ftp -or [string]::IsNullOrWhiteSpace($ftp.host) -or $ftp.host -like "PEGA_*" -or [string]::IsNullOrWhiteSpace($ftp.password) -or $ftp.password -like "PEGA_*") {
+    Write-Host "FTP no configurado del todo (falta host o contrasena en config.json). Omito la subida FTP." -ForegroundColor DarkYellow
     return
 }
 
