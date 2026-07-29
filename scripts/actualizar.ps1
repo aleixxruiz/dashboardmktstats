@@ -235,10 +235,13 @@ if ((Test-Path $scriptSubir) -and $ghCfg -and $ghCfg.token -and $ghCfg.token -ne
     & $scriptSubir -SoloDatos -Silencioso
 }
 
-# --- Subir los datos nuevos al dominio propio por FTP (estudios.ingesco.com), si esta configurado ---
+# --- Subir los datos nuevos al dominio propio por FTP (estudios.ingesco.com) ---
+# DESACTIVADO: el portal de estudios.ingesco.com lee los datos directamente de
+# GitHub (script src absoluto), asi que NO hace falta subirlos por FTP. Este paso
+# solo se ejecuta si en config.json el bloque ftp tiene "activo": true.
 $scriptFtp = Join-Path $PSScriptRoot "subir-ftp.ps1"
 $ftpCfg = $config.ftp
-if ((Test-Path $scriptFtp) -and $ftpCfg -and $ftpCfg.host -and $ftpCfg.host -notlike "PEGA_*" -and $ftpCfg.password -and $ftpCfg.password -notlike "PEGA_*") {
+if ((Test-Path $scriptFtp) -and $ftpCfg -and $ftpCfg.activo -eq $true -and $ftpCfg.host -and $ftpCfg.host -notlike "PEGA_*" -and $ftpCfg.password -and $ftpCfg.password -notlike "PEGA_*") {
     Write-Host "Subiendo datos al servidor FTP..." -ForegroundColor Gray
     try { & $scriptFtp -SoloDatos -Silencioso } catch { Write-Host ("(aviso) FTP fallo: "+$_.Exception.Message) -ForegroundColor DarkYellow; Escribir-Log ("AVISO FTP fallo: "+$_.Exception.Message) }
 }
