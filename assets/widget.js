@@ -28,6 +28,11 @@
    + 'background:#DEDC00;color:#1e2b50;border:none;cursor:pointer;font-size:32px;font-weight:800;font-family:Segoe UI,sans-serif;'
    + 'box-shadow:0 8px 24px rgba(30,43,80,.30);display:flex;align-items:center;justify-content:center;transition:.15s}'
    + '.asis-btn:hover{transform:scale(1.07)}'
+   + '.asis-portal{position:fixed;right:90px;bottom:22px;z-index:99999;width:58px;height:58px;border-radius:50%;'
+   + 'background:#1e2b50;color:#fff;border:2px solid #DEDC00;cursor:pointer;font-size:26px;text-decoration:none;'
+   + 'box-shadow:0 8px 24px rgba(30,43,80,.30);display:flex;align-items:center;justify-content:center;transition:.15s}'
+   + '.asis-portal:hover{transform:scale(1.07)}'
+   + '@media(max-width:520px){.asis-portal{right:88px}}'
    + '.asis-panel{position:fixed;right:22px;bottom:90px;z-index:99999;width:392px;max-width:calc(100vw - 32px);'
    + 'background:#f3f5cf;color:#1e2b50;border:1px solid #cdd06a;border-radius:16px;box-shadow:0 16px 50px rgba(30,43,80,.30);'
    + 'font-family:Segoe UI,system-ui,sans-serif;overflow:hidden;display:none}'
@@ -59,6 +64,14 @@
   // ---- HTML ----
   var btn = document.createElement('button');
   btn.className = 'asis-btn'; btn.innerHTML = '?'; btn.title = 'XIELA IA'; document.body.appendChild(btn);
+
+  // Acceso directo al Portal de Marketing (herramienta externa del departamento)
+  var portal = document.createElement('a');
+  portal.className = 'asis-portal';
+  portal.href = 'https://dena-fss.ardicloud.com:8443/portal_marqueting.html';
+  portal.target = '_blank'; portal.rel = 'noopener';
+  portal.title = 'Portal de Marketing'; portal.innerHTML = '🧰';
+  document.body.appendChild(portal);
 
   var panel = document.createElement('div');
   panel.className = 'asis-panel';
