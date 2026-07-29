@@ -70,7 +70,7 @@
   portal.className = 'asis-portal';
   portal.href = 'https://dena-fss.ardicloud.com:8443/portal_marqueting.html';
   portal.target = '_blank'; portal.rel = 'noopener';
-  portal.title = 'Portal de Marketing'; portal.innerHTML = '🧰';
+  portal.title = 'Portal de Marketing'; portal.innerHTML = '⚡';
   document.body.appendChild(portal);
 
   var panel = document.createElement('div');
