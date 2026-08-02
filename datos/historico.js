@@ -1,1 +1,1 @@
-window.CLARITY_HISTORICO = [{"fecha":"2026-08-01","sesiones":2455,"usuarios":4356,"bots":1492}];
+window.CLARITY_HISTORICO = [{"fecha":"2026-08-02","sesiones":1832,"usuarios":3763,"bots":1533}];
