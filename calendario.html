@@ -201,6 +201,7 @@
     </div>
     <button class="btn btn-hoy" id="btnHoy">Hoy</button>
     <button class="btn btn-pri" id="btnNuevo">+ Nueva publicación</button>
+    <button class="btn btn-sec" id="btnComp">🏢 Competidores</button>
     <button class="btn btn-ideas" id="btnIdeas">💡 Banco de ideas</button>
     <button class="btn btn-est" id="btnEstrategia">✨ Estrategia con IA</button>
     <div class="espacio"></div>
@@ -318,6 +319,48 @@
       <button class="btn btn-est" id="estGenerar" style="width:100%">✨ Generar propuestas</button>
     </div>
     <div id="estResultado"></div>
+  </div>
+</div>
+
+<!-- Competidores -->
+<div class="modal-fondo" id="compFondo"></div>
+<div class="modal" id="compModal">
+  <div class="modal-head">
+    <h2>🏢 Competidores</h2>
+    <span class="x" id="compX">✕</span>
+  </div>
+  <div class="modal-body">
+    <div class="idea-form">
+      <input type="hidden" id="cId">
+      <div class="r1">
+        <div>
+          <label>Nombre *</label>
+          <input type="text" id="cNombre" placeholder="Ej. Aplicaciones Tecnológicas (AT3W)">
+        </div>
+        <div>
+          <label>Página web</label>
+          <input type="text" id="cWeb" placeholder="www.competidor.com">
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <label>LinkedIn</label>
+        <input type="text" id="cLinkedin" placeholder="linkedin.com/company/...">
+      </div>
+      <div style="margin-top:10px">
+        <label>Notas (opcional)</label>
+        <textarea id="cNotas" rows="2" placeholder="Productos, mercados, posicionamiento, observaciones..."></textarea>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-pri" id="cGuardar">Añadir competidor</button>
+        <button class="btn btn-sec" id="cCancelar" style="display:none">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="idea-filtro">
+      <h3>Competidores guardados</h3>
+      <span class="cont" id="cCont">0 competidores</span>
+    </div>
+    <div class="idea-lista" id="cLista"></div>
   </div>
 </div>
 
@@ -457,7 +500,7 @@
     if(syncTimer){ clearTimeout(syncTimer); syncTimer=null; }
     var enviar = function(){
       fetch(CAL_URL, { method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ accion:'cal_save', pubs:pubs, ideas:ideas }) })
+        body: JSON.stringify({ accion:'cal_save', pubs:pubs, ideas:ideas, competidores:competidores }) })
         .then(function(r){ return r.json(); })
         .then(function(j){ if(j && j.sinKV){ nube=false; } })
         .catch(function(){});
@@ -472,15 +515,17 @@
       .then(function(j){
         if(!j || j.sinKV){ nube=false; return; }                 // el Worker no tiene KV -> modo local
         if(j.data === null){                                     // nube vacía (primera vez)
-          if((pubs && pubs.length) || (ideas && ideas.length)) sincronizarNube(true);  // sembramos con lo local
+          if((pubs && pubs.length) || (ideas && ideas.length) || (competidores && competidores.length)) sincronizarNube(true);  // sembramos con lo local
           return;
         }
         pubs  = Array.isArray(j.data.pubs)  ? j.data.pubs  : [];
         ideas = Array.isArray(j.data.ideas) ? j.data.ideas : [];
+        competidores = Array.isArray(j.data.competidores) ? j.data.competidores : [];
         pubs.forEach(normaliza);
-        try{ localStorage.setItem(CLAVE, JSON.stringify(pubs)); localStorage.setItem(CLAVE_IDEAS, JSON.stringify(ideas)); }catch(e){}
+        try{ localStorage.setItem(CLAVE, JSON.stringify(pubs)); localStorage.setItem(CLAVE_IDEAS, JSON.stringify(ideas)); localStorage.setItem(CLAVE_COMP, JSON.stringify(competidores)); }catch(e){}
         pintar();
         if($('ideasModal') && $('ideasModal').classList.contains('on')) pintarIdeas();
+        if($('compModal') && $('compModal').classList.contains('on')) pintarComp();
       })
       .catch(function(){ nube=false; });                         // sin conexión -> modo local
   }
@@ -939,8 +984,80 @@
     alert('✅ Añadidas '+n+' ideas al Banco de ideas.');
   }
 
+  // ==========================================================
+  //  COMPETIDORES (compartido en la nube, junto al calendario)
+  // ==========================================================
+  var CLAVE_COMP = 'ingesco_competidores_v1';
+  var competidores = [];
+  function cargarComp(){ try{ competidores = JSON.parse(localStorage.getItem(CLAVE_COMP)) || []; }catch(e){ competidores = []; } }
+  function guardarComp(){
+    try{ localStorage.setItem(CLAVE_COMP, JSON.stringify(competidores)); }catch(e){ avisoStorage(); }
+    sincronizarNube();   // guarda también en la nube compartida
+  }
+  // Añade https:// si el usuario pone la URL "a pelo"
+  function normUrl(u){ u=(u||'').trim(); if(!u) return ''; if(!/^https?:\/\//i.test(u)) u='https://'+u; return u; }
+
+  var editandoComp = null;
+  function resetComp(){
+    editandoComp=null;
+    $('cId').value=''; $('cNombre').value=''; $('cWeb').value=''; $('cLinkedin').value=''; $('cNotas').value='';
+    $('cGuardar').textContent='Añadir competidor'; $('cCancelar').style.display='none';
+  }
+
+  function pintarComp(){
+    $('cCont').textContent = competidores.length + (competidores.length===1?' competidor':' competidores');
+    if(!competidores.length){ $('cLista').innerHTML='<div class="idea-vacio">Aún no hay competidores. Añade el primero arriba. 👆</div>'; return; }
+    var lst = competidores.slice().sort(function(a,b){ return (a.nombre||'').localeCompare(b.nombre||''); });
+    $('cLista').innerHTML = lst.map(function(c){
+      var enl = [];
+      if(c.web)      enl.push('<a href="'+esc(c.web)+'" target="_blank" rel="noopener" style="color:var(--azul);font-weight:700;font-size:12.5px">🌐 Web</a>');
+      if(c.linkedin) enl.push('<a href="'+esc(c.linkedin)+'" target="_blank" rel="noopener" style="color:#0a66c2;font-weight:700;font-size:12.5px">in LinkedIn</a>');
+      return '<div class="idea" style="border-left-color:#0a66c2" data-id="'+c.id+'">'
+        + '<div class="tit">'+esc(c.nombre)+'</div>'
+        + (enl.length?'<div class="redes" style="display:flex;gap:14px;margin-top:6px">'+enl.join('')+'</div>':'')
+        + (c.notas?'<div class="notas">'+esc(c.notas)+'</div>':'')
+        + '<div class="acc">'
+        +   '<button data-a="edit">✏️ Editar</button>'
+        +   '<button class="del" data-a="del">🗑 Eliminar</button>'
+        + '</div></div>';
+    }).join('');
+  }
+
+  $('cGuardar').onclick = function(){
+    var nombre = $('cNombre').value.trim();
+    if(!nombre){ alert('Escribe el nombre del competidor.'); $('cNombre').focus(); return; }
+    var datos = { nombre:nombre, web:normUrl($('cWeb').value), linkedin:normUrl($('cLinkedin').value), notas:$('cNotas').value.trim() };
+    if(editandoComp){
+      for(var i=0;i<competidores.length;i++){ if(competidores[i].id===editandoComp){ datos.id=editandoComp; competidores[i]=datos; break; } }
+    } else {
+      datos.id='c'+Date.now()+Math.floor(Math.random()*1000); competidores.push(datos);
+    }
+    guardarComp(); resetComp(); pintarComp();
+  };
+  $('cCancelar').onclick = resetComp;
+
+  $('cLista').addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-a]'); if(!btn) return;
+    var id = e.target.closest('.idea').dataset.id;
+    var c = competidores.filter(function(x){return x.id===id;})[0]; if(!c) return;
+    if(btn.dataset.a==='edit'){
+      editandoComp=id; $('cId').value=id; $('cNombre').value=c.nombre||''; $('cWeb').value=c.web||'';
+      $('cLinkedin').value=c.linkedin||''; $('cNotas').value=c.notas||'';
+      $('cGuardar').textContent='Guardar cambios'; $('cCancelar').style.display='inline-block'; $('cNombre').focus();
+    } else if(btn.dataset.a==='del'){
+      if(!confirm('¿Eliminar este competidor?')) return;
+      competidores = competidores.filter(function(x){return x.id!==id;}); guardarComp(); pintarComp();
+    }
+  });
+
+  function abrirComp(){ resetComp(); pintarComp(); $('compFondo').classList.add('on'); $('compModal').classList.add('on'); }
+  function cerrarComp(){ $('compFondo').classList.remove('on'); $('compModal').classList.remove('on'); }
+  $('btnComp').onclick = abrirComp;
+  $('compX').onclick = cerrarComp;
+  $('compFondo').onclick = cerrarComp;
+
   // ---------- Arranque ----------
-  cargar(); cargarIdeas(); pintar();   // 1º caché local -> vista instantánea
+  cargar(); cargarIdeas(); cargarComp(); pintar();   // 1º caché local -> vista instantánea
   cargarNube();                        // 2º calendario compartido de la nube (si está configurada)
 })();
 </script>
