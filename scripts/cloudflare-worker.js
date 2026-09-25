@@ -118,10 +118,14 @@ export default {
           return new Response(JSON.stringify({ ok: true, data: raw ? JSON.parse(raw) : null }),
             { headers: { ...cors, 'Content-Type': 'application/json' } });
         }
-        // cal_save: guarda el estado completo del calendario
+        // cal_save: guarda el estado del calendario. Fusiona con lo previo:
+        // si un cliente no envia un campo (version antigua), NO se pierde.
+        let prevCal = {};
+        try { const raw0 = await env.CALENDARIO.get(KEY); if (raw0) prevCal = JSON.parse(raw0); } catch (e) {}
         const guardado = {
-          pubs:  Array.isArray(body.pubs)  ? body.pubs  : [],
-          ideas: Array.isArray(body.ideas) ? body.ideas : [],
+          pubs:         Array.isArray(body.pubs)         ? body.pubs         : (prevCal.pubs || []),
+          ideas:        Array.isArray(body.ideas)        ? body.ideas        : (prevCal.ideas || []),
+          competidores: Array.isArray(body.competidores) ? body.competidores : (prevCal.competidores || []),
           updated: Date.now()
         };
         await env.CALENDARIO.put(KEY, JSON.stringify(guardado));
