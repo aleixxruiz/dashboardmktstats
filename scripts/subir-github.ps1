@@ -66,6 +66,7 @@ $todos = @(
     @{ local = "assets\PararrayosE.png";      remoto = "assets/PararrayosE.png" },
     @{ local = "assets\favicon.ico.png";     remoto = "assets/favicon.ico.png" },
     @{ local = "assets\widget.js";           remoto = "assets/widget.js" },
+    @{ local = "assets\frescura.js";         remoto = "assets/frescura.js" },
     @{ local = "assets\gate.js";              remoto = "assets/gate.js" },
     @{ local = "datos\datos.js";             remoto = "datos/datos.js" },
     @{ local = "datos\datos-ia.js";          remoto = "datos/datos-ia.js" },
