@@ -220,11 +220,14 @@ if (Test-Path $scriptCitas) {
     & $scriptCitas -Silencioso
 }
 
-# --- Inspeccion de indexacion (LENTA): solo en la nube y como mucho 1 vez/semana ---
+# --- Inspeccion de indexacion (LENTA): como mucho 1 vez cada 6 dias ---
+# El propio script lleva un candado de 6 dias, asi que aunque se llame a diario
+# solo inspecciona de verdad ~1 vez/semana. Se ejecuta donde corra la tarea
+# (PC local o nube) siempre que haya token de Google.
 $scriptIdx = Join-Path $PSScriptRoot "actualizar-indexacion.ps1"
-if ((Test-Path $scriptIdx) -and ($env:GITHUB_ACTIONS -eq 'true') -and $config.google_oauth -and $config.google_oauth.refresh_token) {
-    Write-Host "Comprobando indexacion (semanal)..." -ForegroundColor Gray
-    & $scriptIdx -Silencioso
+if ((Test-Path $scriptIdx) -and $config.google_oauth -and $config.google_oauth.refresh_token) {
+    Write-Host "Comprobando indexacion (max. 1 vez cada 6 dias)..." -ForegroundColor Gray
+    try { & $scriptIdx -Silencioso } catch { Write-Host ("(aviso) Indexacion fallo: "+$_.Exception.Message) -ForegroundColor DarkYellow; Escribir-Log ("AVISO Indexacion fallo: "+$_.Exception.Message) }
 }
 
 # --- Subir los datos nuevos a la web (GitHub Pages), si esta configurado ---
